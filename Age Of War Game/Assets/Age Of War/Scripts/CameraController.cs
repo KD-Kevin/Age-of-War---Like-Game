@@ -15,6 +15,11 @@ public class CameraController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        bool Left = Input.GetKey(KeyCode.A);
+        bool Right = Input.GetKey(KeyCode.D);
+        if (Left && !Right)
+        {
+
+        }
     }
 }
