@@ -19,7 +19,11 @@ public class CameraController : MonoBehaviour
         bool Right = Input.GetKey(KeyCode.D);
         if (Left && !Right)
         {
-
+            transform.position += Vector3.right * -MovementSpeed * Time.deltaTime;
+        }
+        else if (Right && !Left)
+        {
+            transform.position += Vector3.right * MovementSpeed * Time.deltaTime;
         }
     }
 }
