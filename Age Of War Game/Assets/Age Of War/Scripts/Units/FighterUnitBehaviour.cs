@@ -12,9 +12,12 @@ public class FighterUnitBehaviour : BaseUnitBehaviour
     [SerializeField]
     protected MeleeBox MeleeAttackObject;
 
-    public override void Initialize()
+    public override int GetAttackDamage()
     {
-        base.Initialize();
-        MeleeAttackObject.Damage = MeleeDamage;
+        int AttackDamage = MeleeDamage;
+
+        // Modifiers here
+
+        return AttackDamage;
     }
 }

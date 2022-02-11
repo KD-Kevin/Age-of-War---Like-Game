@@ -149,7 +149,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -204,7 +204,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 2
   m_Sprite: {fileID: 21300000, guid: 6fb5d783b792d9c4bb29ae841429b68a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 1
@@ -228,9 +228,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1248d7ed0ee58af47b444403f20d6ce1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  UnitDisplayName: Turkey
+  UnitDisplaySprite: {fileID: 21300000, guid: 6fb5d783b792d9c4bb29ae841429b68a, type: 3}
+  BuildTime: 3
+  BuildCooldown: 8
+  BuildCost: 100
   StartHealth: 100
   StartArmor: 0
   StopDistance: 3
+  AlliedUnitStopDistance: 1.2
   MovementSpeed: 4
   RaycastLayers:
     serializedVersion: 2

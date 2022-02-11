@@ -41,7 +41,14 @@ public class MeleeBox : MonoBehaviour
 
         if (Health != null)
         {
-            Health.Damage(Damage, DisplayDamageText);
+            if (UsingFigher != null)
+            {
+                Health.Damage(UsingFigher.GetAttackDamage(), DisplayDamageText);
+            }
+            else
+            {
+                Health.Damage(Damage, DisplayDamageText);
+            }
         }
     }
 }
