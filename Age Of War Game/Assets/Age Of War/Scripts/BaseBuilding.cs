@@ -22,25 +22,25 @@ public class BaseBuilding : MonoBehaviour, IHealth, ITeam
     public BaseBuildingData BuildingData { get; set; }
     public int Team { get => TeamBaseID; set => TeamBaseID = value; }
 
-    public int CurrentHealth { get => CurrentHP; set => CurrentHP = value; }
-    public int MaxHealth { get => MaxHP; set => MaxHP = value; }
+    public int CurrentHealth { get => BuildingData.Health; set => BuildingData.Health = value; }
+    public int MaxHealth { get => BuildingData.MaxHealth; set => BuildingData.MaxHealth = value; }
     public int StartingHealth { get => StartHealth; set => StartHealth = value; }
-    public int CurrentArmor { get => CurrentArmorValue; set => CurrentArmorValue = value; }
-    public int MaxArmor { get => MaxArmorValue; set => MaxArmorValue = value; }
+    public int CurrentArmor { get => BuildingData.Armor; set => BuildingData.Armor = value; }
+    public int MaxArmor { get => BuildingData.MaxArmor; set => BuildingData.MaxArmor = value; }
     public int StartingArmor { get => StartArmor; set => StartArmor = value; }
+    public int CurrentXp { get => BuildingData.Experience; set => BuildingData.Experience = value; }
+    public int MaxXp { get => BuildingData.MaxExperience; set => BuildingData.MaxExperience = value; }
 
     public static Dictionary<int, BaseBuilding> TeamBuildings = new Dictionary<int, BaseBuilding>();
 
     protected int StartHealth = 0;
-    protected int CurrentHP = 1000;
-    protected int MaxHP = 1000;
     protected int StartArmor = 0;
-    protected int CurrentArmorValue = 0;
-    protected int MaxArmorValue = 0;
     protected int FrameCounter = 0;
     protected RaycastHit2D[] RayHits = new RaycastHit2D[0];
     [HideInInspector]
     public List<BaseUnitBehaviour> BuyUnitBuffer = new List<BaseUnitBehaviour>();
+    [HideInInspector]
+    public List<Behaviour> HoldPopulationSpot = new List<Behaviour>(); 
 
     private void Awake()
     {
@@ -115,10 +115,10 @@ public class BaseBuilding : MonoBehaviour, IHealth, ITeam
     {
         if (!BaseUnitBehaviour.AllActiveTeamUnits.ContainsKey(TeamBaseID))
         {
-            return BuyUnitBuffer.Count;
+            return BuyUnitBuffer.Count + HoldPopulationSpot.Count;
         }
 
-        return BuyUnitBuffer.Count + BaseUnitBehaviour.AllActiveTeamUnits[TeamBaseID].Count;
+        return BuyUnitBuffer.Count + BaseUnitBehaviour.AllActiveTeamUnits[TeamBaseID].Count + HoldPopulationSpot.Count;
     }
 
     #region IHealth Interface
@@ -126,6 +126,17 @@ public class BaseBuilding : MonoBehaviour, IHealth, ITeam
     public virtual void Damage(int DamageAmount, string DamageReason)
     {
         // Modifiers Here
+        if (CurrentArmor > 0)
+        {
+            if (DamageAmount > 10)
+            {
+                DamageAmount -= 10;
+            }
+            else
+            {
+                DamageAmount /= 2;
+            }
+        }
 
         int Remainder = DamageAmount - CurrentArmor;
 
@@ -195,6 +206,20 @@ public class BaseBuilding : MonoBehaviour, IHealth, ITeam
         }
     }
 
+    public virtual void RecieveExperience(int Experience)
+    {
+        if (CurrentXp == MaxXp)
+        {
+            return;
+        }
+
+        CurrentXp += Experience;
+        if (CurrentXp > MaxXp)
+        {
+            CurrentXp = MaxXp;
+        }
+    }
+
     public virtual void Initialize()
     {
         CurrentArmor = StartArmor;
@@ -232,6 +257,8 @@ public class BaseBuildingData
 {
     public int Health = 1000;
     public int MaxHealth = 1000;
+    public int Armor = 0;
+    public int MaxArmor = 0;
 
     public int Experience = 0;
     public int MaxExperience = 1000;

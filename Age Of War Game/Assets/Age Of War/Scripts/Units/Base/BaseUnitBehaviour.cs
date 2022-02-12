@@ -15,6 +15,8 @@ public class BaseUnitBehaviour : MonoBehaviour, IHealth, ITeam
     [SerializeField]
     private int BuildCost = 100;
     [SerializeField]
+    private int ExperienceGiven = 15;
+    [SerializeField]
     protected int StartHealth = 100;
     [SerializeField]
     protected int StartArmor = 0;
@@ -65,6 +67,17 @@ public class BaseUnitBehaviour : MonoBehaviour, IHealth, ITeam
     public virtual void Damage(int DamageAmount, string DamageReason)
     {
         // Modifiers Here
+        if (CurrentArmor > 0)
+        {
+            if (DamageAmount > 10)
+            {
+                DamageAmount -= 10;
+            }
+            else
+            {
+                DamageAmount /= 2;
+            }
+        }
 
         int Remainder = DamageAmount - CurrentArmor;
 
@@ -105,6 +118,11 @@ public class BaseUnitBehaviour : MonoBehaviour, IHealth, ITeam
             {
                 AllActiveTeamUnits[TeamID].Remove(this);
             }
+        }
+
+        if (TeamID != 1)
+        {
+            BaseBuilding.TeamBuildings[1].RecieveExperience(GetExperienceDropped());
         }
     }
 
@@ -218,6 +236,16 @@ public class BaseUnitBehaviour : MonoBehaviour, IHealth, ITeam
     public virtual int GetAttackDamage()
     {
         return 0;
+    }
+
+    public virtual int GetExperienceDropped()
+    {
+        int Experience = ExperienceGiven;
+
+        // Modifiers Here
+
+
+        return Experience;
     }
 
     // MAKE SURE TO ALWAYS SPAWN IT HERE

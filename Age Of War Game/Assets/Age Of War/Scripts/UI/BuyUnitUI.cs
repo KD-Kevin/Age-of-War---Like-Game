@@ -15,6 +15,8 @@ public class BuyUnitUI : MonoBehaviour
     private TextMeshProUGUI UnitName;
     [SerializeField]
     private Image UnitSprite;
+    [SerializeField]
+    private TextMeshProUGUI UnitCost;
 
     private float BuildTimer = 0;
     private float BuildTime = 0;
@@ -37,6 +39,13 @@ public class BuyUnitUI : MonoBehaviour
                 return;
             }
 
+            PlayerUiManager.Instance.CurrentCurrencyAmount -= BuyUnit.GetBuildCost();
+            if (!BaseBuilding.TeamBuildings[1].HoldPopulationSpot.Contains(this))
+            {
+                BaseBuilding.TeamBuildings[1].HoldPopulationSpot.Add(this);
+            }
+            PlayerUiManager.Instance.UpdateCurrencyText();
+            PlayerUiManager.Instance.UpdatePopulationText();
             CooldownTime = BuyUnit.GetCooldown();
             CooldownTimer = CooldownTime;
             BuildTimer = BuyUnit.GetTimeToCreate();
@@ -61,6 +70,10 @@ public class BuyUnitUI : MonoBehaviour
             {
                 if (BuyUnit != null)
                 {
+                    if (BaseBuilding.TeamBuildings[1].HoldPopulationSpot.Contains(this))
+                    {
+                        BaseBuilding.TeamBuildings[1].HoldPopulationSpot.Remove(this);
+                    }
                     PlayerUiManager.Instance.BuyUnit(BuyUnit);
                 }
             }
@@ -91,6 +104,11 @@ public class BuyUnitUI : MonoBehaviour
                 CooldownImage.gameObject.SetActive(false);
             }
         }
+
+        if (BuyUnit != null)
+        {
+            UpdateText();
+        }
     }
 
     public void SetUnit(BaseUnitBehaviour Unit)
@@ -98,5 +116,11 @@ public class BuyUnitUI : MonoBehaviour
         BuyUnit = Unit;
         UnitName.text = Unit.DisplayName;
         UnitSprite.sprite = Unit.DisplaySprite;
+        UnitCost.text = $"${Unit.GetBuildCost()}";
+    }
+
+    public void UpdateText()
+    {
+        UnitCost.text = $"${BuyUnit.GetBuildCost()}";
     }
 }
