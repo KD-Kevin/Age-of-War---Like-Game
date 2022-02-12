@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using UnityEditor;
+using UnityEngine.SceneManagement;
 
 public class PlayerUiManager : MonoBehaviour
 {
@@ -169,5 +171,22 @@ public class PlayerUiManager : MonoBehaviour
         }
 
         return CurrentCurrencyAmount >= unit.GetBuildCost();
+    }
+
+    public void GoToMainMenu()
+    {
+        SceneManager.LoadScene("Main Menu", LoadSceneMode.Single);
+    }
+
+    public void CloseGame()
+    {
+        if (Application.isEditor)
+        {
+            EditorApplication.ExitPlaymode();
+        }
+        else
+        {
+            Application.Quit();
+        }
     }
 }
