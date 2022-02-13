@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-[CreateAssetMenu(fileName = "TipManager", menuName = "DungeonMasters/Tips/TipManager")]
+[CreateAssetMenu(fileName = "TipManager", menuName = "AgeOfWar/Tips/TipManager")]
 public class TipLocalizationManager : ScriptableObject
 {
     public List<TipScriptableObject> Localizations = new List<TipScriptableObject>();

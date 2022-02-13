@@ -30,6 +30,8 @@ public class BaseUnitBehaviour : MonoBehaviour, IHealth, ITeam
     protected LayerMask RaycastLayers;
     [SerializeField]
     private Transform LookTransform;
+    [SerializeField]
+    private UnitDataScriptableObject UnitDataScriptableObject;
 
     public string DisplayName { get => UnitDisplayName; set => UnitDisplayName = value; }
     public Sprite DisplaySprite { get => UnitDisplaySprite; set => UnitDisplaySprite = value; }
@@ -41,6 +43,8 @@ public class BaseUnitBehaviour : MonoBehaviour, IHealth, ITeam
     public int StartingArmor { get => StartArmor; set => StartArmor = value; }
     public int PrefabID { get => PrefabSpawnID; set => PrefabSpawnID = value; }
     public int Team { get => TeamID; set => TeamID = value; }
+    public UnitData UnitData { get; set; }
+    public List<EquipmentChangeScriptableObject> CurrentListOfPossibleChanges { get; set; }
     public bool Moving { get; set; }
     public bool Attack { get; set; }
 
@@ -185,6 +189,9 @@ public class BaseUnitBehaviour : MonoBehaviour, IHealth, ITeam
         {
             AllActiveTeamUnits[TeamID].Add(this);
         }
+
+        UnitData = UnitDataScriptableObject.Data.Clone();
+        CurrentListOfPossibleChanges = UnitData.PossibleEquipmentChanges;
     }
 
     public virtual void Repair(int RepairAmount)

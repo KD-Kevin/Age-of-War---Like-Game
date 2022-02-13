@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b010b963f563964fb586ff803b4c8b8, type: 3}
+  m_Name: CopperBeak
+  m_EditorClassIdentifier: 
+  EquipmentChangeDisplayName: Copper Beak
+  Changes:
+    StatChanges:
+      UnitCostChange: 0
+      MeleeDamageChange: 0
+      MeleeRangeChange: 0
+      ProjectileDamageChange: 0
+      ProjectileRangeChange: 0
+      ExperienceGivenWhenKilledChange: 0
+      MaxHealthChange: 0
+      HealEquivalentHealth: 1
+      MaxArmorChange: 0
+      HealEquivalentArmor: 1
+      MovementSpeedChange: 0
+    NewHelmetSprite: {fileID: 0}
+    NewTorsoSprite: {fileID: 0}
+    NewLeggingSprite: {fileID: 0}
+    NewShoeSprite: {fileID: 0}
+  PossibleEquipmentChanges:
+  - {fileID: 0}
+  PossibleClassChanges:
+  - {fileID: 11400000, guid: 0d743270f3f93dd4a8d42cec946cbacc, type: 2}

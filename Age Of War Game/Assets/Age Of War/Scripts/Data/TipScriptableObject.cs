@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Tips", menuName = "DungeonMasters/Tips/LoadingTips")]
+[CreateAssetMenu(fileName = "Tips", menuName = "AgeOfWar/Tips/LoadingTips")]
 public class TipScriptableObject : ScriptableObject
 {
     public Localization TestLocalization;

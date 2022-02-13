@@ -15,11 +15,11 @@ D:/Unity Projects/Age of War - Like Game/Age-of-War---Like-Game/Age Of War Game
 -logFile
 Logs/AssetImportWorker0.log
 -srvPort
-65425
+65016
 Successfully changed project path to: D:/Unity Projects/Age of War - Like Game/Age-of-War---Like-Game/Age Of War Game
 D:/Unity Projects/Age of War - Like Game/Age-of-War---Like-Game/Age Of War Game
 Using Asset Import Pipeline V2.
-Refreshing native plugins compatible for Editor in 57.90 ms, found 2 plugins.
+Refreshing native plugins compatible for Editor in 58.31 ms, found 2 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
 Initialize engine version: 2020.3.26f1 (7298b473bc1a)
 [Subsystems] Discovering subsystems at path C:/Program Files/Unity/Hub/Editor/2020.3.26f1/Editor/Data/Resources/UnitySubsystems
@@ -35,75 +35,75 @@ Initialize mono
 Mono path[0] = 'C:/Program Files/Unity/Hub/Editor/2020.3.26f1/Editor/Data/Managed'
 Mono path[1] = 'C:/Program Files/Unity/Hub/Editor/2020.3.26f1/Editor/Data/MonoBleedingEdge/lib/mono/unityjit'
 Mono config path = 'C:/Program Files/Unity/Hub/Editor/2020.3.26f1/Editor/Data/MonoBleedingEdge/etc'
-Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56316
+Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56148
 Begin MonoManager ReloadAssembly
 Registering precompiled unity dll's ...
 Register platform support module: C:/Program Files/Unity/Hub/Editor/2020.3.26f1/Editor/Data/PlaybackEngines/WindowsStandaloneSupport/UnityEditor.WindowsStandalone.Extensions.dll
 Register platform support module: C:/Program Files/Unity/Hub/Editor/2020.3.26f1/Editor/Data/PlaybackEngines/LinuxStandaloneSupport/UnityEditor.LinuxStandalone.Extensions.dll
-Registered in 0.002730 seconds.
+Registered in 0.002642 seconds.
 Native extension for LinuxStandalone target not found
 Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 51.52 ms, found 2 plugins.
+Refreshing native plugins compatible for Editor in 48.77 ms, found 2 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
 Mono: successfully reloaded assembly
-- Completed reload, in  0.618 seconds
+- Completed reload, in  0.573 seconds
 Domain Reload Profiling:
-	ReloadAssembly (618ms)
-		BeginReloadAssembly (68ms)
+	ReloadAssembly (573ms)
+		BeginReloadAssembly (60ms)
 			ExecutionOrderSort (0ms)
 			DisableScriptedObjects (0ms)
 			BackupInstance (0ms)
 			ReleaseScriptingObjects (0ms)
 			CreateAndSetChildDomain (1ms)
-		EndReloadAssembly (481ms)
-			LoadAssemblies (65ms)
+		EndReloadAssembly (447ms)
+			LoadAssemblies (57ms)
 			RebuildTransferFunctionScriptingTraits (0ms)
-			SetupTypeCache (98ms)
+			SetupTypeCache (94ms)
 			ReleaseScriptCaches (0ms)
 			RebuildScriptCaches (21ms)
-			SetupLoadedEditorAssemblies (229ms)
+			SetupLoadedEditorAssemblies (210ms)
 				LogAssemblyErrors (0ms)
 				InitializePlatformSupportModulesInManaged (8ms)
 				SetLoadedEditorAssemblies (0ms)
-				RefreshPlugins (52ms)
-				BeforeProcessingInitializeOnLoad (23ms)
-				ProcessInitializeOnLoadAttributes (110ms)
-				ProcessInitializeOnLoadMethodAttributes (35ms)
+				RefreshPlugins (49ms)
+				BeforeProcessingInitializeOnLoad (21ms)
+				ProcessInitializeOnLoadAttributes (99ms)
+				ProcessInitializeOnLoadMethodAttributes (32ms)
 				AfterProcessingInitializeOnLoad (0ms)
 				EditorAssembliesLoaded (0ms)
 			ExecutionOrderSort2 (0ms)
 			AwakeInstancesAfterBackupRestoration (0ms)
 Platform modules already initialized, skipping
 Registering precompiled user dll's ...
-Registered in 0.005791 seconds.
+Registered in 0.005497 seconds.
 Begin MonoManager ReloadAssembly
 Native extension for LinuxStandalone target not found
 Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 46.81 ms, found 2 plugins.
+Refreshing native plugins compatible for Editor in 49.58 ms, found 2 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
 Mono: successfully reloaded assembly
-- Completed reload, in  1.063 seconds
+- Completed reload, in  1.062 seconds
 Domain Reload Profiling:
-	ReloadAssembly (1064ms)
-		BeginReloadAssembly (135ms)
+	ReloadAssembly (1063ms)
+		BeginReloadAssembly (139ms)
 			ExecutionOrderSort (0ms)
-			DisableScriptedObjects (7ms)
+			DisableScriptedObjects (8ms)
 			BackupInstance (0ms)
 			ReleaseScriptingObjects (0ms)
-			CreateAndSetChildDomain (20ms)
-		EndReloadAssembly (874ms)
-			LoadAssemblies (100ms)
+			CreateAndSetChildDomain (22ms)
+		EndReloadAssembly (869ms)
+			LoadAssemblies (104ms)
 			RebuildTransferFunctionScriptingTraits (0ms)
-			SetupTypeCache (208ms)
+			SetupTypeCache (217ms)
 			ReleaseScriptCaches (1ms)
-			RebuildScriptCaches (37ms)
-			SetupLoadedEditorAssemblies (409ms)
+			RebuildScriptCaches (38ms)
+			SetupLoadedEditorAssemblies (401ms)
 				LogAssemblyErrors (0ms)
 				InitializePlatformSupportModulesInManaged (7ms)
 				SetLoadedEditorAssemblies (0ms)
-				RefreshPlugins (47ms)
-				BeforeProcessingInitializeOnLoad (95ms)
-				ProcessInitializeOnLoadAttributes (241ms)
+				RefreshPlugins (50ms)
+				BeforeProcessingInitializeOnLoad (91ms)
+				ProcessInitializeOnLoadAttributes (234ms)
 				ProcessInitializeOnLoadMethodAttributes (12ms)
 				AfterProcessingInitializeOnLoad (7ms)
 				EditorAssembliesLoaded (0ms)
@@ -112,15 +112,15 @@ Domain Reload Profiling:
 Platform modules already initialized, skipping
 ========================================================================
 Worker process is ready to serve import requests
-Launched and connected shader compiler UnityShaderCompiler.exe after 0.09 seconds
-Refreshing native plugins compatible for Editor in 1.27 ms, found 2 plugins.
+Launched and connected shader compiler UnityShaderCompiler.exe after 0.07 seconds
+Refreshing native plugins compatible for Editor in 0.66 ms, found 2 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
-Unloading 3184 Unused Serialized files (Serialized files now loaded: 0)
-System memory in use before: 141.0 MB.
-System memory in use after: 141.2 MB.
+Unloading 3224 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 142.4 MB.
+System memory in use after: 142.6 MB.
 
-Unloading 20 unused Assets to reduce memory usage. Loaded Objects now: 3617.
-Total: 2.878438 ms (FindLiveObjects: 0.266794 ms CreateObjectMapping: 0.113073 ms MarkObjects: 2.428102 ms  DeleteObjects: 0.064883 ms)
+Unloading 20 unused Assets to reduce memory usage. Loaded Objects now: 3657.
+Total: 3.080908 ms (FindLiveObjects: 0.251638 ms CreateObjectMapping: 0.101759 ms MarkObjects: 2.646146 ms  DeleteObjects: 0.075638 ms)
 
 AssetImportParameters requested are different than current active one (requested -> active):
   custom:framework-win-MediaFoundation: 216162199b28c13a410421893ffa2e32 -> 
@@ -134,193 +134,81 @@ AssetImportParameters requested are different than current active one (requested
   custom:audio-encoder-webm-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
 ========================================================================
 Received Import Request.
-  path: Assets/Age Of War/Prefabs/Turkish Warrior.prefab
-  artifactKey: Guid(069babf77dd68c14fbc9c99c81d035fe) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Age Of War/Prefabs/Turkish Warrior.prefab using Guid(069babf77dd68c14fbc9c99c81d035fe) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '812ec1cb7a2b8e13047eb86fb78c5df4') in 0.263824 seconds 
-  Import took 0.291361 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 5.022947 seconds.
-  path: Assets/Age Of War/Scenes/Game.unity
-  artifactKey: Guid(b37c12e6825537f4fbcf40c5324b6117) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Age Of War/Scenes/Game.unity using Guid(b37c12e6825537f4fbcf40c5324b6117) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'a263aee3c3b901a6dcee20e7668bfe1b') in 0.004304 seconds 
-  Import took 0.019634 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 20.359021 seconds.
   path: Assets/Age Of War/Scenes/Main Menu.unity
   artifactKey: Guid(8c158c56c24fc83449ea6c0e6b390bac) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Age Of War/Scenes/Main Menu.unity using Guid(8c158c56c24fc83449ea6c0e6b390bac) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '7c4693dd98f2b119cb698ba7329a0cee') in 0.010745 seconds 
-  Import took 0.015224 seconds .
+Start importing Assets/Age Of War/Scenes/Main Menu.unity using Guid(8c158c56c24fc83449ea6c0e6b390bac) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'b28af15175eb9ee0897a9d8751e3e29d') in 0.017157 seconds 
+  Import took 0.021040 seconds .
 
 ========================================================================
 Received Import Request.
-  Time since last request: 15.852652 seconds.
-  path: Assets/Age Of War/Scenes/Splash.unity
-  artifactKey: Guid(cce162ec8f5c7ab4397deb5037f3c065) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Age Of War/Scenes/Splash.unity using Guid(cce162ec8f5c7ab4397deb5037f3c065) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '5d0d6a9a093cc56b2e5c3df0dc1d2374') in 0.003792 seconds 
-  Import took 0.009823 seconds .
+  Time since last request: 9054.068844 seconds.
+  path: Assets/Age Of War/Scripts/UI/MainMenu.cs
+  artifactKey: Guid(0b04b5647f29700469243080dd6f7f05) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Age Of War/Scripts/UI/MainMenu.cs using Guid(0b04b5647f29700469243080dd6f7f05) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'bb4394fe114296cf77bdb72e6cb4785e') in 0.022985 seconds 
+  Import took 0.063306 seconds .
 
 ========================================================================
 Received Import Request.
-  Time since last request: 1113.621296 seconds.
-  path: Assets/Age Of War/Scripts/UI/SceneLoadManager.cs
-  artifactKey: Guid(12ac882dcb489b44180f4b25669e9925) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Age Of War/Scripts/UI/SceneLoadManager.cs using Guid(12ac882dcb489b44180f4b25669e9925) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '979bcfac785c5f59a475d3d183c7aa8f') in 0.009195 seconds 
-  Import took 0.041833 seconds .
+  Time since last request: 8.769063 seconds.
+  path: Assets/Age Of War/Scripts/UI/MainMenu.cs
+  artifactKey: Guid(0b04b5647f29700469243080dd6f7f05) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Age Of War/Scripts/UI/MainMenu.cs using Guid(0b04b5647f29700469243080dd6f7f05) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'bbe734ba0601de0c7499a7ab0329b72c') in 0.003755 seconds 
+  Import took 0.008114 seconds .
 
 ========================================================================
 Received Import Request.
-  Time since last request: 8.670029 seconds.
-  path: Assets/Age Of War/Scripts/Data
-  artifactKey: Guid(84720803e7bcabc4d8d255f41f2df5df) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Age Of War/Scripts/Data using Guid(84720803e7bcabc4d8d255f41f2df5df) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '75a669327d0e44a1dd15b75505a528ca') in 0.003416 seconds 
-  Import took 0.007932 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 9.779385 seconds.
-  path: Assets/Age Of War/Scripts/Data/TipLocalizationManager.cs
-  artifactKey: Guid(844aca12bc577be44b52179b01fc2291) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Age Of War/Scripts/Data/TipLocalizationManager.cs using Guid(844aca12bc577be44b52179b01fc2291) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '4626d62cf1c5f597bd84a4a03e925b03') in 0.003511 seconds 
-  Import took 0.023220 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 28.664511 seconds.
-  path: Assets/Age Of War/Scripts/Data/TipLocalizationManager.cs
-  artifactKey: Guid(844aca12bc577be44b52179b01fc2291) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Age Of War/Scripts/Data/TipLocalizationManager.cs using Guid(844aca12bc577be44b52179b01fc2291) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'b10486160fa378927bc7753442887dfd') in 0.003276 seconds 
-  Import took 0.042080 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 20.845108 seconds.
-  path: Assets/Age Of War/Scripts/Data/TipScriptableObject.cs
-  artifactKey: Guid(4677933891b6d45438cd256a8145c0ee) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Age Of War/Scripts/Data/TipScriptableObject.cs using Guid(4677933891b6d45438cd256a8145c0ee) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '02c3750faa089d245b571ecf3d43b69e') in 0.004106 seconds 
-  Import took 0.009343 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 25.724309 seconds.
-  path: Assets/Age Of War/Scripts/Data/TipScriptableObject.cs
-  artifactKey: Guid(4677933891b6d45438cd256a8145c0ee) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Age Of War/Scripts/Data/TipScriptableObject.cs using Guid(4677933891b6d45438cd256a8145c0ee) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '71496d7433a033c95a6a88830aa89236') in 0.003526 seconds 
-  Import took 0.043986 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 8.653850 seconds.
-  path: Assets/Age Of War/Data
-  artifactKey: Guid(28212ce845ae25b4481234aa0ee5e308) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Age Of War/Data using Guid(28212ce845ae25b4481234aa0ee5e308) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '2d85710fe2166d6da12a4942d622ce9d') in 0.003395 seconds 
-  Import took 0.015917 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 6.761632 seconds.
-  path: Assets/Age Of War/Data/Localization
-  artifactKey: Guid(6bb9c0971c589a5488578c49b166a2d3) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Age Of War/Data/Localization using Guid(6bb9c0971c589a5488578c49b166a2d3) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '0153f21e503796793f1733d709bb59ad') in 0.003865 seconds 
-  Import took 0.008413 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 13.185106 seconds.
-  path: Assets/Age Of War/Data/Localization/TipManager.asset
-  artifactKey: Guid(e522d5f3339a4dc4f91e6857f08721d1) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Age Of War/Data/Localization/TipManager.asset using Guid(e522d5f3339a4dc4f91e6857f08721d1) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '722d0875a32c6479e93d3a819d4d1d9b') in 0.005879 seconds 
-  Import took 0.016531 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 4.336617 seconds.
-  path: Assets/Age Of War/Data/Localization/Localizations
-  artifactKey: Guid(d38872eee7016e9489ec6d3b5b0f273f) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Age Of War/Data/Localization/Localizations using Guid(d38872eee7016e9489ec6d3b5b0f273f) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'e8944ba882d1e23fc5a137659313c2e1') in 0.003446 seconds 
-  Import took 0.007682 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.657227 seconds.
-  path: Assets/Age Of War/Data/Localization/Localizations/English.asset
-  artifactKey: Guid(49f6abb735e38c241aadee7c1c325b62) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Age Of War/Data/Localization/Localizations/English.asset using Guid(49f6abb735e38c241aadee7c1c325b62) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'c99cc731626f952dd9ee9b644da4d72d') in 0.004234 seconds 
-  Import took 0.023849 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.000175 seconds.
-  path: Assets/Age Of War/Data/Localization/Localizations/French.asset
-  artifactKey: Guid(9e78c7657a50eb84faece21de8f11d48) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Age Of War/Data/Localization/Localizations/French.asset using Guid(9e78c7657a50eb84faece21de8f11d48) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'fae4b0dd1eb76cb44177fa64f1a3aa9f') in 0.004091 seconds 
-  Import took 0.012166 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 36.130398 seconds.
-  path: Assets/Age Of War/Data/Localization/Manager
-  artifactKey: Guid(7de3d384d06d6c847b998eb7b74bae2f) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Age Of War/Data/Localization/Manager using Guid(7de3d384d06d6c847b998eb7b74bae2f) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'fd2dee162d831e495525326d09c800de') in 0.003562 seconds 
-  Import took 0.017644 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 103.292455 seconds.
-  path: Assets/Age Of War/Scripts/UI/LanguageSelector.cs
-  artifactKey: Guid(98f49ba42dac82d4f9e869caa286ce9a) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Age Of War/Scripts/UI/LanguageSelector.cs using Guid(98f49ba42dac82d4f9e869caa286ce9a) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'ec31b7cb051af42e2b38d16f5804a574') in 0.004731 seconds 
-  Import took 0.010375 seconds .
+  Time since last request: 1858.013460 seconds.
+  path: Assets/Age Of War/Scripts/UI/MainMenu.cs
+  artifactKey: Guid(0b04b5647f29700469243080dd6f7f05) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Age Of War/Scripts/UI/MainMenu.cs using Guid(0b04b5647f29700469243080dd6f7f05) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'e4bbf40f1fc8047c4d0f9c7e6b92141e') in 0.003237 seconds 
+  Import took 0.007458 seconds .
 
 ========================================================================
 Received Prepare
 Registering precompiled user dll's ...
-Registered in 0.004842 seconds.
+Registered in 0.004861 seconds.
 Begin MonoManager ReloadAssembly
 Native extension for LinuxStandalone target not found
 Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 0.66 ms, found 2 plugins.
+Refreshing native plugins compatible for Editor in 0.70 ms, found 2 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
 Mono: successfully reloaded assembly
-- Completed reload, in  1.014 seconds
+- Completed reload, in  1.047 seconds
 Domain Reload Profiling:
-	ReloadAssembly (1015ms)
-		BeginReloadAssembly (135ms)
+	ReloadAssembly (1048ms)
+		BeginReloadAssembly (147ms)
 			ExecutionOrderSort (0ms)
-			DisableScriptedObjects (10ms)
+			DisableScriptedObjects (8ms)
 			BackupInstance (0ms)
 			ReleaseScriptingObjects (0ms)
-			CreateAndSetChildDomain (39ms)
-		EndReloadAssembly (825ms)
-			LoadAssemblies (100ms)
+			CreateAndSetChildDomain (51ms)
+		EndReloadAssembly (842ms)
+			LoadAssemblies (106ms)
 			RebuildTransferFunctionScriptingTraits (0ms)
-			SetupTypeCache (211ms)
+			SetupTypeCache (226ms)
 			ReleaseScriptCaches (1ms)
-			RebuildScriptCaches (27ms)
-			SetupLoadedEditorAssemblies (363ms)
+			RebuildScriptCaches (28ms)
+			SetupLoadedEditorAssemblies (383ms)
 				LogAssemblyErrors (0ms)
-				InitializePlatformSupportModulesInManaged (8ms)
+				InitializePlatformSupportModulesInManaged (9ms)
 				SetLoadedEditorAssemblies (1ms)
 				RefreshPlugins (1ms)
-				BeforeProcessingInitializeOnLoad (92ms)
-				ProcessInitializeOnLoadAttributes (244ms)
-				ProcessInitializeOnLoadMethodAttributes (12ms)
+				BeforeProcessingInitializeOnLoad (93ms)
+				ProcessInitializeOnLoadAttributes (260ms)
+				ProcessInitializeOnLoadMethodAttributes (13ms)
 				AfterProcessingInitializeOnLoad (7ms)
 				EditorAssembliesLoaded (0ms)
 			ExecutionOrderSort2 (0ms)
-			AwakeInstancesAfterBackupRestoration (20ms)
+			AwakeInstancesAfterBackupRestoration (13ms)
 Platform modules already initialized, skipping
-Refreshing native plugins compatible for Editor in 1.56 ms, found 2 plugins.
+Refreshing native plugins compatible for Editor in 0.75 ms, found 2 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
-Unloading 3063 Unused Serialized files (Serialized files now loaded: 0)
-System memory in use before: 137.5 MB.
-System memory in use after: 137.7 MB.
+Unloading 3099 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 133.5 MB.
+System memory in use after: 133.8 MB.
 
-Unloading 15 unused Assets to reduce memory usage. Loaded Objects now: 3668.
-Total: 3.741467 ms (FindLiveObjects: 0.416883 ms CreateObjectMapping: 0.242210 ms MarkObjects: 3.052553 ms  DeleteObjects: 0.022698 ms)
+Unloading 15 unused Assets to reduce memory usage. Loaded Objects now: 3660.
+Total: 3.204877 ms (FindLiveObjects: 0.272032 ms CreateObjectMapping: 0.153790 ms MarkObjects: 2.750140 ms  DeleteObjects: 0.023187 ms)
 
 AssetImportParameters requested are different than current active one (requested -> active):
   custom:framework-win-MediaFoundation: 216162199b28c13a410421893ffa2e32 -> 
@@ -334,130 +222,189 @@ AssetImportParameters requested are different than current active one (requested
   custom:audio-encoder-webm-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
 ========================================================================
 Received Import Request.
-  Time since last request: 209.649186 seconds.
-  path: Assets/Age Of War/Scripts/UI/LanguageSelector.cs
-  artifactKey: Guid(98f49ba42dac82d4f9e869caa286ce9a) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Age Of War/Scripts/UI/LanguageSelector.cs using Guid(98f49ba42dac82d4f9e869caa286ce9a) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '130e2cab34c7892b40c2c4913a30e58f') in 0.008125 seconds 
-  Import took 0.034929 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 34.528587 seconds.
-  path: Assets/Age Of War/Data/TipManager.asset
-  artifactKey: Guid(a6c0f88e2f6a93848acfa5b0f6a8d9a8) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Age Of War/Data/TipManager.asset using Guid(a6c0f88e2f6a93848acfa5b0f6a8d9a8) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '6909718eafac4b9d6e651673bc222895') in 0.018683 seconds 
-  Import took 0.051528 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 68.193980 seconds.
-  path: Assets/Age Of War/Data/Localization/English.asset
-  artifactKey: Guid(800d3b37039bd764ca38c61585438f0b) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Age Of War/Data/Localization/English.asset using Guid(800d3b37039bd764ca38c61585438f0b) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '60908a7d0035b5ba71320cb2ca004593') in 0.004263 seconds 
-  Import took 0.014324 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 5.937557 seconds.
-  path: Assets/Age Of War/Data/Localization/English Tips.asset
-  artifactKey: Guid(800d3b37039bd764ca38c61585438f0b) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Age Of War/Data/Localization/English Tips.asset using Guid(800d3b37039bd764ca38c61585438f0b) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '3d6bd8778e45dd1e967fbfda20d33e3f') in 0.004150 seconds 
-  Import took 0.008595 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 1.142715 seconds.
-  path: Assets/Age Of War/Data/Localization/English Tips 1.asset
-  artifactKey: Guid(fdeb533ad8ead6b4c80077c0369127fc) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Age Of War/Data/Localization/English Tips 1.asset using Guid(fdeb533ad8ead6b4c80077c0369127fc) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'c9320989bee4f63a1fbb30f660617b8a') in 0.004429 seconds 
-  Import took 0.009053 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 9.268011 seconds.
-  path: Assets/Age Of War/Data/Localization/French Tips.asset
-  artifactKey: Guid(fdeb533ad8ead6b4c80077c0369127fc) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Age Of War/Data/Localization/French Tips.asset using Guid(fdeb533ad8ead6b4c80077c0369127fc) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'e88c32c74815d29ae470a30cc91df50b') in 0.004185 seconds 
-  Import took 0.008334 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 32.935504 seconds.
-  path: Assets/Age Of War/Data/Localization/French Tips.asset
-  artifactKey: Guid(fdeb533ad8ead6b4c80077c0369127fc) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Age Of War/Data/Localization/French Tips.asset using Guid(fdeb533ad8ead6b4c80077c0369127fc) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'ae6c9c3e8055568279c4be0af11d7db7') in 0.005597 seconds 
-  Import took 0.012860 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 33.787019 seconds.
-  path: Assets/Age Of War/Data/Localization/English Tips.asset
-  artifactKey: Guid(800d3b37039bd764ca38c61585438f0b) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Age Of War/Data/Localization/English Tips.asset using Guid(800d3b37039bd764ca38c61585438f0b) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '3024213c847e0e5015093b687857181d') in 0.004001 seconds 
-  Import took 0.013411 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.000161 seconds.
-  path: Assets/Age Of War/Data/Localization/Manager/TipManager.asset
-  artifactKey: Guid(a6c0f88e2f6a93848acfa5b0f6a8d9a8) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Age Of War/Data/Localization/Manager/TipManager.asset using Guid(a6c0f88e2f6a93848acfa5b0f6a8d9a8) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '22547ef9879e6497430eb3fa6ee4c25a') in 0.003901 seconds 
-  Import took 0.007414 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 236.974131 seconds.
-  path: Assets/Scenes
-  artifactKey: Guid(c6058545ddc46004db4e626bc883426e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Scenes using Guid(c6058545ddc46004db4e626bc883426e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'bf0644eebce3830d89b181d3b83aab27') in 0.018839 seconds 
-  Import took 0.036266 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 14.938682 seconds.
-  path: Assets/Age Of War/Game.unity
-  artifactKey: Guid(59e8646caebd5944cb1fdfacd8a1e766) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Age Of War/Game.unity using Guid(59e8646caebd5944cb1fdfacd8a1e766) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '8bacbe07ad346819d5122a30e10daff5') in 0.004693 seconds 
-  Import took 0.009964 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 19.870914 seconds.
+  Time since last request: 25.163191 seconds.
   path: Assets/Age Of War/Scenes/Splash.unity
   artifactKey: Guid(9fc0d4010bbf28b4594072e72b8655ab) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Age Of War/Scenes/Splash.unity using Guid(9fc0d4010bbf28b4594072e72b8655ab) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '3551f1657ae222d63bacff1b4e8a19b6') in 0.004201 seconds 
-  Import took 0.008829 seconds .
+Start importing Assets/Age Of War/Scenes/Splash.unity using Guid(9fc0d4010bbf28b4594072e72b8655ab) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '7a0fbea5d6250a0a3d0bde4bb6552ae4') in 0.027112 seconds 
+  Import took 0.031733 seconds .
 
 ========================================================================
 Received Import Request.
-  Time since last request: 358.829149 seconds.
-  path: Assets/Splash Ui.prefab
-  artifactKey: Guid(58bf5c94452cf1748ba957c13527360a) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Splash Ui.prefab using Guid(58bf5c94452cf1748ba957c13527360a) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '6422a034bf6ca18b452a88a28b08f8c2') in 0.029349 seconds 
-  Import took 0.061173 seconds .
+  Time since last request: 2.616107 seconds.
+  path: Assets/Age Of War/Scenes/Main Menu.unity
+  artifactKey: Guid(8c158c56c24fc83449ea6c0e6b390bac) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Age Of War/Scenes/Main Menu.unity using Guid(8c158c56c24fc83449ea6c0e6b390bac) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '58e1e115069d1cb2a9f0320769f3612f') in 0.004233 seconds 
+  Import took 0.008264 seconds .
 
 ========================================================================
-Received Import Request.
-  Time since last request: 39.610255 seconds.
-  path: Assets/Age Of War/Prefabs/UI
-  artifactKey: Guid(8158cb11680cb814282d7470f8f90ca3) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Age Of War/Prefabs/UI using Guid(8158cb11680cb814282d7470f8f90ca3) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'ea43e07b163709bb27407b8913061800') in 0.003909 seconds 
-  Import took 0.009136 seconds .
+Received Prepare
+Registering precompiled user dll's ...
+Registered in 0.004670 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for LinuxStandalone target not found
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 0.69 ms, found 2 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Mono: successfully reloaded assembly
+- Completed reload, in  0.984 seconds
+Domain Reload Profiling:
+	ReloadAssembly (985ms)
+		BeginReloadAssembly (118ms)
+			ExecutionOrderSort (0ms)
+			DisableScriptedObjects (7ms)
+			BackupInstance (0ms)
+			ReleaseScriptingObjects (0ms)
+			CreateAndSetChildDomain (36ms)
+		EndReloadAssembly (812ms)
+			LoadAssemblies (100ms)
+			RebuildTransferFunctionScriptingTraits (0ms)
+			SetupTypeCache (210ms)
+			ReleaseScriptCaches (1ms)
+			RebuildScriptCaches (29ms)
+			SetupLoadedEditorAssemblies (372ms)
+				LogAssemblyErrors (0ms)
+				InitializePlatformSupportModulesInManaged (8ms)
+				SetLoadedEditorAssemblies (1ms)
+				RefreshPlugins (1ms)
+				BeforeProcessingInitializeOnLoad (93ms)
+				ProcessInitializeOnLoadAttributes (250ms)
+				ProcessInitializeOnLoadMethodAttributes (12ms)
+				AfterProcessingInitializeOnLoad (8ms)
+				EditorAssembliesLoaded (0ms)
+			ExecutionOrderSort2 (0ms)
+			AwakeInstancesAfterBackupRestoration (13ms)
+Platform modules already initialized, skipping
+Refreshing native plugins compatible for Editor in 0.69 ms, found 2 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 3099 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 133.6 MB.
+System memory in use after: 133.8 MB.
 
+Unloading 15 unused Assets to reduce memory usage. Loaded Objects now: 3662.
+Total: 2.735124 ms (FindLiveObjects: 0.282019 ms CreateObjectMapping: 0.091283 ms MarkObjects: 2.336191 ms  DeleteObjects: 0.019416 ms)
+
+AssetImportParameters requested are different than current active one (requested -> active):
+  custom:framework-win-MediaFoundation: 216162199b28c13a410421893ffa2e32 -> 
+  custom:video-decoder-ogg-theora: a1e56fd34408186e4bbccfd4996cb3dc -> 
+  custom:container-muxer-webm: aa71ff27fc2769a1b78a27578f13a17b -> 
+  custom:container-demuxer-webm: 4f35f7cbe854078d1ac9338744f61a02 -> 
+  custom:container-demuxer-ogg: 62fdf1f143b41e24485cea50d1cbac27 -> 
+  custom:video-encoder-webm-vp8: eb34c28f22e8b96e1ab97ce403110664 -> 
+  custom:video-decoder-webm-vp8: 9c59270c3fd7afecdb556c50c9e8de78 -> 
+  custom:audio-decoder-ogg-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
+  custom:audio-encoder-webm-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
 ========================================================================
-Received Import Request.
-  Time since last request: 5.236690 seconds.
-  path: Assets/Age Of War/Prefabs/Units
-  artifactKey: Guid(65fa2fd3018e6424a912e4dfa0355268) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Age Of War/Prefabs/Units using Guid(65fa2fd3018e6424a912e4dfa0355268) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '297e5848948096aab39c1949af7d6ebb') in 0.006176 seconds 
-  Import took 0.010180 seconds .
+Received Prepare
+Registering precompiled user dll's ...
+Registered in 0.004734 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for LinuxStandalone target not found
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 0.69 ms, found 2 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Mono: successfully reloaded assembly
+- Completed reload, in  0.983 seconds
+Domain Reload Profiling:
+	ReloadAssembly (984ms)
+		BeginReloadAssembly (116ms)
+			ExecutionOrderSort (0ms)
+			DisableScriptedObjects (8ms)
+			BackupInstance (0ms)
+			ReleaseScriptingObjects (0ms)
+			CreateAndSetChildDomain (33ms)
+		EndReloadAssembly (813ms)
+			LoadAssemblies (99ms)
+			RebuildTransferFunctionScriptingTraits (0ms)
+			SetupTypeCache (209ms)
+			ReleaseScriptCaches (1ms)
+			RebuildScriptCaches (29ms)
+			SetupLoadedEditorAssemblies (372ms)
+				LogAssemblyErrors (0ms)
+				InitializePlatformSupportModulesInManaged (8ms)
+				SetLoadedEditorAssemblies (1ms)
+				RefreshPlugins (1ms)
+				BeforeProcessingInitializeOnLoad (93ms)
+				ProcessInitializeOnLoadAttributes (249ms)
+				ProcessInitializeOnLoadMethodAttributes (12ms)
+				AfterProcessingInitializeOnLoad (7ms)
+				EditorAssembliesLoaded (0ms)
+			ExecutionOrderSort2 (0ms)
+			AwakeInstancesAfterBackupRestoration (14ms)
+Platform modules already initialized, skipping
+Refreshing native plugins compatible for Editor in 0.69 ms, found 2 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 3099 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 133.6 MB.
+System memory in use after: 133.9 MB.
 
+Unloading 15 unused Assets to reduce memory usage. Loaded Objects now: 3664.
+Total: 3.103188 ms (FindLiveObjects: 0.257854 ms CreateObjectMapping: 0.121594 ms MarkObjects: 2.694407 ms  DeleteObjects: 0.022698 ms)
+
+AssetImportParameters requested are different than current active one (requested -> active):
+  custom:framework-win-MediaFoundation: 216162199b28c13a410421893ffa2e32 -> 
+  custom:video-decoder-ogg-theora: a1e56fd34408186e4bbccfd4996cb3dc -> 
+  custom:container-muxer-webm: aa71ff27fc2769a1b78a27578f13a17b -> 
+  custom:container-demuxer-webm: 4f35f7cbe854078d1ac9338744f61a02 -> 
+  custom:container-demuxer-ogg: 62fdf1f143b41e24485cea50d1cbac27 -> 
+  custom:video-encoder-webm-vp8: eb34c28f22e8b96e1ab97ce403110664 -> 
+  custom:video-decoder-webm-vp8: 9c59270c3fd7afecdb556c50c9e8de78 -> 
+  custom:audio-decoder-ogg-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
+  custom:audio-encoder-webm-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
 ========================================================================
-Received Import Request.
-  Time since last request: 947.318061 seconds.
-  path: Assets/Age Of War/Scripts/UI/SplashScene.cs
-  artifactKey: Guid(e61e1d1d6dc27f8468728dd943f0243e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Age Of War/Scripts/UI/SplashScene.cs using Guid(e61e1d1d6dc27f8468728dd943f0243e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '1c964a9892ecf90f397d6ea3f8d714df') in 0.003979 seconds 
-  Import took 0.009541 seconds .
+Received Prepare
+Registering precompiled user dll's ...
+Registered in 0.004855 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for LinuxStandalone target not found
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 1.29 ms, found 2 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Mono: successfully reloaded assembly
+- Completed reload, in  1.033 seconds
+Domain Reload Profiling:
+	ReloadAssembly (1035ms)
+		BeginReloadAssembly (122ms)
+			ExecutionOrderSort (0ms)
+			DisableScriptedObjects (7ms)
+			BackupInstance (0ms)
+			ReleaseScriptingObjects (0ms)
+			CreateAndSetChildDomain (35ms)
+		EndReloadAssembly (852ms)
+			LoadAssemblies (105ms)
+			RebuildTransferFunctionScriptingTraits (0ms)
+			SetupTypeCache (219ms)
+			ReleaseScriptCaches (1ms)
+			RebuildScriptCaches (30ms)
+			SetupLoadedEditorAssemblies (387ms)
+				LogAssemblyErrors (0ms)
+				InitializePlatformSupportModulesInManaged (10ms)
+				SetLoadedEditorAssemblies (1ms)
+				RefreshPlugins (1ms)
+				BeforeProcessingInitializeOnLoad (99ms)
+				ProcessInitializeOnLoadAttributes (255ms)
+				ProcessInitializeOnLoadMethodAttributes (13ms)
+				AfterProcessingInitializeOnLoad (8ms)
+				EditorAssembliesLoaded (0ms)
+			ExecutionOrderSort2 (0ms)
+			AwakeInstancesAfterBackupRestoration (14ms)
+Platform modules already initialized, skipping
+Refreshing native plugins compatible for Editor in 0.95 ms, found 2 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 3099 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 133.6 MB.
+System memory in use after: 133.9 MB.
 
+Unloading 15 unused Assets to reduce memory usage. Loaded Objects now: 3666.
+Total: 2.957010 ms (FindLiveObjects: 0.379937 ms CreateObjectMapping: 0.154768 ms MarkObjects: 2.399188 ms  DeleteObjects: 0.016552 ms)
+
+AssetImportParameters requested are different than current active one (requested -> active):
+  custom:framework-win-MediaFoundation: 216162199b28c13a410421893ffa2e32 -> 
+  custom:video-decoder-ogg-theora: a1e56fd34408186e4bbccfd4996cb3dc -> 
+  custom:container-muxer-webm: aa71ff27fc2769a1b78a27578f13a17b -> 
+  custom:container-demuxer-webm: 4f35f7cbe854078d1ac9338744f61a02 -> 
+  custom:container-demuxer-ogg: 62fdf1f143b41e24485cea50d1cbac27 -> 
+  custom:video-encoder-webm-vp8: eb34c28f22e8b96e1ab97ce403110664 -> 
+  custom:video-decoder-webm-vp8: 9c59270c3fd7afecdb556c50c9e8de78 -> 
+  custom:audio-decoder-ogg-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
+  custom:audio-encoder-webm-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
 AssetImportWorkerClient::OnTransportError - code=2 error=End of file
