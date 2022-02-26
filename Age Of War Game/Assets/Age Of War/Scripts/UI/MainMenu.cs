@@ -23,4 +23,29 @@ public class MainMenu : MonoBehaviour
             Application.Quit();
         }
     }
+
+    public void OpenVsCpuPage()
+    {
+
+    }
+
+    public void OpenRankedPage()
+    {
+
+    }
+
+    public void OpenCustomGamePage()
+    {
+
+    }
+
+    public void JoinQuickplayQueue()
+    {
+
+    }
+
+    public void OpenCampaignPage()
+    {
+
+    }
 }

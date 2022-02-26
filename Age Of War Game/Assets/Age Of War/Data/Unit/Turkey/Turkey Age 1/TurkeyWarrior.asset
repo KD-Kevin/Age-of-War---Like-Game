@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: TurkeyWarrior
   m_EditorClassIdentifier: 
   ClassChangeDisplayName: Turkey Warrior
-  NewUnitType: {fileID: 0}
+  NewUnitType: {fileID: 6349147188241674974, guid: c6bd6059b79103146b78ce26c221883f, type: 3}
