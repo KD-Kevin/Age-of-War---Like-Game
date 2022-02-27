@@ -7,6 +7,8 @@ public class MeleeBox : MonoBehaviour
 {
     public string DisplayDamageText = "Damage";
     public int Damage = 10;
+    public int MagicDamage = 0;
+    public int TrueDamage = 0;
     public bool TeamAttackDamage = false;
     [SerializeField]
     private FighterUnitBehaviour UsingFigher;
@@ -43,11 +45,15 @@ public class MeleeBox : MonoBehaviour
         {
             if (UsingFigher != null)
             {
-                Health.Damage(UsingFigher.GetAttackDamage(), DisplayDamageText);
+                Health.Damage(UsingFigher.GetTrueAttackDamage(), DisplayDamageText, DamageTypes.True);
+                Health.Damage(UsingFigher.GetMagicAttackDamage(), DisplayDamageText, DamageTypes.Magical);
+                Health.Damage(UsingFigher.GetAttackDamage(), DisplayDamageText, DamageTypes.Physical);
             }
             else
             {
-                Health.Damage(Damage, DisplayDamageText);
+                Health.Damage(TrueDamage, DisplayDamageText, DamageTypes.True);
+                Health.Damage(MagicDamage, DisplayDamageText, DamageTypes.Magical);
+                Health.Damage(Damage, DisplayDamageText, DamageTypes.Physical);
             }
         }
     }

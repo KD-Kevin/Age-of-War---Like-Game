@@ -1,0 +1,92 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98e23e1e1126dd34aaf7326f663f6978, type: 3}
+  m_Name: Test
+  m_EditorClassIdentifier: 
+  DisplayName: Test Perk
+  DisplayDescription: Does Whatever The Test Needs to Do
+  DisplaySprite: {fileID: 21300000, guid: a81b811d419055c43a7ddc04ce938fab, type: 3}
+  BasicChanges:
+    FlatMoneyIncreaseAtStart: 0
+    MoneyGainMultiplier: 1
+    WeaponPriceMultiplier: 1
+    UnitPriceMultiplier: 1
+    FlatExperienceIncreaseAtStart: 0
+    ExperienceGainMultiplier: 1
+    FlatUltimateChargePercentIncreaseAtStart: 0
+    UltimateGainMultiplier: 1
+    BaseBuildingMaxHealthChange: 0
+    BaseBuildingMaxArmorChange: 0
+    BaseBuildingMaxMagicArmorChange: 0
+    BaseBuildingAutoHealChange: 0
+    BaseBuildingAutoRepairChange: 0
+    BaseBuildingMAutoRestoreChange: 0
+    MaxTowerWeaponSlotsChange: 0
+    TowerWeaponDamageChange: 0
+    TowerWeaponRangeChange: 0
+    WeaponBuildTimeMultiplier: 1
+    AllUnitCostChange: 0
+    PerUnitCostChange: 00000000000000000000000000000000
+    AllUnitMeleeDamageChange: 0
+    PerUnitMeleeDamageChange: 00000000000000000000000000000000
+    AllUnitMeleeRangeChange: 0
+    PerUnitMeleeRangeChange: 00000000000000000000000000000000
+    AllUnitMeleeMagicDamageChange: 0
+    PerUnitMeleeMagicDamageChange: 00000000000000000000000000000000
+    AllUnitMeleeTrueDamageChange: 0
+    PerUnitMeleeTrueDamageChange: 00000000000000000000000000000000
+    AllUnitMeleeLifestealChange: 0
+    PerUnitMeleeLifestealChange: 00000000000000000000000000000000
+    AllUnitProjectileDamageChange: 0
+    PerUnitProjectileDamageChange: 00000000000000000000000000000000
+    AllUnitProjectileRangeChange: 0
+    PerUnitProjectileRangeChange: 00000000000000000000000000000000
+    AllUnitProjectileMagicDamageChange: 0
+    PerUnitProjectileMagicDamageChange: 00000000000000000000000000000000
+    AllUnitProjectileTrueDamageChange: 0
+    PerUnitProjectileTrueDamageChange: 00000000000000000000000000000000
+    AllUnitProjectileLifestealChange: 0
+    PerUnitProjectileLifestealChange: 00000000000000000000000000000000
+    AllUnitBaseExperienceChange: 0
+    PerUnitExperienceGivenWhenKilledChange: 00000000000000000000000000000000
+    AllUnitMaxHealthChange: 0
+    PerUnitMaxHealthChange: 00000000000000000000000000000000
+    AllUnitAutoHealChange: 0
+    PerUnitAutoHealChange: 00000000000000000000000000000000
+    AllUnitMaxArmorChange: 0
+    PerUnitMaxArmorChange: 00000000000000000000000000000000
+    AllUnitAutoRepairChange: 0
+    PerUnitAutoRepairChange: 00000000000000000000000000000000
+    AllUnitMaxMagicArmorChange: 0
+    PerUnitMaxMagicArmorChange: 00000000000000000000000000000000
+    AllUnitAutoRestoreChange: 0
+    PerUnitAutoRestoreChange: 00000000000000000000000000000000
+    AllUnitDamageMitigationMultiplierChange: 0
+    PerUnitDamageMitigationMultiplierChange: 00000000000000000000000000000000
+    AllUnitMovementSpeedChange: 0
+    PerUnitMovementSpeedChange:
+    - 0
+    - 0
+    - 0
+    - 0
+    AllUnitCooldownMultiplier: 1
+    PerUnitCooldownMultiplier:
+    - 1
+    - 1
+    - 1
+    - 1
+    AllUnitBuildTimeMultiplier: 1
+    PerUnitBuildTimeMultiplier:
+    - 1
+    - 1
+    - 1
+    - 1

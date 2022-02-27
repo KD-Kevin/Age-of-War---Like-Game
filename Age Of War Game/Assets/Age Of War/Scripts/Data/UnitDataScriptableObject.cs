@@ -48,7 +48,14 @@ public class StatChanges
     public int ProjectileDamageChange = 0;
     public float ProjectileRangeChange = 0;
 
-    public int ExperienceGivenWhenKilledChange = 0; // Buff for the other player
+    /// <summary>
+    /// base Experience given to the other unit when this is killed
+    /// </summary>
+    public int BaseXP = 0;
+    /// <summary>
+    /// How much this unit type gains on a kill (Base XP x ExperienceGainMultipler = Actual XP)
+    /// </summary>
+    public float ExperienceGainMultipler = 1f;
 
     public int MaxHealthChange = 0;
     public bool HealEquivalentHealth = true;

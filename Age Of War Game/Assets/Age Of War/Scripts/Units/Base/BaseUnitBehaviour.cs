@@ -21,9 +21,19 @@ public class BaseUnitBehaviour : MonoBehaviour, IHealth, ITeam
     [SerializeField]
     protected int StartArmor = 0;
     [SerializeField]
+    protected int StartMagicArmor = 0;
+    [SerializeField]
+    protected float DamageMitigationMultiplier = 1f;
+    [SerializeField]
+    protected int AutoHealAmount = 0;
+    [SerializeField]
+    protected int AutoRepairAmount = 0;
+    [SerializeField]
+    protected int AutoRestoreAmount = 0;
+    [SerializeField]
     protected float StopDistance = 3;
     [SerializeField]
-    protected float AlliedUnitStopDistance = 1;
+    protected float AlliedUnitStopDistance = 1f;
     [SerializeField]
     private float MovementSpeed = 4;
     [SerializeField]
@@ -41,8 +51,16 @@ public class BaseUnitBehaviour : MonoBehaviour, IHealth, ITeam
     public int CurrentArmor { get => CurrentArmorValue; set => CurrentArmorValue = value; }
     public int MaxArmor { get => MaxArmorValue; set => MaxArmorValue = value; }
     public int StartingArmor { get => StartArmor; set => StartArmor = value; }
+    public int CurrentMagicArmor { get => CurrentMagicArmorValue; set => CurrentMagicArmorValue = value; }
+    public int MaxMagicArmor { get => MaxMagicArmorValue; set => MaxMagicArmorValue = value; }
+    public int StartingMagicArmor { get => StartMagicArmor; set => StartMagicArmor = value; }
+    public float DamgeMitigationMult { get => DamageMitigationMultiplier; set => DamageMitigationMultiplier = value; }
+    public int AutoHeal { get => AutoHealAmount; set => AutoHealAmount = value; }
+    public int AutoRepair { get => AutoRepairAmount; set => AutoRepairAmount = value; }
+    public int AutoRestore { get => AutoRestoreAmount; set => AutoRestoreAmount = value; }
     public int PrefabID { get => PrefabSpawnID; set => PrefabSpawnID = value; }
-    public int Team { get => TeamID; set => TeamID = value; }
+    public int Team { get => TeamID; set => SetTeam(value); }
+
     public UnitData UnitData { get; set; }
     public List<EquipmentChangeScriptableObject> CurrentListOfPossibleChanges { get; set; }
     public bool Moving { get; set; }
@@ -54,10 +72,13 @@ public class BaseUnitBehaviour : MonoBehaviour, IHealth, ITeam
     protected int MaxHP = 0;
     protected int CurrentArmorValue = 0;
     protected int MaxArmorValue = 0;
+    protected int CurrentMagicArmorValue = 0;
+    protected int MaxMagicArmorValue = 0;
     protected int FrameCounter = 0;
     protected RaycastHit2D[] RayHits = new RaycastHit2D[0];
     protected IHealth HealthTarget = null;
     protected float LongestRaycastDistance;
+    protected float RepairHealRestoreTimer = 0;
 
     public static List<BaseUnitBehaviour> FighterPrefabList = new List<BaseUnitBehaviour>();
     public static Dictionary<int, List<BaseUnitBehaviour>> FighterPools = new Dictionary<int, List<BaseUnitBehaviour>>();
@@ -68,29 +89,59 @@ public class BaseUnitBehaviour : MonoBehaviour, IHealth, ITeam
     public static Dictionary<(int, int), List<BaseUnitBehaviour>> TeamUnits = new Dictionary<(int, int), List<BaseUnitBehaviour>>();
     public static Dictionary<int, List<BaseUnitBehaviour>> AllActiveTeamUnits = new Dictionary<int, List<BaseUnitBehaviour>>();
 
-    public virtual void Damage(int DamageAmount, string DamageReason)
+    #region IHealth
+
+    public virtual void Damage(int DamageAmount, string DamageReason, DamageTypes DamageType)
     {
-        // Modifiers Here
-        if (CurrentArmor > 0)
+        // Multipliers here
+
+
+        // Defenses Here
+        DamageAmount = Mathf.FloorToInt(DamageMitigationMultiplier * DamageAmount);
+        int Remainder = DamageAmount;
+        if (DamageType == DamageTypes.Physical)
         {
-            if (DamageAmount > 10)
+            // Modifiers Here
+            if (CurrentArmor > 0)
             {
-                DamageAmount -= 10;
+                if (DamageAmount > 10)
+                {
+                    DamageAmount -= 10;
+                }
+                else
+                {
+                    DamageAmount /= 2;
+                }
             }
-            else
+            Remainder = DamageAmount - CurrentArmor;
+            CurrentArmor -= DamageAmount;
+            if (CurrentArmor < 0)
             {
-                DamageAmount /= 2;
+                CurrentArmor = 0;
+            }
+        }
+        else if (DamageType == DamageTypes.Magical)
+        {
+            if (CurrentMagicArmor > 0)
+            {
+                if (DamageAmount > 10)
+                {
+                    DamageAmount -= 10;
+                }
+                else
+                {
+                    DamageAmount /= 2;
+                }
+            }
+            Remainder = DamageAmount - CurrentMagicArmor;
+            CurrentMagicArmor -= DamageAmount;
+            if (CurrentMagicArmor < 0)
+            {
+                CurrentMagicArmor = 0;
             }
         }
 
-        int Remainder = DamageAmount - CurrentArmor;
-
-        CurrentArmor -= DamageAmount;
-        if (CurrentArmor < 0)
-        {
-            CurrentArmor = 0;
-        }
-
+        // Damage Here
         if (Remainder > 0)
         {
             CurrentHealth -= Remainder;
@@ -173,6 +224,165 @@ public class BaseUnitBehaviour : MonoBehaviour, IHealth, ITeam
         }
     }
 
+    public virtual void HealAndRestore(int RestoreAmount)
+    {
+        // Modifiers Here
+
+        if (CurrentHealth <= 0)
+        {
+            return;
+        }
+
+        CurrentHealth += RestoreAmount;
+        int Remainder = 0;
+        if (CurrentHealth > MaxHealth)
+        {
+            Remainder = CurrentHealth - MaxHealth;
+            CurrentHealth = MaxHealth;
+        }
+
+        if (Remainder > 0)
+        {
+            CurrentMagicArmor += Remainder;
+            if (CurrentMagicArmor > MaxMagicArmor)
+            {
+                CurrentMagicArmor = MaxMagicArmor;
+            }
+        }
+    }
+
+    public virtual void RepairAndRestore(int RepairAmount)
+    {
+        // Modifiers Here
+
+        CurrentArmor += RepairAmount;
+        int Remainder = 0;
+        if (CurrentArmor > MaxArmor)
+        {
+            Remainder = CurrentArmor - MaxArmor;
+            CurrentArmor = MaxArmor;
+        }
+
+        if (Remainder > 0)
+        {
+            CurrentMagicArmor += Remainder;
+            if (CurrentMagicArmor > MaxMagicArmor)
+            {
+                CurrentMagicArmor = MaxMagicArmor;
+            }
+        }
+    }
+
+    public virtual void RestoreAndRepair(int RestoreAmount)
+    {
+        // Modifiers Here
+
+        CurrentMagicArmor += RestoreAmount;
+        int Remainder = 0;
+        if (CurrentMagicArmor > MaxMagicArmor)
+        {
+            Remainder = CurrentMagicArmor - MaxMagicArmor;
+            CurrentMagicArmor = MaxMagicArmor;
+        }
+
+        if (Remainder > 0)
+        {
+            CurrentArmor += Remainder;
+            if (CurrentArmor > MaxArmor)
+            {
+                CurrentArmor = MaxArmor;
+            }
+        }
+    }
+
+    public virtual void HealRepairAndRestore(int Amount)
+    {
+        if (CurrentHealth <= 0)
+        {
+            return;
+        }
+
+        CurrentHealth += Amount;
+        int Remainder = 0;
+        if (CurrentHealth > MaxHealth)
+        {
+            Remainder = CurrentHealth - MaxHealth;
+            CurrentHealth = MaxHealth;
+        }
+
+        if (Remainder > 0)
+        {
+            CurrentArmor += Remainder;
+            if (CurrentArmor > MaxArmor)
+            {
+                Remainder = CurrentArmor - MaxArmor;
+                CurrentArmor = MaxArmor;
+            }
+            else
+            {
+                Remainder = 0;
+            }
+        }
+
+        if (Remainder > 0)
+        {
+            CurrentMagicArmor += Remainder;
+            if (CurrentMagicArmor > MaxMagicArmor)
+            {
+                Remainder = CurrentMagicArmor - MaxMagicArmor;
+                CurrentMagicArmor = MaxMagicArmor;
+            }
+            else
+            {
+                Remainder = 0;
+            }
+        }
+    }
+
+    public virtual void HealRestoreAndRepair(int Amount)
+    {
+        if (CurrentHealth <= 0)
+        {
+            return;
+        }
+
+        CurrentHealth += Amount;
+        int Remainder = 0;
+        if (CurrentHealth > MaxHealth)
+        {
+            Remainder = CurrentHealth - MaxHealth;
+            CurrentHealth = MaxHealth;
+        }
+
+        if (Remainder > 0)
+        {
+            CurrentMagicArmor += Remainder;
+            if (CurrentMagicArmor > MaxMagicArmor)
+            {
+                Remainder = CurrentMagicArmor - MaxMagicArmor;
+                CurrentMagicArmor = MaxMagicArmor;
+            }
+            else
+            {
+                Remainder = 0;
+            }
+        }
+
+        if (Remainder > 0)
+        {
+            CurrentArmor += Remainder;
+            if (CurrentArmor > MaxArmor)
+            {
+                Remainder = CurrentArmor - MaxArmor;
+                CurrentArmor = MaxArmor;
+            }
+            else
+            {
+                Remainder = 0;
+            }
+        }
+    }
+
     public virtual void Initialize()
     {
         CurrentArmor = StartArmor;
@@ -198,17 +408,25 @@ public class BaseUnitBehaviour : MonoBehaviour, IHealth, ITeam
     {
         // Modifiers Here
 
-        if (CurrentArmor <= 0)
-        {
-            return;
-        }
-
         CurrentArmor += RepairAmount;
         if (CurrentArmor > MaxArmor)
         {
             CurrentArmor = MaxArmor;
         }
     }
+
+    public virtual void Restore(int RestoreAmount)
+    {
+        // Modifiers Here
+
+        CurrentMagicArmor += RestoreAmount;
+        if (CurrentMagicArmor > MaxMagicArmor)
+        {
+            CurrentMagicArmor = MaxMagicArmor;
+        }
+    }
+
+    #endregion
 
     public virtual float GetTimeToCreate()
     {
@@ -241,6 +459,16 @@ public class BaseUnitBehaviour : MonoBehaviour, IHealth, ITeam
     }
 
     public virtual int GetAttackDamage()
+    {
+        return 0;
+    }
+
+    public virtual int GetMagicAttackDamage()
+    {
+        return 0;
+    }
+
+    public virtual int GetTrueAttackDamage()
     {
         return 0;
     }
@@ -450,6 +678,21 @@ public class BaseUnitBehaviour : MonoBehaviour, IHealth, ITeam
             if (Attack)
             {
                 AttackUpdate();
+            }
+        }
+
+        if (AutoHeal != 0 || AutoRepair != 0 || AutoRestore != 0)
+        {
+            if (CurrentHealth < MaxHealth || CurrentArmor < MaxArmor || CurrentMagicArmor < MaxMagicArmor)
+            {
+                RepairHealRestoreTimer += Time.deltaTime;
+                if (RepairHealRestoreTimer > 1f)
+                {
+                    RepairHealRestoreTimer = 0;
+                    Heal(AutoHeal);
+                    Repair(AutoRepair);
+                    Restore(AutoRestore);
+                }
             }
         }
     }
