@@ -5,11 +5,18 @@ using UnityEngine;
 
 public class MainMenu : MonoBehaviour
 {
+    [SerializeField]
+    private RaceSelector RaceSelectionUI;
+    [SerializeField]
+    private PerkSelector PerkSelectionUI;
+
     public static MainMenu Instance;
 
     private void Awake()
     {
         Instance = this;
+        RaceSelectionUI.SetInstance();
+        PerkSelectionUI.SetInstance();
     }
 
     public void CloseGame()

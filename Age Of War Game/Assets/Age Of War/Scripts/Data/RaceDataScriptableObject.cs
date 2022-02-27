@@ -37,4 +37,7 @@ public class RaceDataScriptableObject : ScriptableObject
     
     public List<BackgroundWeapon> StartingBackgroundWeaponBlueprints = new List<BackgroundWeapon>();
     public List<BackgroundWeapon> UnlockableBackgroundWeaponBlueprints = new List<BackgroundWeapon>();
+
+    [Header("Passive")]
+    public RacePassive Passive;
 }

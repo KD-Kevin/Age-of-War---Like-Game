@@ -8,6 +8,7 @@ public class Perk : ScriptableObject
     public string DisplayName;
     public string DisplayDescription;
     public Sprite DisplaySprite;
+    public List<PerkTypes> PerkCatagories = new List<PerkTypes>();
 
     public PerkChanges BasicChanges = new PerkChanges();
 
@@ -21,6 +22,19 @@ public class Perk : ScriptableObject
     public virtual void OnUpdateEffects()
     {
 
+    }
+
+    public bool IsPerkType(PerkTypes Type)
+    {
+        foreach(PerkTypes type in PerkCatagories)
+        {
+            if (type == Type || type == PerkTypes.All)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
 
@@ -184,4 +198,15 @@ public class PerkChanges
     {
         1f,1f,1f,1f
     };
+}
+
+public enum PerkTypes
+{
+    All,
+    Economy,
+    Weapon,
+    Unit,
+    Base,
+    Ultimate,
+    Other,
 }
