@@ -67,6 +67,7 @@ public class RaceSelector : MonoBehaviour
 
     public void OpenRaceSelector(System.Action<RaceDataScriptableObject> ConfirmCallback, System.Action CancelCallback)
     {
+        gameObject.SetActive(true);
         ConfirmationCallback = ConfirmCallback;
         CancellationCallback = CancelCallback;
     }

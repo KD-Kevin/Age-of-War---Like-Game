@@ -712,9 +712,9 @@ public class BaseUnitBehaviour : MonoBehaviour, IHealth, ITeam
 
     }
 
-    public virtual void SetTeam(int TeamID)
+    public virtual void SetTeam(int NewTeamID)
     {
-        Team = TeamID;
+        TeamID = NewTeamID;
         if (Team == 1)
         {
             transform.localScale = new Vector3(1, 1, 1);

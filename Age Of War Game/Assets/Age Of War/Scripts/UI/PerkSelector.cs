@@ -41,8 +41,15 @@ public class PerkSelector : MonoBehaviour
         Instance = this;
     }
 
-    public void OpenPerkSelector(System.Action<Perk, Perk> ConfirmCallback, System.Action CancelCallback, Perk CurrentPerk1, Perk CurrentPerk2)
+    public void OpenPerkSelector(RaceDataScriptableObject OpenForRace, System.Action<Perk, Perk> ConfirmCallback, System.Action CancelCallback, Perk CurrentPerk1, Perk CurrentPerk2)
     {
+        if (OpenForRace == null)
+        {
+            return;
+        }
+
+        PossiblePerks = OpenForRace.PossiblePerks;
+        gameObject.SetActive(true);
         ConfirmationCallback = ConfirmCallback;
         CancellationCallback = CancelCallback;
 
@@ -124,6 +131,10 @@ public class PerkSelector : MonoBehaviour
 
     public void ResetUi()
     {
+        if (CurrentCatagory == null)
+        {
+            CurrentCatagory = Catagories[0];
+        }
         CurrentCatagory.ResetUi(SelectedPerk1, SelectedPerk2);
     }
 

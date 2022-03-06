@@ -16,7 +16,9 @@ MonoBehaviour:
   DisplayDescription: Trying to take my land are ya? I don't think so!
   DisplayPlaystyleDescription: A versatile race that can transform your inumerable
     amount of turkeys in a wide range of battle assets.
+  CampainSceneName: CrazyFarmerCampaign
   DisplaySprite: {fileID: 21300000, guid: b7414fdd0411d364ab74c963a05b62d3, type: 3}
+  RaceSpecificUiPrefab: {fileID: 0}
   BaseBlueprint: {fileID: 0}
   Ultimates: []
   PossiblePerks: []
@@ -31,3 +33,4 @@ MonoBehaviour:
   UnlockableFloorWeaponBlueprints: []
   StartingBackgroundWeaponBlueprints: []
   UnlockableBackgroundWeaponBlueprints: []
+  Passive: {fileID: 0}

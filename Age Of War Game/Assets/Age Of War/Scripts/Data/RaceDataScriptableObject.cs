@@ -11,7 +11,9 @@ public class RaceDataScriptableObject : ScriptableObject
     public string DisplayDescription;
     [TextArea]
     public string DisplayPlaystyleDescription;
+    public string CampainSceneName;
     public Sprite DisplaySprite;
+    public RaceTypes RaceType;
 
     [Header("UI For Race")]
     public GameObject RaceSpecificUiPrefab;
@@ -40,4 +42,15 @@ public class RaceDataScriptableObject : ScriptableObject
 
     [Header("Passive")]
     public RacePassive Passive;
+}
+
+public enum RaceTypes
+{
+    Unknown,
+    Human,
+    Elven,
+    Dwarfes,
+    Goblin,
+    CrazyFarmer,
+    Froggen,
 }
