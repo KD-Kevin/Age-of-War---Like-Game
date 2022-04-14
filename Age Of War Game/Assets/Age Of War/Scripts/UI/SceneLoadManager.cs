@@ -72,9 +72,10 @@ public class SceneLoadManager : MonoBehaviour
         string Scenename = message.GetString();
         messageToSend.AddUShort(newPlayerId);
         messageToSend.AddString(Scenename);
-        NetworkManager.Instance.Server.Send(messageToSend, newPlayerId);
-
-        Instance.LoadScene(Scenename);
+        foreach (NetworkPlayer player in PlayerManager.Instance.ConnectedPlayers.Values)
+        {
+            NetworkManager.Instance.Server.Send(messageToSend, player.PlayerID);
+        }
     }
 
     [MessageHandler((ushort)MessageId.ChangeScene)]
