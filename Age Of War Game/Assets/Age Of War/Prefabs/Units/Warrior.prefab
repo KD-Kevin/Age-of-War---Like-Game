@@ -102,6 +102,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DisplayDamageText: Damage
   Damage: 25
+  MagicDamage: 0
+  TrueDamage: 0
   TeamAttackDamage: 0
   UsingFigher: {fileID: 6349147188241674974}
 --- !u!1 &7617537392311017519
@@ -233,8 +235,14 @@ MonoBehaviour:
   BuildTime: 3
   BuildCooldown: 8
   BuildCost: 100
+  ExperienceGiven: 15
   StartHealth: 100
   StartArmor: 0
+  StartMagicArmor: 0
+  DamageMitigationMultiplier: 1
+  AutoHealAmount: 0
+  AutoRepairAmount: 0
+  AutoRestoreAmount: 0
   StopDistance: 3
   AlliedUnitStopDistance: 1.2
   MovementSpeed: 4
@@ -242,5 +250,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 192
   LookTransform: {fileID: 8868827228275375262}
+  UnitDataScriptableObject: {fileID: 11400000, guid: ab6e263022a4dba4a9b394b01184340c, type: 2}
   MeleeDamage: 25
+  MagicMeleeDamage: 0
+  TrueMeleeDamage: 0
   MeleeAttackObject: {fileID: 6452966282490488460}

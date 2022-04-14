@@ -54,14 +54,12 @@ public class MainMenu : MonoBehaviour
     public void CloseGame()
     {
         NetworkManager.Instance.LeaveGame();
-        if (Application.isEditor)
-        {
-            EditorApplication.ExitPlaymode();
-        }
-        else
-        {
-            Application.Quit();
-        }
+#if UNITY_EDITOR
+        EditorApplication.ExitPlaymode();
+#endif
+
+        Application.Quit();
+
     }
 
     public void OpenVsCpuPage()

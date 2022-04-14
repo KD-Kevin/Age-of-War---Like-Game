@@ -98,7 +98,7 @@ public class PlayerManager : MonoBehaviour
             NetworkManager.Instance.Server.Send(messageToSend, player.PlayerID);
         }
 
-        foreach (NetworkPlayer player in PlayerManager.Instance.ConnectedPlayers.Values)
+        foreach (NetworkPlayer player in Instance.ConnectedPlayers.Values)
         {
             if (player.PlayerID == fromClientId)
             {
@@ -110,15 +110,11 @@ public class PlayerManager : MonoBehaviour
     [MessageHandler((ushort)MessageId.SendPlayerReadyForSimulation)]
     private static void SendReadyToStart(Message message)
     {
-        if (NetworkManager.Instance.IsHost)
-        {
-            return;
-        }
         Debug.Log("Client Recieved - Send Ready Confirmation");
         ushort confirmedPlayer = message.GetUShort();
         bool Confirmed = message.GetBool();
 
-        foreach (NetworkPlayer player in PlayerManager.Instance.ConnectedPlayers.Values)
+        foreach (NetworkPlayer player in Instance.ConnectedPlayers.Values)
         {
             if (player.PlayerID == confirmedPlayer)
             {
@@ -164,7 +160,7 @@ public class PlayerManager : MonoBehaviour
         Debug.Log("Client Sent - Send Player Data");
         Message message = Message.Create(MessageSendMode.reliable, MessageId.SendPlayerData);
         message.AddUShort(Instance.LocalPlayer.PlayerID);
-        byte[] PlayerDataByteArr = LocalPlayerData.Data.SerializeToByteArray();
+        //byte[] PlayerDataByteArr = LocalPlayerData.Data.SerializeToByteArray();
         //message.AddBytes(PlayerDataByteArr, true, true);
         message.AddString(LocalPlayerData.Data.SerializeToJSON());
 
