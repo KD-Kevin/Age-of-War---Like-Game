@@ -179,7 +179,7 @@ public class LockstepManager : MonoBehaviour
 
     public void AsyncGameTurn()
     {
-        Debug.Log($"Async Update {System.DateTime.Now.Hour} hr / {System.DateTime.Now.Minute} min / {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
+        //Debug.Log($"Async Update {System.DateTime.Now.Hour} hr / {System.DateTime.Now.Minute} min / {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
     }
 
     public void GameTurn()
@@ -352,7 +352,7 @@ public class LockstepManager : MonoBehaviour
     [MessageHandler((ushort)MessageId.SendTurnActions)]
     private static void SendTurnActions(ushort fromClientId, Message message)
     {
-        Debug.Log("Server Recieved - Send actions");
+        //Debug.Log("Server Recieved - Send actions");
         int NumberOfActions = message.GetInt();
         ushort SentFromPlayerID = message.GetUShort();
 
@@ -360,7 +360,6 @@ public class LockstepManager : MonoBehaviour
         Message messageToSend = Message.Create(MessageSendMode.reliable, MessageId.SendTurnActions);
         messageToSend.AddInt(NumberOfActions);
         messageToSend.AddUShort(SentFromPlayerID);
-        PlayerActions PlayerAction = new PlayerActions(SentFromPlayerID);
         for (int actionIndex = 0; actionIndex < NumberOfActions; actionIndex++)
         {
             int TypeOfAction = message.GetInt();
@@ -377,23 +376,10 @@ public class LockstepManager : MonoBehaviour
             {
                 NewAction = new CorruptAction();
             }
-
-            if (NewAction != null)
-            {
-                NewAction.ActionType = TypeOfAction;
-                NewAction.OwningPlayer = SentFromPlayerID;
-                PlayerAction.AddAction(NewAction);
-            }
         }
-
-        Instance.RecievePlayerAction(PlayerAction);
 
         foreach (NetworkPlayer player in PlayerManager.Instance.ConnectedPlayers.Values)
         {
-            if (player == PlayerManager.Instance.LocalPlayer)
-            {
-                continue;
-            }
             NetworkManager.Instance.Server.Send(messageToSend, player.PlayerID);
         }
     }
@@ -401,10 +387,6 @@ public class LockstepManager : MonoBehaviour
     [MessageHandler((ushort)MessageId.SendTurnActions)]
     private static void SendTurnActions(Message message)
     {
-        if (NetworkManager.Instance.IsHost)
-        {
-            return;
-        }
         Debug.Log("Cient Recieved - Send actions");
         int NumberOfActions = message.GetInt();
         ushort SentFromPlayerID = message.GetUShort();
@@ -536,11 +518,13 @@ public class ActionTurn
         {
             CurrentState = ActionStates.Pending;
             // Send Off All Actions
+            LockstepManager.Instance.PendingTurn = this;
             LockstepManager.Instance.SendOffLocalActions();
         }
         else if (CurrentState == ActionStates.Pending)
         {
             // Recieved Everyones Actions
+            LockstepManager.Instance.ConfirmedTurn = this;
             CurrentState = ActionStates.Confirmed;
         }
         else if (CurrentState == ActionStates.Confirmed)
