@@ -397,11 +397,13 @@ public class CustomGamePage : MonoBehaviour
         if (MultiplayerStatus == MultiplayStatus.FoundMatch)
         {
             // Forfiet match?
+            MultiplayerStatus = MultiplayStatus.NoSearching;
             NetworkManager.Instance.LeaveGame();
             gameObject.SetActive(false);
             return;
         }
 
+        MultiplayerStatus = MultiplayStatus.NoSearching;
         if (NetworkManager.Instance.Server.IsRunning)
         {
             NetworkManager.Instance.LeaveGame();
