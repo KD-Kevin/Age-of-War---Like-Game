@@ -150,7 +150,7 @@ public class PlayerManager : MonoBehaviour
             BF.Serialize(ms, PlayerData.Data);
             PlayerDataByteArr = ms.ToArray();
         }
-        message.AddBytes(PlayerDataByteArr);
+        message.AddBytes(PlayerDataByteArr, true, true);
 
         NetworkManager.Instance.Client.Send(message);
     }
@@ -163,7 +163,7 @@ public class PlayerManager : MonoBehaviour
         Message messageToSend = Message.Create(MessageSendMode.reliable, MessageId.SendPlayerData);
         byte[] PlayerDataArr = message.GetBytes();
         messageToSend.AddUShort(newPlayerId);
-        messageToSend.AddBytes(PlayerDataArr);
+        messageToSend.AddBytes(PlayerDataArr, true ,true);
         NetworkManager.Instance.Server.Send(messageToSend, newPlayerId);
 
         PlayerData SentPlayersData;
