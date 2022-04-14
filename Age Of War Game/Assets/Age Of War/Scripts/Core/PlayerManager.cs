@@ -52,6 +52,7 @@ public class PlayerManager : MonoBehaviour
         else
         {
             Instance = this;
+            DontDestroyOnLoad(gameObject);
         }
 
         // Load Player Data
