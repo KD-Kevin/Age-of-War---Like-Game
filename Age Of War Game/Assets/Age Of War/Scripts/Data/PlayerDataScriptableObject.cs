@@ -1,5 +1,7 @@
+using Newtonsoft.Json;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "PlayerData", menuName = "AgeOfWar/Player/PlayerData")]
@@ -32,6 +34,77 @@ public class PlayerData
         QuickPlayData = new List<RankingData>();
         CustomGamePlayData = new List<RankingData>();
         VsComputerPlayData = new List<RankingData>();
+    }
+
+    public string SerializeToJSON()
+    {
+        JsonSerializerSettings setting = new JsonSerializerSettings
+        {
+            Formatting = Formatting.None,
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+        };
+
+        string json = JsonConvert.SerializeObject(this, setting);
+
+        return json;
+    }
+
+    public byte[] SerializeToByteArray()
+    {
+        string jsonSerialization = SerializeToJSON();
+        using (MemoryStream m = new MemoryStream())
+        {
+            using (BinaryWriter writer = new BinaryWriter(m))
+            {
+                writer.Write(jsonSerialization);
+            }
+            return m.ToArray();
+        }
+    }
+
+    public static PlayerData Deserialize(string json)
+    {
+        PlayerData PlayerData = JsonConvert.DeserializeObject<PlayerData>(json);
+        return PlayerData;
+    }
+
+    public static PlayerData Deserialize(byte[] bytaArr)
+    {
+        string json;
+        using (MemoryStream m = new MemoryStream(bytaArr))
+        {
+            using (BinaryReader reader = new BinaryReader(m))
+            {
+                json = reader.ReadString();
+            }
+        }
+        return Deserialize(json);
+    }
+
+    public void SaveLocal()
+    {
+        string path = Path.Combine(Application.persistentDataPath + "/PlayerData/", $"PlayerData'{UserName}'.json");
+        string json = SerializeToJSON();
+        if (File.Exists(path))
+        {
+            File.Delete(path);
+        }
+        File.WriteAllText(path, json);
+    }
+
+    public static PlayerData LoadLocal(string userName)
+    {
+        string path = Path.Combine(Application.persistentDataPath + "/PlayerData/", $"PlayerData'{userName}'.json");
+        if (File.Exists(path))
+        {
+            string fileContent = File.ReadAllText(path);
+            PlayerData PlayerData = Deserialize(fileContent);
+            return PlayerData;
+        }
+        else
+        {
+            return null;
+        }
     }
 
     public RankingData GetPlayData(PlayModes PlayMode, RaceTypes RaceWanted)

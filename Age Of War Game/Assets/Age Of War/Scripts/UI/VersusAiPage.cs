@@ -78,7 +78,7 @@ public class VersusAiPage : MonoBehaviour
     public void OpenPage()
     {
         gameObject.SetActive(true);
-        PlayerNameText.text = PlayerManager.Instance.PlayerData.Data.UserName;
+        PlayerNameText.text = PlayerManager.Instance.LocalPlayerData.Data.UserName;
         if (AiSelectedRace == null || PlayerSelectedRace == null)
         {
             PlayerButton.interactable = false;

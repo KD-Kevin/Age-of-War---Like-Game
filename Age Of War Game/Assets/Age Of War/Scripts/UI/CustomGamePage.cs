@@ -107,7 +107,7 @@ public class CustomGamePage : MonoBehaviour
     public void OpenPage()
     {
         gameObject.SetActive(true);
-        PlayerNameText.text = PlayerManager.Instance.PlayerData.Data.UserName;
+        PlayerNameText.text = PlayerManager.Instance.LocalPlayerData.Data.UserName;
         OpponentRaceButton.interactable = false;
         OpponentPerk1Button.interactable = false;
         OpponentPerk2Button.interactable = false;

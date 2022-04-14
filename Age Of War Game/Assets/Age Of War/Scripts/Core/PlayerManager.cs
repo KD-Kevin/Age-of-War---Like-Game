@@ -12,7 +12,7 @@ public class PlayerManager : MonoBehaviour
     public PlayModes ActiveOnlineMode = PlayModes.None;
 
     // Use to store data for player and opponent
-    public PlayerDataScriptableObject PlayerData;
+    public PlayerDataScriptableObject LocalPlayerData;
     public PlayerDataScriptableObject CustomGameOpponentData;
     public PlayerDataScriptableObject QuickplayOpponentData;
     public PlayerDataScriptableObject RankedOpponentData;
@@ -143,13 +143,7 @@ public class PlayerManager : MonoBehaviour
         Debug.Log("Client Sent - Send Player Data");
         Message message = Message.Create(MessageSendMode.reliable, MessageId.SendPlayerData);
         message.AddUShort(Instance.LocalPlayer.PlayerID);
-        BinaryFormatter BF = new BinaryFormatter();
-        byte[] PlayerDataByteArr;
-        using (var ms = new MemoryStream())
-        {
-            BF.Serialize(ms, PlayerData.Data);
-            PlayerDataByteArr = ms.ToArray();
-        }
+        byte[] PlayerDataByteArr = LocalPlayerData.Data.SerializeToByteArray();
         message.AddBytes(PlayerDataByteArr, true, true);
 
         NetworkManager.Instance.Client.Send(message);
@@ -166,16 +160,20 @@ public class PlayerManager : MonoBehaviour
         messageToSend.AddBytes(PlayerDataArr, true ,true);
         NetworkManager.Instance.Server.Send(messageToSend, newPlayerId);
 
-        PlayerData SentPlayersData;
-        using (var memStream = new MemoryStream())
+        PlayerData SentPlayersData = PlayerData.Deserialize(PlayerDataArr);
+
+        if (Instance.ActiveOnlineMode == PlayModes.Ranked)
         {
-            var binForm = new BinaryFormatter();
-            memStream.Write(PlayerDataArr, 0, PlayerDataArr.Length);
-            memStream.Seek(0, SeekOrigin.Begin);
-            SentPlayersData = binForm.Deserialize(memStream) as PlayerData;
+            Instance.ConfirmationRankedOpponentCallback(SentPlayersData);
         }
-
-
+        else if (Instance.ActiveOnlineMode == PlayModes.Quickplay)
+        {
+            Instance.ConfirmationQuickplayOpponentCallback(SentPlayersData);
+        }
+        else if (Instance.ActiveOnlineMode == PlayModes.CustomGame)
+        {
+            Instance.ConfirmationCustomGameOpponentCallback(SentPlayersData);
+        }
     }
 
     [MessageHandler((ushort)MessageId.SendPlayerData)]
@@ -189,14 +187,7 @@ public class PlayerManager : MonoBehaviour
         ushort newPlayerId = message.GetUShort();
         byte[] PlayerDataArr = message.GetBytes();
 
-        PlayerData SentPlayersData;
-        using (var memStream = new MemoryStream())
-        {
-            var binForm = new BinaryFormatter();
-            memStream.Write(PlayerDataArr, 0, PlayerDataArr.Length);
-            memStream.Seek(0, SeekOrigin.Begin);
-            SentPlayersData = binForm.Deserialize(memStream) as PlayerData;
-        }
+        PlayerData SentPlayersData = PlayerData.Deserialize(PlayerDataArr);
 
         if (Instance.ActiveOnlineMode == PlayModes.Ranked)
         {
@@ -285,7 +276,7 @@ public class PlayerManager : MonoBehaviour
         CurrentMatchData.PlayMode = PlayModes.VsComputer;
         CurrentMatchData.AiDifficulty = page.CurrentDifficulty;
 
-        CurrentMatchData.PlayersData = PlayerData.Data;
+        CurrentMatchData.PlayersData = LocalPlayerData.Data;
         CurrentMatchData.PlayerSelectedRace = page.PlayerSelectedRace;
         CurrentMatchData.PlayerSelectedPerk1 = page.PlayerSelectedPerk1;
         CurrentMatchData.PlayerSelectedPerk2 = page.PlayerSelectedPerk2;

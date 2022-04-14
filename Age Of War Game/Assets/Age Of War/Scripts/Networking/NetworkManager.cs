@@ -93,7 +93,7 @@ public class NetworkManager : MonoBehaviour
 
     private void DidConnect(object sender, EventArgs e)
     {
-        NetworkPlayer.Spawn(Client.Id, PlayerManager.Instance.PlayerData.Data.UserName, Vector3.zero, true);
+        NetworkPlayer.Spawn(Client.Id, PlayerManager.Instance.LocalPlayerData.Data.UserName, Vector3.zero, true);
     }
 
     private void FailedToConnect(object sender, EventArgs e)
