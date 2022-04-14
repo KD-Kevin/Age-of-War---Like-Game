@@ -1,3 +1,4 @@
+using BitStrap;
 using RiptideNetworking;
 using System.Collections;
 using System.Collections.Generic;
@@ -362,6 +363,13 @@ public class PlayerManager : MonoBehaviour
     public void LoadCampaignScene(Scene loadedScene, LoadSceneMode Mode)
     {
         SceneManager.sceneLoaded -= LoadCampaignScene;
+    }
+
+    [Button]
+    public void ClearNameSaveData()
+    {
+        LocalPlayerData.Data.UserName = "No Name";
+        PlayerPrefs.SetString("SaveName", "No Name");
     }
 }
 
