@@ -83,4 +83,22 @@ public class RaceSelector : MonoBehaviour
         CancellationCallback();
         gameObject.SetActive(false);
     }
+
+    public int GetRaceIndex(RaceDataScriptableObject WantedRaceInfo)
+    {
+        if (WantedRaceInfo == null)
+        {
+            return -1;
+        }
+
+        for(int index = 0; index < RaceDataList.Count; index++)
+        {
+            if (RaceDataList[index].DisplayName == WantedRaceInfo.DisplayName)
+            {
+                return index;
+            }
+        }
+
+        return -1;
+    }
 }

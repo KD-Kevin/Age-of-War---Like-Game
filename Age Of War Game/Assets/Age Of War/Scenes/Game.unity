@@ -541,6 +541,7 @@ GameObject:
   - component: {fileID: 71647198}
   - component: {fileID: 71647200}
   - component: {fileID: 71647199}
+  - component: {fileID: 71647201}
   m_Layer: 5
   m_Name: Background
   m_TagString: Untagged
@@ -581,7 +582,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.4627451, g: 0.3019608, b: 0.09411765, a: 0.3529412}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.3529412}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -606,6 +607,52 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 71647197}
   m_CullTransparentMesh: 0
+--- !u!114 &71647201
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 71647197}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a9d2f9067277ade4e9b47012ea4d9e17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _gradientType: 0
+  _blendMode: 2
+  _modifyVertices: 1
+  _offset: 0
+  _zoom: 1
+  _effectGradient:
+    serializedVersion: 2
+    key0: {r: 0.46274513, g: 0.3019608, b: 0.09411766, a: 1}
+    key1: {r: 0.3995738, g: 0, b: 1, a: 1}
+    key2: {r: 0, g: 0, b: 0, a: 0}
+    key3: {r: 0, g: 0, b: 0, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 28720
+    ctime1: 29105
+    ctime2: 0
+    ctime3: 0
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_NumColorKeys: 2
+    m_NumAlphaKeys: 2
 --- !u!1 &84200295
 GameObject:
   m_ObjectHideFlags: 0
@@ -892,6 +939,63 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 85632002}
   m_CullTransparentMesh: 1
+--- !u!1 &98360243
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 98360245}
+  - component: {fileID: 98360244}
+  m_Layer: 0
+  m_Name: Lockstep Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &98360244
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 98360243}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f30ad0bf315aa4444add90572bca24b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CurrentTurn:
+    CurrentState: 0
+    AllActionsDone: []
+  PendingTurn:
+    CurrentState: 0
+    AllActionsDone: []
+  ConfirmedTurn:
+    CurrentState: 0
+    AllActionsDone: []
+  ProcessingTurn:
+    CurrentState: 0
+    AllActionsDone: []
+  ActionTurnHistory:
+    AllTurnsCompleted: []
+--- !u!4 &98360245
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 98360243}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &102291554
 GameObject:
   m_ObjectHideFlags: 0
@@ -3069,6 +3173,7 @@ GameObject:
   - component: {fileID: 450718512}
   - component: {fileID: 450718514}
   - component: {fileID: 450718513}
+  - component: {fileID: 450718515}
   m_Layer: 5
   m_Name: Bar
   m_TagString: Untagged
@@ -3108,7 +3213,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.81960785, g: 0.5137255, b: 0.07450981, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -3120,7 +3225,7 @@ MonoBehaviour:
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 0
-  m_FillAmount: 0.25
+  m_FillAmount: 0.135
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
@@ -3133,6 +3238,52 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 450718511}
   m_CullTransparentMesh: 0
+--- !u!114 &450718515
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 450718511}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a9d2f9067277ade4e9b47012ea4d9e17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _gradientType: 0
+  _blendMode: 2
+  _modifyVertices: 1
+  _offset: 0
+  _zoom: 1
+  _effectGradient:
+    serializedVersion: 2
+    key0: {r: 0.8196079, g: 0.5137255, b: 0.07450981, a: 1}
+    key1: {r: 0.80468225, g: 0.4009434, b: 1, a: 1}
+    key2: {r: 0, g: 0, b: 0, a: 0}
+    key3: {r: 0, g: 0, b: 0, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 31804
+    ctime1: 31997
+    ctime2: 0
+    ctime3: 0
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_NumColorKeys: 2
+    m_NumAlphaKeys: 2
 --- !u!1 &463772859
 GameObject:
   m_ObjectHideFlags: 0
@@ -4593,6 +4744,9 @@ MonoBehaviour:
   UnitRaycastLayer:
     serializedVersion: 2
     m_Bits: 320
+  TowerWeaponSpawnLocations: []
+  BackgroundWeaponSpawnLocations: []
+  FloorWeaponSpawnLocations: []
   BuyUnitBuffer: []
   HoldPopulationSpot: []
 --- !u!61 &690900943
@@ -8728,6 +8882,9 @@ MonoBehaviour:
   UnitRaycastLayer:
     serializedVersion: 2
     m_Bits: 64
+  TowerWeaponSpawnLocations: []
+  BackgroundWeaponSpawnLocations: []
+  FloorWeaponSpawnLocations: []
   BuyUnitBuffer: []
   HoldPopulationSpot: []
 --- !u!1 &1197066152

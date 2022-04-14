@@ -79,6 +79,14 @@ public class RankedPage : MonoBehaviour
 
     public MultiplayStatus MultiplayerStatus { get; set; }
 
+    private void OnDisable()
+    {
+        if (MainMenu.Instance.MainMenuMode != MainMenuModes.FrontMenu)
+        {
+            MainMenu.Instance.MainMenuMode = MainMenuModes.FrontMenu;
+        }
+    }
+
     public void OpenPage()
     {
         gameObject.SetActive(true);
@@ -323,6 +331,7 @@ public enum MultiplayStatus
     Offline,
     NoSearching,
     Searching,
+    Hosting,
     FoundMatch,
     MatchStarted,
     MatchInProgress,

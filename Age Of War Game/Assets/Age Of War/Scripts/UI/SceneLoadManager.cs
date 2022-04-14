@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using RiptideNetworking;
 
 public class SceneLoadManager : MonoBehaviour
 {
@@ -28,6 +29,7 @@ public class SceneLoadManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(this.gameObject);
             //SceneManager.sceneLoaded += SceneLoaded;
+            Application.targetFrameRate = 240;
         }
         else
         {
@@ -40,7 +42,7 @@ public class SceneLoadManager : MonoBehaviour
         StartCoroutine(FadeCanvasOut());
     }
 
-    public void LoadScene(string name)
+    public void LoadScene(string name, bool SendNetworkCall = false)
     {
         if (!_loadingScene)
         {
@@ -49,7 +51,40 @@ public class SceneLoadManager : MonoBehaviour
 
             StartCoroutine(FadeCanvasIn());
             _sceneName = name;
+
+            if (SendNetworkCall)
+            {
+                Debug.Log("Change Scene");
+                Message message = Message.Create(MessageSendMode.reliable, MessageId.ChangeScene);
+                message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
+                message.AddString(name);
+                NetworkManager.Instance.Client.Send(message);
+            }
         }
+    }
+
+    [MessageHandler((ushort)MessageId.ChangeScene)]
+    private static void LoadScene(ushort fromClientId, Message message)
+    {
+        Debug.Log("Change Scene");
+        ushort newPlayerId = message.GetUShort();
+        Message messageToSend = Message.Create(MessageSendMode.reliable, MessageId.ChangeScene);
+        string Scenename = message.GetString();
+        messageToSend.AddUShort(newPlayerId);
+        messageToSend.AddString(Scenename);
+        NetworkManager.Instance.Server.Send(messageToSend, newPlayerId);
+
+        Instance.LoadScene(Scenename);
+    }
+
+    [MessageHandler((ushort)MessageId.ChangeScene)]
+    private static void SendConfirmation(Message message)
+    {
+        Debug.Log("Change Scene");
+        ushort newPlayerId = message.GetUShort();
+        string Scenename = message.GetString();
+
+        Instance.LoadScene(Scenename);
     }
 
     private IEnumerator FadeCanvasOut()

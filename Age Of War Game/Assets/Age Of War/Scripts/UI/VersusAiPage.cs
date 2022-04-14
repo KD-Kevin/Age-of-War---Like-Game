@@ -67,6 +67,14 @@ public class VersusAiPage : MonoBehaviour
         CurrentDifficulty = CampaignDifficulty.Normal;
     }
 
+    private void OnDisable()
+    {
+        if (MainMenu.Instance.MainMenuMode != MainMenuModes.FrontMenu)
+        {
+            MainMenu.Instance.MainMenuMode = MainMenuModes.FrontMenu;
+        }
+    }
+
     public void OpenPage()
     {
         gameObject.SetActive(true);

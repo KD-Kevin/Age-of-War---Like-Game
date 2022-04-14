@@ -538,7 +538,7 @@ public class BaseUnitBehaviour : MonoBehaviour, IHealth, ITeam
         return Fighter;
     }
 
-    protected void Update()
+    protected void UpdateUnit()
     {
         FrameCounter++;
 

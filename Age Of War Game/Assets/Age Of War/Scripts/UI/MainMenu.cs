@@ -20,7 +20,18 @@ public class MainMenu : MonoBehaviour
     [SerializeField]
     private GameObject PlayerModeMenuObject;
 
-    public static MainMenu Instance;
+    public static MainMenu Instance = null;
+    public MainMenuModes MainMenuMode = MainMenuModes.FrontMenu;
+
+    public CampaignPage CampaignUi { get { return CP; } }
+    public VersusAiPage VersusAiUi { get { return AiP; } }
+    public RankedPage RankedUi { get { return RP; } }
+    public CustomGamePage CustomGameUi { get { return CGP; } }
+
+    private void OnDestroy()
+    {
+        Instance = null;
+    }
 
     private void Awake()
     {
@@ -31,6 +42,7 @@ public class MainMenu : MonoBehaviour
 
     public void CloseGame()
     {
+        NetworkManager.Instance.LeaveGame();
         if (Application.isEditor)
         {
             EditorApplication.ExitPlaymode();
@@ -43,6 +55,7 @@ public class MainMenu : MonoBehaviour
 
     public void OpenVsCpuPage()
     {
+        MainMenuMode = MainMenuModes.VersusAi;
         RP.gameObject.SetActive(false);
         PerkSelectionUI.gameObject.SetActive(false);
         PerkSelectionUI.gameObject.SetActive(false);
@@ -54,6 +67,7 @@ public class MainMenu : MonoBehaviour
 
     public void OpenRankedPage()
     {
+        MainMenuMode = MainMenuModes.Ranked;
         AiP.gameObject.SetActive(false);
         PerkSelectionUI.gameObject.SetActive(false);
         PerkSelectionUI.gameObject.SetActive(false);
@@ -65,6 +79,7 @@ public class MainMenu : MonoBehaviour
 
     public void OpenCustomGamePage()
     {
+        MainMenuMode = MainMenuModes.Custom;
         AiP.gameObject.SetActive(false);
         PerkSelectionUI.gameObject.SetActive(false);
         PerkSelectionUI.gameObject.SetActive(false);
@@ -76,6 +91,7 @@ public class MainMenu : MonoBehaviour
 
     public void JoinQuickplayQueue()
     {
+        MainMenuMode = MainMenuModes.Quickplay;
         PlayerManager.Instance.RequestOpponentQuickplay(FoundQuickplayOpponent, CancelQuickplaySearch);
     }
 
@@ -87,16 +103,53 @@ public class MainMenu : MonoBehaviour
         RP.gameObject.SetActive(false);
         CGP.gameObject.SetActive(false);
         PlayerModeMenuObject.SetActive(false);
+        MainMenuMode = MainMenuModes.Campaign;
         CP.OpenPage();
     }
 
     public void FoundQuickplayOpponent(PlayerData Player)
     {
+        AiP.gameObject.SetActive(false);
+        PerkSelectionUI.gameObject.SetActive(false);
+        PerkSelectionUI.gameObject.SetActive(false);
+        RP.gameObject.SetActive(false);
+        CGP.gameObject.SetActive(false);
+        PlayerModeMenuObject.SetActive(false);
 
+        // Need to open page for the quickplay class selection and perk selections
     }
 
     public void CancelQuickplaySearch()
     {
-
+        if (CP.gameObject.activeSelf)
+        {
+            MainMenuMode = MainMenuModes.Campaign;
+        }
+        else if (AiP.gameObject.activeSelf)
+        {
+            MainMenuMode = MainMenuModes.VersusAi;
+        }
+        else if (RP.gameObject.activeSelf)
+        {
+            MainMenuMode = MainMenuModes.Ranked;
+        }
+        else if (CGP.gameObject.activeSelf)
+        {
+            MainMenuMode = MainMenuModes.Custom;
+        }
+        else
+        {
+            MainMenuMode = MainMenuModes.FrontMenu;
+        }
     }
+}
+
+public enum MainMenuModes
+{
+    FrontMenu,
+    Quickplay,
+    Ranked,
+    Custom,
+    VersusAi,
+    Campaign,
 }

@@ -54,6 +54,14 @@ public class CampaignPage : MonoBehaviour
         Instance = this;
     }
 
+    private void OnDisable()
+    {
+        if (MainMenu.Instance.MainMenuMode != MainMenuModes.FrontMenu)
+        {
+            MainMenu.Instance.MainMenuMode = MainMenuModes.FrontMenu;
+        }
+    }
+
     public void OpenPage()
     {
         gameObject.SetActive(true);

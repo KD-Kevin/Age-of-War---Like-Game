@@ -82,6 +82,8 @@ public class PlayerUiManager : MonoBehaviour
     private void Start()
     {
         RefeshBaseUi();
+
+        PlayerManager.Instance.SendReadyToStart();
     }
 
     public void ChangeBase(BaseBuildingData BuildingData, int Team)
@@ -175,6 +177,7 @@ public class PlayerUiManager : MonoBehaviour
 
     public void GoToMainMenu()
     {
+        NetworkManager.Instance.LeaveGame();
         SceneManager.LoadScene("Main Menu", LoadSceneMode.Single);
     }
 

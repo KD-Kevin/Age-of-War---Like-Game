@@ -42,6 +42,24 @@ public class RaceDataScriptableObject : ScriptableObject
 
     [Header("Passive")]
     public RacePassive Passive;
+
+    public int GetPerkIndex(Perk WantedPerkInfo)
+    {
+        if (WantedPerkInfo == null)
+        {
+            return -1;
+        }
+
+        for (int index = 0; index < PossiblePerks.Count; index++)
+        {
+            if (PossiblePerks[index].DisplayName == WantedPerkInfo.DisplayName)
+            {
+                return index;
+            }
+        }
+
+        return -1;
+    }
 }
 
 public enum RaceTypes
