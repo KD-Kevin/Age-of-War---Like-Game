@@ -25,6 +25,15 @@ public class PlayerData
     // Custom Game Mode Data
     public List<RankingData> VsComputerPlayData;
 
+    public PlayerData()
+    {
+        UserName = "No Name";
+        RankedPlayData = new List<RankingData>();
+        QuickPlayData = new List<RankingData>();
+        CustomGamePlayData = new List<RankingData>();
+        VsComputerPlayData = new List<RankingData>();
+    }
+
     public RankingData GetPlayData(PlayModes PlayMode, RaceTypes RaceWanted)
     {
         if (PlayMode == PlayModes.Ranked)

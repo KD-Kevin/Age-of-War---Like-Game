@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: PlayerData
   m_EditorClassIdentifier: 
   Data:
-    UserName: 
+    UserName: No Name
     RankedPlayData: []
     QuickPlayData: []
     CustomGamePlayData: []
+    VsComputerPlayData: []
