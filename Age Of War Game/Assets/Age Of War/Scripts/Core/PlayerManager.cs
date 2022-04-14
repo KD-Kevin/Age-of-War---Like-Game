@@ -54,6 +54,24 @@ public class PlayerManager : MonoBehaviour
         }
 
         // Load Player Data
+        string SavedUserName = PlayerPrefs.GetString("SaveName", "No Name");
+        if (SavedUserName != "No Name")
+        {
+            PlayerData LoadedData = PlayerData.LoadLocal(SavedUserName);
+            if (LoadedData != null)
+            {
+                LocalPlayerData.Data = LoadedData;
+            }
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (LocalPlayerData.Data.UserName != "No Name" && !string.IsNullOrEmpty(LocalPlayerData.Data.UserName))
+        {
+            PlayerPrefs.SetString("SaveName", LocalPlayerData.Data.UserName);
+            LocalPlayerData.Data.SaveLocal(LocalPlayerData.Data.UserName);
+        }
     }
 
     // Online
@@ -144,7 +162,8 @@ public class PlayerManager : MonoBehaviour
         Message message = Message.Create(MessageSendMode.reliable, MessageId.SendPlayerData);
         message.AddUShort(Instance.LocalPlayer.PlayerID);
         byte[] PlayerDataByteArr = LocalPlayerData.Data.SerializeToByteArray();
-        message.AddBytes(PlayerDataByteArr, true, true);
+        //message.AddBytes(PlayerDataByteArr, true, true);
+        message.AddString(LocalPlayerData.Data.SerializeToJSON());
 
         NetworkManager.Instance.Client.Send(message);
     }
@@ -152,15 +171,23 @@ public class PlayerManager : MonoBehaviour
     [MessageHandler((ushort)MessageId.SendPlayerData)]
     private static void SendPlayerData(ushort fromClientId, Message message)
     {
-        Debug.Log("Server Recieved - Send Player Data");
         ushort newPlayerId = message.GetUShort();
         Message messageToSend = Message.Create(MessageSendMode.reliable, MessageId.SendPlayerData);
-        byte[] PlayerDataArr = message.GetBytes();
+        //byte[] PlayerDataArr = message.GetBytes();
+        string PlayerDataJSON = message.GetString();
         messageToSend.AddUShort(newPlayerId);
-        messageToSend.AddBytes(PlayerDataArr, true ,true);
+        //messageToSend.AddBytes(PlayerDataArr, true ,true);
+        messageToSend.AddString(PlayerDataJSON);
         NetworkManager.Instance.Server.Send(messageToSend, newPlayerId);
 
-        PlayerData SentPlayersData = PlayerData.Deserialize(PlayerDataArr);
+        if (newPlayerId == PlayerManager.Instance.LocalPlayer.PlayerID)
+        {
+            return;
+        }
+
+        Debug.Log("Server Recieved - Send Player Data");
+        //PlayerData SentPlayersData = PlayerData.Deserialize(PlayerDataArr);
+        PlayerData SentPlayersData = PlayerData.Deserialize(PlayerDataJSON);
 
         if (Instance.ActiveOnlineMode == PlayModes.Ranked)
         {
@@ -185,9 +212,11 @@ public class PlayerManager : MonoBehaviour
         }
         Debug.Log("Client Recieved - Send Player Data");
         ushort newPlayerId = message.GetUShort();
-        byte[] PlayerDataArr = message.GetBytes();
+        //byte[] PlayerDataArr = message.GetBytes();
+        string PlayerDataJSON = message.GetString();
 
-        PlayerData SentPlayersData = PlayerData.Deserialize(PlayerDataArr);
+        //PlayerData SentPlayersData = PlayerData.Deserialize(PlayerDataArr);
+        PlayerData SentPlayersData = PlayerData.Deserialize(PlayerDataJSON);
 
         if (Instance.ActiveOnlineMode == PlayModes.Ranked)
         {

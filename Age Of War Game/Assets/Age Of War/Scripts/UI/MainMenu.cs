@@ -14,6 +14,8 @@ public class MainMenu : MonoBehaviour
     [SerializeField]
     private CustomGamePage CGP;
     [SerializeField]
+    private EnterUsernamePage EUP;
+    [SerializeField]
     private RaceSelector RaceSelectionUI;
     [SerializeField]
     private PerkSelector PerkSelectionUI;
@@ -27,6 +29,7 @@ public class MainMenu : MonoBehaviour
     public VersusAiPage VersusAiUi { get { return AiP; } }
     public RankedPage RankedUi { get { return RP; } }
     public CustomGamePage CustomGameUi { get { return CGP; } }
+    public EnterUsernamePage EnterUsernameUi { get { return EUP; } }
 
     private void OnDestroy()
     {
@@ -38,6 +41,14 @@ public class MainMenu : MonoBehaviour
         Instance = this;
         RaceSelectionUI.SetInstance();
         PerkSelectionUI.SetInstance();
+    }
+
+    private void Start()
+    {
+        if (PlayerManager.Instance.LocalPlayerData.Data.UserName == "No Name" || string.IsNullOrEmpty(PlayerManager.Instance.LocalPlayerData.Data.UserName))
+        {
+            EnterUsernameUi.OpenPage();
+        }
     }
 
     public void CloseGame()

@@ -81,20 +81,21 @@ public class PlayerData
         return Deserialize(json);
     }
 
-    public void SaveLocal()
+    public void SaveLocal(string saveName)
     {
-        string path = Path.Combine(Application.persistentDataPath + "/PlayerData/", $"PlayerData'{UserName}'.json");
+        string path = Path.Combine(Application.streamingAssetsPath + "/PlayerData/", $"PlayerData'{saveName}'.json");
         string json = SerializeToJSON();
         if (File.Exists(path))
         {
             File.Delete(path);
         }
+
         File.WriteAllText(path, json);
     }
 
-    public static PlayerData LoadLocal(string userName)
+    public static PlayerData LoadLocal(string saveName)
     {
-        string path = Path.Combine(Application.persistentDataPath + "/PlayerData/", $"PlayerData'{userName}'.json");
+        string path = Path.Combine(Application.streamingAssetsPath + "/PlayerData/", $"PlayerData'{saveName}'.json");
         if (File.Exists(path))
         {
             string fileContent = File.ReadAllText(path);
