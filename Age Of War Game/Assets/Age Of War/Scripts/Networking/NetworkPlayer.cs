@@ -30,6 +30,7 @@ public class NetworkPlayer : MonoBehaviour
             player = Instantiate(NetworkManager.Instance.PlayerPrefab, position, Quaternion.identity);
             player.IsLocalPlayer = false;
         }
+        player.transform.SetParent(NetworkManager.Instance.transform);
 
         player.PlayerID = id;
         player.UserName = username;
