@@ -44057,7 +44057,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ActiveOnlineMode: 0
-  PlayerData: {fileID: 11400000, guid: 673fe3e2632e3ed4e94151a696e946fd, type: 2}
+  LocalPlayerData: {fileID: 11400000, guid: 673fe3e2632e3ed4e94151a696e946fd, type: 2}
   CustomGameOpponentData: {fileID: 11400000, guid: a3feb9e0855ebff46a8c8c0fafcae575, type: 2}
   QuickplayOpponentData: {fileID: 11400000, guid: 34cf923a4060a1e4f85df192e1a70b86, type: 2}
   RankedOpponentData: {fileID: 11400000, guid: 2268d652ec354174091dae7cf604ee0e, type: 2}
