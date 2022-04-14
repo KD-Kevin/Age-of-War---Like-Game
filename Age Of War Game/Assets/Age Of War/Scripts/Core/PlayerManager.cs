@@ -210,8 +210,13 @@ public class PlayerManager : MonoBehaviour
         {
             return;
         }
+
         Debug.Log("Client Recieved - Send Player Data");
         ushort newPlayerId = message.GetUShort();
+        if (newPlayerId == PlayerManager.Instance.LocalPlayer.PlayerID)
+        {
+            return;
+        }
         //byte[] PlayerDataArr = message.GetBytes();
         string PlayerDataJSON = message.GetString();
 
