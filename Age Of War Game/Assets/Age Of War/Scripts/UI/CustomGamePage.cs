@@ -604,11 +604,17 @@ public class CustomGamePage : MonoBehaviour
         messageToSend.AddInt(Perk2Index);
         foreach (NetworkPlayer player in PlayerManager.Instance.ConnectedPlayers.Values)
         {
-            if (player == PlayerManager.Instance.LocalPlayer)
+            if (player.PlayerID == fromClientId)
             {
                 continue;
             }
             NetworkManager.Instance.Server.Send(messageToSend, player.PlayerID);
+        }
+
+
+        if (fromClientId == PlayerManager.Instance.LocalPlayer.PlayerID)
+        {
+            return;
         }
 
         RaceDataScriptableObject SelectedRace;
