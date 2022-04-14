@@ -342,7 +342,14 @@ public class CustomGamePage : MonoBehaviour
         bool Ready = message.GetBool();
         messageToSend.AddUShort(newPlayerId);
         messageToSend.AddBool(Ready);
-        NetworkManager.Instance.Server.Send(messageToSend, newPlayerId);
+        foreach (NetworkPlayer player in PlayerManager.Instance.ConnectedPlayers.Values)
+        {
+            if (player == PlayerManager.Instance.LocalPlayer)
+            {
+                continue;
+            }
+            NetworkManager.Instance.Server.Send(messageToSend, player.PlayerID);
+        }
 
         if (newPlayerId == PlayerManager.Instance.LocalPlayer.PlayerID)
         {
@@ -595,7 +602,14 @@ public class CustomGamePage : MonoBehaviour
         messageToSend.AddInt(RaceIndex);
         messageToSend.AddInt(Perk1Index);
         messageToSend.AddInt(Perk2Index);
-        NetworkManager.Instance.Server.Send(messageToSend, newPlayerId);
+        foreach (NetworkPlayer player in PlayerManager.Instance.ConnectedPlayers.Values)
+        {
+            if (player == PlayerManager.Instance.LocalPlayer)
+            {
+                continue;
+            }
+            NetworkManager.Instance.Server.Send(messageToSend, player.PlayerID);
+        }
 
         RaceDataScriptableObject SelectedRace;
         Perk SelectedPerk1;

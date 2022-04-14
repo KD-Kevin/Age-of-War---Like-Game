@@ -93,7 +93,10 @@ public class PlayerManager : MonoBehaviour
         bool Confirmed = message.GetBool();
         messageToSend.AddUShort(newPlayerId);
         messageToSend.AddBool(Confirmed);
-        NetworkManager.Instance.Server.Send(messageToSend, newPlayerId);
+        foreach (NetworkPlayer player in PlayerManager.Instance.ConnectedPlayers.Values)
+        {
+            NetworkManager.Instance.Server.Send(messageToSend, player.PlayerID);
+        }
 
         foreach (NetworkPlayer player in PlayerManager.Instance.ConnectedPlayers.Values)
         {
@@ -178,7 +181,14 @@ public class PlayerManager : MonoBehaviour
         messageToSend.AddUShort(newPlayerId);
         //messageToSend.AddBytes(PlayerDataArr, true ,true);
         messageToSend.AddString(PlayerDataJSON);
-        NetworkManager.Instance.Server.Send(messageToSend, newPlayerId);
+        foreach (NetworkPlayer player in PlayerManager.Instance.ConnectedPlayers.Values)
+        {
+            if (player.PlayerID == fromClientId)
+            {
+                continue;
+            }
+            NetworkManager.Instance.Server.Send(messageToSend, player.PlayerID);
+        }
 
         if (newPlayerId == PlayerManager.Instance.LocalPlayer.PlayerID)
         {
@@ -211,12 +221,12 @@ public class PlayerManager : MonoBehaviour
             return;
         }
 
-        Debug.Log("Client Recieved - Send Player Data");
         ushort newPlayerId = message.GetUShort();
-        if (newPlayerId == PlayerManager.Instance.LocalPlayer.PlayerID)
+        if (newPlayerId == Instance.LocalPlayer.PlayerID)
         {
             return;
         }
+        Debug.Log("Client Recieved - Send Player Data");
         //byte[] PlayerDataArr = message.GetBytes();
         string PlayerDataJSON = message.GetString();
 

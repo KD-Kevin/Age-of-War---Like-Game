@@ -387,7 +387,15 @@ public class LockstepManager : MonoBehaviour
         }
 
         Instance.RecievePlayerAction(PlayerAction);
-        NetworkManager.Instance.Server.Send(messageToSend, SentFromPlayerID);
+
+        foreach (NetworkPlayer player in PlayerManager.Instance.ConnectedPlayers.Values)
+        {
+            if (player == PlayerManager.Instance.LocalPlayer)
+            {
+                continue;
+            }
+            NetworkManager.Instance.Server.Send(messageToSend, player.PlayerID);
+        }
     }
 
     [MessageHandler((ushort)MessageId.SendTurnActions)]
@@ -448,7 +456,11 @@ public class LockstepManager : MonoBehaviour
         bool Confirmed = message.GetBool();
         messageToSend.AddUShort(newPlayerId);
         messageToSend.AddBool(Confirmed);
-        NetworkManager.Instance.Server.Send(messageToSend, newPlayerId);
+
+        foreach (NetworkPlayer player in PlayerManager.Instance.ConnectedPlayers.Values)
+        {
+            NetworkManager.Instance.Server.Send(messageToSend, player.PlayerID);
+        }
     }
 
     [MessageHandler((ushort)MessageId.TurnConfirmation)]
