@@ -15416,7 +15416,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &517816660
 RectTransform:
   m_ObjectHideFlags: 0
@@ -15523,7 +15523,7 @@ MonoBehaviour:
   OpponentNameText: {fileID: 414311960}
   OpponentRaceText: {fileID: 1499285136}
   OpponentRaceImage: {fileID: 30894023}
-  OpponentPerk1Text: {fileID: 1499285136}
+  OpponentPerk1Text: {fileID: 418554786}
   OpponentPerk1Image: {fileID: 1741372842}
   OpponentPerk1Button: {fileID: 918307263}
   OpponentPerk2Text: {fileID: 1893217741}
