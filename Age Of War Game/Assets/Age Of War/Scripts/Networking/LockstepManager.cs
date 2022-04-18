@@ -692,7 +692,11 @@ public class ActionTurn
                 }
                 else
                 {
-
+                    if (this == LockstepManager.Instance.CurrentTurn)
+                    {
+                        Debug.LogWarning($"Tried to add a extra command set from player beyond next action set {Action.PlayerID} -> Action Turn {Action.TurnNumber} vs Current Turn {LockStepTurnNumber}");
+                        return;
+                    }
                     // Got the packets really fast, so set them to the next action set
                     LockstepManager.Instance.CurrentTurn.AddActionSet(Action);
                 }
