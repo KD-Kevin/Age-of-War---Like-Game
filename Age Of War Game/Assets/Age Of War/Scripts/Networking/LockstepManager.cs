@@ -44,6 +44,9 @@ public class LockstepManager : MonoBehaviour
         FixedFrameCounter = 0;
         FixedGameTurnCounter = 0;
         LockstepTurnCounter = 0;
+        PendingTurn = null;
+        ConfirmedTurn = null;
+        ProcessingTurn = null;
     }
 
     private void Update()
@@ -524,7 +527,7 @@ public class ActionTurn
 {
     public ActionStates CurrentState = ActionStates.New;
 
-    public List<PlayerActions> AllActionsDone = new List<PlayerActions>();
+    public List<PlayerActions> AllActionsDone;
 
     public int LockStepTurnNumber = -1;
     public int GameTurnNumber = -1;
@@ -532,6 +535,7 @@ public class ActionTurn
 
     public ActionTurn(int LockStepNumber = -1, int GameTurn = -1)
     {
+        AllActionsDone = new List<PlayerActions>();
         LockStepTurnNumber = LockStepNumber;
         GameTurnNumber = GameTurn;
     }
