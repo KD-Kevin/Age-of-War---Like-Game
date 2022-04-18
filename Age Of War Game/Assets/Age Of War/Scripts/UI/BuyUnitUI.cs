@@ -124,6 +124,7 @@ public class BuyUnitUI : MonoBehaviour
         if (Unit == null)
         {
             gameObject.SetActive(false);
+            return;
         }
         BuyUnitIndex = UnitIndex;
         BuyUnit = Unit;
