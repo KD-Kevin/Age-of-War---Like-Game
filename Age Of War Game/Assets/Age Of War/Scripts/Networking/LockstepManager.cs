@@ -218,7 +218,7 @@ public class LockstepManager : MonoBehaviour
         // Turn 3 and above
         if (LockstepTurnCounter > 1)
         {
-            WaitingOnPlayer = !(PendingTurn.ReadyForNextTurn() && ConfirmedTurn.ReadyForNextTurn());
+            WaitingOnPlayer = !PendingTurn.ReadyForNextTurn() || !ConfirmedTurn.ReadyForNextTurn();
             if (!WaitingOnPlayer)
             {
                 LockstepTurnCounter++;
@@ -532,7 +532,7 @@ public class LockstepManager : MonoBehaviour
 
     public void SendCountdown(int Sec)
     {
-        //Debug.Log("Send Sent - Confirmation");
+        //Debug.Log("Sent - Reconnect Countdown Sec");
         Message message = Message.Create(MessageSendMode.reliable, MessageId.SendStartCoundDownSec);
         message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
         message.AddInt(Sec);
@@ -548,6 +548,11 @@ public class LockstepManager : MonoBehaviour
         int Sec = message.GetInt();
         messageToSend.AddUShort(newPlayerId);
         messageToSend.AddInt(Sec);
+
+        foreach (NetworkPlayer player in PlayerManager.Instance.ConnectedPlayers.Values)
+        {
+            NetworkManager.Instance.Server.Send(messageToSend, player.PlayerID);
+        }
     }
 
     [MessageHandler((ushort)MessageId.SendStartCoundDownSec)]
@@ -593,9 +598,8 @@ public class ActionTurn
             // Recieved Everyones Actions
             return ContainsActionsFromAllPlayers();
         }
-        else if (CurrentState == ActionStates.Confirmed)
+        else
         {
-            CurrentState = ActionStates.Processing;
             // Process Everyone Turn
             foreach(NetworkPlayer Player in PlayerManager.Instance.ConnectedPlayers.Values)
             {
@@ -607,12 +611,6 @@ public class ActionTurn
 
             return true;
         }
-        else if (CurrentState == ActionStates.Processing)
-        {
-            return true;
-        }
-
-        return false;
     }
 
     public ActionTurn NextTurn()
@@ -694,6 +692,7 @@ public class ActionTurn
                 }
                 else
                 {
+
                     // Got the packets really fast, so set them to the next action set
                     LockstepManager.Instance.CurrentTurn.AddActionSet(Action);
                 }
