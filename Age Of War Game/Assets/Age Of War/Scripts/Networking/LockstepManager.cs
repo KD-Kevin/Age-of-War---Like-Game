@@ -207,7 +207,7 @@ public class LockstepManager : MonoBehaviour
     public void LockstepTurn()
     {
         // Turn 3 and above
-        if (PendingTurn != null && ConfirmedTurn != null)
+        if (LockstepTurnCounter > 2)
         {
             WaitingOnPlayer = !(PendingTurn.ReadyForNextTurn() && ConfirmedTurn.ReadyForNextTurn());
             if (!WaitingOnPlayer)
@@ -220,7 +220,7 @@ public class LockstepManager : MonoBehaviour
             }
         }
         // Turn 2
-        else if (PendingTurn != null)
+        else if (LockstepTurnCounter > 1)
         {
             WaitingOnPlayer = !PendingTurn.ReadyForNextTurn();
             if (!WaitingOnPlayer)
