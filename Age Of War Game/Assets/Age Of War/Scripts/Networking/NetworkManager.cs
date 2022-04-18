@@ -136,4 +136,7 @@ internal enum MessageId : ushort
     // Custom Game
     ReadyButtonPressed = 6,
     SendCustomGameRacePerkData = 7,
+
+    // Countdown
+    SendStartCoundDownSec = 8,
 }

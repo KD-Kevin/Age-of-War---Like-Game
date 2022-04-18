@@ -109,6 +109,10 @@ public class LockstepManager : MonoBehaviour
             {
                 CountDown = true;
                 ReconnectOnSecond = System.DateTime.Now.Second + 6;
+                if (NetworkManager.Instance.IsHost)
+                {
+                    SendCountdown(ReconnectOnSecond);
+                }
                 SecondsTillReconnect = 6;
 
                 if (ReconnectOnSecond >= 60)
@@ -525,6 +529,36 @@ public class LockstepManager : MonoBehaviour
             }
         }
     }
+
+    public void SendCountdown(int Sec)
+    {
+        //Debug.Log("Send Sent - Confirmation");
+        Message message = Message.Create(MessageSendMode.reliable, MessageId.SendStartCoundDownSec);
+        message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
+        message.AddInt(Sec);
+        NetworkManager.Instance.Client.Send(message);
+    }
+
+    [MessageHandler((ushort)MessageId.SendStartCoundDownSec)]
+    private static void SendCountdown(ushort fromClientId, Message message)
+    {
+        //Debug.Log("Server Recieved - Send Confirmation");
+        ushort newPlayerId = message.GetUShort();
+        Message messageToSend = Message.Create(MessageSendMode.reliable, MessageId.SendStartCoundDownSec);
+        int Sec = message.GetInt();
+        messageToSend.AddUShort(newPlayerId);
+        messageToSend.AddInt(Sec);
+    }
+
+    [MessageHandler((ushort)MessageId.SendStartCoundDownSec)]
+    private static void SendCountdown(Message message)
+    {
+        ushort confirmedPlayer = message.GetUShort();
+        int sec = message.GetInt();
+        Debug.Log($"Client Recieved - Reconnect on Second {sec}");
+
+        Instance.ReconnectOnSecond = sec;
+    }
 }
 
 [System.Serializable]
@@ -648,7 +682,22 @@ public class ActionTurn
     {
         if (ContainsActionFromPlayer(Action.PlayerID))
         {
-            Debug.LogWarning($"Tried to add a extra command set from player {Action.PlayerID}");
+            if (Action.TurnNumber == LockStepTurnNumber)
+            {
+                Debug.LogWarning($"Tried to add a extra command set from player {Action.PlayerID}");
+            }
+            else
+            {
+                if (Action.TurnNumber < LockStepTurnNumber)
+                {
+                    Debug.LogWarning($"Tried to add a extra command set from player for a previous action set {Action.PlayerID}");
+                }
+                else
+                {
+                    // Got the packets really fast, so set them to the next action set
+                    LockstepManager.Instance.CurrentTurn.AddActionSet(Action);
+                }
+            }
         }
         else
         {
