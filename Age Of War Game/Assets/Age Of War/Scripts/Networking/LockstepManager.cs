@@ -314,6 +314,16 @@ public class LockstepManager : MonoBehaviour
 
     public void RecievePlayerAction(PlayerActions PendingActionToTrack)
     {
+        if (PendingTurn == null)
+        {
+            LateRecievedAction.Add(PendingActionToTrack);
+            if (!RecievingLateActions)
+            {
+                RecievingLateActions = true;
+                Invoke(nameof(RecievePlayerActionLate), 0.02f);
+            }
+            return;
+        }
         PendingTurn.AllActionsDone.Add(PendingActionToTrack);
 
         if (PendingTurn.AllActionsDone.Count == PlayerManager.Instance.ConnectedPlayers.Count)
@@ -321,6 +331,29 @@ public class LockstepManager : MonoBehaviour
             // Send Confirmation that you recieved all the player actions - RPC call
             SendConfirmation();
         }
+    }
+    private bool RecievingLateActions = false;
+    private List<PlayerActions> LateRecievedAction = new List<PlayerActions>();
+    private void RecievePlayerActionLate()
+    {
+        if (PendingTurn == null)
+        {
+            Invoke(nameof(RecievePlayerActionLate), 0.02f);
+            return;
+        }
+
+        foreach(PlayerActions action in LateRecievedAction)
+        {
+            PendingTurn.AllActionsDone.Add(action);
+        }
+
+        if (PendingTurn.AllActionsDone.Count == PlayerManager.Instance.ConnectedPlayers.Count)
+        {
+            // Send Confirmation that you recieved all the player actions - RPC call
+            SendConfirmation();
+        }
+        LateRecievedAction.Clear();
+        RecievingLateActions = false;
     }
 
     public void SendTurnActions()
