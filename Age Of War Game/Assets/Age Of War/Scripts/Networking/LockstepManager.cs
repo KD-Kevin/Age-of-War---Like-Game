@@ -327,7 +327,7 @@ public class LockstepManager : MonoBehaviour
             }
             return;
         }
-        PendingTurn.AllActionsDone.Add(PendingActionToTrack);
+        PendingTurn.AddActionSet(PendingActionToTrack);
 
         if (PendingTurn.AllActionsDone.Count == PlayerManager.Instance.ConnectedPlayers.Count)
         {
@@ -347,7 +347,7 @@ public class LockstepManager : MonoBehaviour
 
         foreach(PlayerActions action in LateRecievedAction)
         {
-            PendingTurn.AllActionsDone.Add(action);
+            PendingTurn.AddActionSet(action);
         }
 
         if (PendingTurn.AllActionsDone.Count == PlayerManager.Instance.ConnectedPlayers.Count)
@@ -549,7 +549,7 @@ public class ActionTurn
         else if (CurrentState == ActionStates.Pending)
         {
             // Recieved Everyones Actions
-            return PlayerManager.Instance.ConnectedPlayers.Count == AllActionsDone.Count;
+            return ContainsActionsFromAllPlayers();
         }
         else if (CurrentState == ActionStates.Confirmed)
         {
@@ -603,6 +603,43 @@ public class ActionTurn
         }
 
         return this;
+    }
+
+    public bool ContainsActionsFromAllPlayers()
+    {
+        foreach (NetworkPlayer player in PlayerManager.Instance.ConnectedPlayers.Values)
+        {
+            if (!ContainsActionFromPlayer(player.PlayerID))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public bool ContainsActionFromPlayer(int PlayerID)
+    {
+        foreach (PlayerActions action in AllActionsDone)
+        {
+            if (action.PlayerID == PlayerID)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void AddActionSet(PlayerActions Action)
+    {
+        if (ContainsActionFromPlayer(Action.PlayerID))
+        {
+            Debug.LogWarning($"Tried to add a extra command set from player {Action.PlayerID}");
+        }
+        else
+        {
+            AllActionsDone.Add(Action);
+        }
     }
 }
 
