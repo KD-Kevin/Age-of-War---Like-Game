@@ -151,6 +151,7 @@ public class LockstepManager : MonoBehaviour
             {
                 CountDown = false;
                 SecondsTillReconnect = 0;
+                Debug.Log($"Finished Countdown on -> {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
             }
             else
             {
@@ -201,13 +202,13 @@ public class LockstepManager : MonoBehaviour
             LockstepTurn();
         }
 
-        Debug.Log($"Game Update {System.DateTime.Now.Hour} hr / {System.DateTime.Now.Minute} min / {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
+        Debug.Log($"Game Update -> {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
     }
 
     public void LockstepTurn()
     {
         // Turn 3 and above
-        if (LockstepTurnCounter > 2)
+        if (LockstepTurnCounter > 1)
         {
             WaitingOnPlayer = !(PendingTurn.ReadyForNextTurn() && ConfirmedTurn.ReadyForNextTurn());
             if (!WaitingOnPlayer)
@@ -220,7 +221,7 @@ public class LockstepManager : MonoBehaviour
             }
         }
         // Turn 2
-        else if (LockstepTurnCounter > 1)
+        else if (LockstepTurnCounter > 0)
         {
             WaitingOnPlayer = !PendingTurn.ReadyForNextTurn();
             if (!WaitingOnPlayer)
@@ -239,7 +240,7 @@ public class LockstepManager : MonoBehaviour
             CurrentTurn.NextTurn();
         }
 
-        Debug.Log($"Lockstep Update {System.DateTime.Now.Hour} hr / {System.DateTime.Now.Minute} min / {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
+        Debug.Log($"Lockstep Update -> {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
     }
 
     public void ReconnectedLockstepTurn()
@@ -329,7 +330,7 @@ public class LockstepManager : MonoBehaviour
         }
         PendingTurn.AddActionSet(PendingActionToTrack);
 
-        if (PendingTurn.AllActionsDone.Count == PlayerManager.Instance.ConnectedPlayers.Count)
+        if (PendingTurn.ContainsActionsFromAllPlayers())
         {
             // Send Confirmation that you recieved all the player actions - RPC call
             SendConfirmation();
@@ -350,7 +351,7 @@ public class LockstepManager : MonoBehaviour
             PendingTurn.AddActionSet(action);
         }
 
-        if (PendingTurn.AllActionsDone.Count == PlayerManager.Instance.ConnectedPlayers.Count)
+        if (PendingTurn.ContainsActionsFromAllPlayers())
         {
             // Send Confirmation that you recieved all the player actions - RPC call
             SendConfirmation();
@@ -361,7 +362,7 @@ public class LockstepManager : MonoBehaviour
 
     public void SendTurnActions()
     {
-        Debug.Log("Client Sent - Send actions");
+        //Debug.Log("Client Sent - Send actions");
         Message message = Message.Create(MessageSendMode.reliable, MessageId.SendTurnActions);
         int NumberOfActions = LocalPlayersCurrentTurn.ActionsDone.Count;
         message.AddInt(NumberOfActions);
@@ -438,9 +439,9 @@ public class LockstepManager : MonoBehaviour
     [MessageHandler((ushort)MessageId.SendTurnActions)]
     private static void SendTurnActions(Message message)
     {
-        Debug.Log("Cient Recieved - Send actions");
         int NumberOfActions = message.GetInt();
         ushort SentFromPlayerID = message.GetUShort();
+        Debug.Log($"Cient Recieved - Send actions from Player {SentFromPlayerID}");
 
         // ResendData
         PlayerActions PlayerAction = new PlayerActions(SentFromPlayerID);
@@ -482,7 +483,7 @@ public class LockstepManager : MonoBehaviour
 
     public void SendConfirmation()
     {
-        Debug.Log("Send Sent - Confirmation");
+        //Debug.Log("Send Sent - Confirmation");
         Message message = Message.Create(MessageSendMode.reliable, MessageId.TurnConfirmation);
         message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
         message.AddBool(true);
@@ -492,7 +493,7 @@ public class LockstepManager : MonoBehaviour
     [MessageHandler((ushort)MessageId.TurnConfirmation)]
     private static void SendConfirmation(ushort fromClientId, Message message)
     {
-        Debug.Log("Server Recieved - Send Confirmation");
+        //Debug.Log("Server Recieved - Send Confirmation");
         ushort newPlayerId = message.GetUShort();
         Message messageToSend = Message.Create(MessageSendMode.reliable, MessageId.TurnConfirmation);
         bool Confirmed = message.GetBool();
@@ -508,8 +509,8 @@ public class LockstepManager : MonoBehaviour
     [MessageHandler((ushort)MessageId.TurnConfirmation)]
     private static void SendConfirmation(Message message)
     {
-        Debug.Log("Client Recieved - Send Confirmation");
         ushort confirmedPlayer = message.GetUShort();
+        Debug.Log($"Client Recieved - Send Confirmation From Player {confirmedPlayer}");
         bool Confirmed = message.GetBool();
 
         foreach (NetworkPlayer player in PlayerManager.Instance.ConnectedPlayers.Values)
