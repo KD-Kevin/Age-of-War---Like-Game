@@ -111,7 +111,7 @@ public class LockstepManager : MonoBehaviour
                 ReconnectOnSecond = System.DateTime.Now.Second + 6;
                 SecondsTillReconnect = 6;
 
-                if (ReconnectOnSecond > 60)
+                if (ReconnectOnSecond >= 60)
                 {
                     ReconnectOnSecond -= 60;
                 }
@@ -119,6 +119,28 @@ public class LockstepManager : MonoBehaviour
                 SimulationStarted = true;
 
                 LocalPlayersCurrentTurn = new PlayerActions(PlayerManager.Instance.LocalPlayer.PlayerID, true);
+            }
+        }
+
+        if (CountDown)
+        {
+            if (System.DateTime.Now.Second == ReconnectOnSecond)
+            {
+                CountDown = false;
+                SecondsTillReconnect = 0;
+                Debug.Log($"Finished Countdown on -> {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
+            }
+            else
+            {
+                int CurrentSecond = System.DateTime.Now.Second;
+                if (CurrentSecond > ReconnectOnSecond)
+                {
+                    SecondsTillReconnect = 60 + ReconnectOnSecond - CurrentSecond;
+                }
+                else
+                {
+                    SecondsTillReconnect = ReconnectOnSecond - CurrentSecond;
+                }
             }
         }
     }
@@ -147,25 +169,7 @@ public class LockstepManager : MonoBehaviour
 
         if (CountDown)
         {
-            if (System.DateTime.Now.Second == ReconnectOnSecond)
-            {
-                CountDown = false;
-                SecondsTillReconnect = 0;
-                Debug.Log($"Finished Countdown on -> {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
-            }
-            else
-            {
-                int CurrentSecond = System.DateTime.Now.Second;
-                if (CurrentSecond > ReconnectOnSecond)
-                {
-                    SecondsTillReconnect = 60 + ReconnectOnSecond - CurrentSecond;
-                }
-                else
-                {
-                    SecondsTillReconnect = ReconnectOnSecond - CurrentSecond;
-                }
-                return;
-            }
+            return;
         }
 
         //Debug.Log($"Fixed Delta Times ({Time.fixedDeltaTime})");
@@ -528,7 +532,7 @@ public class ActionTurn
 {
     public ActionStates CurrentState = ActionStates.New;
 
-    public List<PlayerActions> AllActionsDone;
+    public List<PlayerActions> AllActionsDone = null;
 
     public int LockStepTurnNumber = -1;
     public int GameTurnNumber = -1;
@@ -536,7 +540,10 @@ public class ActionTurn
 
     public ActionTurn(int LockStepNumber = -1, int GameTurn = -1)
     {
-        AllActionsDone = new List<PlayerActions>();
+        if (AllActionsDone == null)
+        {
+            AllActionsDone = new List<PlayerActions>();
+        }
         LockStepTurnNumber = LockStepNumber;
         GameTurnNumber = GameTurn;
     }
@@ -621,6 +628,11 @@ public class ActionTurn
 
     public bool ContainsActionFromPlayer(int PlayerID)
     {
+        if (AllActionsDone == null)
+        {
+            AllActionsDone = new List<PlayerActions>();
+            return false;
+        }
         foreach (PlayerActions action in AllActionsDone)
         {
             if (action.PlayerID == PlayerID)
