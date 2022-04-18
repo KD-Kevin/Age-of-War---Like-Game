@@ -293,6 +293,26 @@ public class PlayerManager : MonoBehaviour
         CancellationCustomGameOpponentCallback.Invoke();
     }
 
+    public void SetMatchData(CustomGamePage CGP, bool MakeNewData = false)
+    {
+        if (MakeNewData)
+        {
+            CurrentMatchData = new MatchData();
+        }
+
+        CurrentMatchData.PlayMode = PlayModes.CustomGame;
+
+        CurrentMatchData.PlayersData = LocalPlayerData.Data;
+        CurrentMatchData.PlayerSelectedRace = CGP.PlayerSelectedRace;
+        CurrentMatchData.PlayerSelectedPerk1 = CGP.PlayerSelectedPerk1;
+        CurrentMatchData.PlayerSelectedPerk2 = CGP.PlayerSelectedPerk2;
+
+        CurrentMatchData.OpponentsData = CGP.OpponentPlayerData;
+        CurrentMatchData.OpponentSelectedRace = CGP.OpponentSelectedRace;
+        CurrentMatchData.OpponentSelectedPerk1 = CGP.OpponentSelectedPerk1;
+        CurrentMatchData.OpponentSelectedPerk2 = CGP.OpponentSelectedPerk2;
+    }
+
     // Ranked Game
     public void RequestOpponentRanked(System.Action<PlayerData> FindPlayer, System.Action CannotFindPlayer)
     {

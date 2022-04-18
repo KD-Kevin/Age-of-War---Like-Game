@@ -56,7 +56,7 @@ public class BaseBuilding : MonoBehaviour, IHealth, ITeam
     [HideInInspector]
     public List<BaseUnitBehaviour> BuyUnitBuffer = new List<BaseUnitBehaviour>();
     [HideInInspector]
-    public List<Behaviour> HoldPopulationSpot = new List<Behaviour>(); 
+    public List<int> HoldPopulationSpot = new List<int>(); 
 
     private void Awake()
     {

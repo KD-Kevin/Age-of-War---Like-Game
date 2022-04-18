@@ -13,15 +13,15 @@ public class PlayerUiManager : MonoBehaviour
     [SerializeField]
     private BaseUnitBehaviour TestUnit;
     [SerializeField]
-    private BuyUnitUI BuyBaseUnitUI;
+    private BuyUnitUI BuyBaseUnitUI; // Index 0
     [SerializeField]
-    private BuyUnitUI BuyRangedUnitUI;
+    private BuyUnitUI BuyRangedUnitUI; // Index 1
     [SerializeField]
-    private BuyUnitUI BuySpeedUnitUI;
+    private BuyUnitUI BuySpeedUnitUI; // Index 2
     [SerializeField]
-    private BuyUnitUI BuyTankUnitUI;
+    private BuyUnitUI BuyTankUnitUI; // Index 3
     [SerializeField]
-    private BuyUnitUI BuyExtraUnitUI;
+    private BuyUnitUI BuyExtraUnitUI; // Index 4
 
     [Header("Health and Info")]
     [SerializeField]
@@ -66,17 +66,108 @@ public class PlayerUiManager : MonoBehaviour
     public static PlayerUiManager Instance;
 
     public int CurrentCurrencyAmount { get; set; }
+    public RaceDataScriptableObject SetRace { get; set; }
 
     private void Awake()
     {
         Instance = this;
         CurrentCurrencyAmount = 1000;
 
-        BuyBaseUnitUI.SetUnit(TestUnit);
-        BuyRangedUnitUI.SetUnit(TestUnit);
-        BuySpeedUnitUI.SetUnit(TestUnit);
-        BuyTankUnitUI.SetUnit(TestUnit);
-        BuyExtraUnitUI.SetUnit(TestUnit);
+        SetRace = PlayerManager.Instance.CurrentMatchData.PlayerSelectedRace;
+        if (SetRace != null)
+        {
+            if (SetRace.StartingUnitsBlueprints.Count > 0)
+            {
+                BuyBaseUnitUI.SetUnit(SetRace.StartingUnitsBlueprints[0], 0);
+            }
+            else
+            {
+                BuyBaseUnitUI.SetUnit(null, 0);
+            }
+            if (SetRace.StartingUnitsBlueprints.Count > 1)
+            {
+                BuyRangedUnitUI.SetUnit(SetRace.StartingUnitsBlueprints[1], 1);
+            }
+            else
+            {
+                BuyRangedUnitUI.SetUnit(null, 1);
+            }
+            if (SetRace.StartingUnitsBlueprints.Count > 2)
+            {
+                BuySpeedUnitUI.SetUnit(SetRace.StartingUnitsBlueprints[2], 2);
+            }
+            else
+            {
+                BuySpeedUnitUI.SetUnit(null, 2);
+            }
+            if (SetRace.StartingUnitsBlueprints.Count > 3)
+            {
+                BuyTankUnitUI.SetUnit(SetRace.StartingUnitsBlueprints[3], 3);
+            }
+            else
+            {
+                BuyTankUnitUI.SetUnit(null, 3);
+            }
+            if (SetRace.StartingUnitsBlueprints.Count > 4)
+            {
+                BuyExtraUnitUI.SetUnit(SetRace.StartingUnitsBlueprints[4], 4);
+            }
+            else
+            {
+                BuyExtraUnitUI.SetUnit(null, 4);
+            }
+        }
+        else
+        {
+            BuyBaseUnitUI.SetUnit(TestUnit, 0);
+            BuyRangedUnitUI.SetUnit(TestUnit, 1);
+            BuySpeedUnitUI.SetUnit(TestUnit, 2);
+            BuyTankUnitUI.SetUnit(TestUnit, 3);
+            BuyExtraUnitUI.SetUnit(TestUnit, 4);
+        }
+    }
+
+    public BaseUnitBehaviour GetUnitByIndex(int Index)
+    {
+        if (SetRace == null)
+        {
+            return null;
+        }
+
+        if(SetRace.StartingUnitsBlueprints.Count <= Index)
+        {
+            return null;
+        }
+
+        return SetRace.StartingUnitsBlueprints[Index];
+
+    }
+
+    public BuyUnitUI GetBuyUnitUiByIndex(int Index)
+    {
+        if (Index == 0)
+        {
+            return BuyBaseUnitUI;
+        }
+        else if (Index == 1)
+        {
+            return BuyRangedUnitUI;
+        }
+        else if (Index == 2)
+        {
+            return BuySpeedUnitUI;
+        }
+        else if (Index == 3)
+        {
+            return BuyTankUnitUI;
+        }
+        else if (Index == 4)
+        {
+            return BuyExtraUnitUI;
+        }
+
+        return null;
+
     }
 
     private void Start()

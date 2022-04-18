@@ -188,6 +188,7 @@ public class LockstepManager : MonoBehaviour
         if (ReconnectOnNextGameTurn)
         {
             ReconnectedLockstepTurn();
+            ReconnectOnNextGameTurn = false;
         }
 
         FixedGameTurnCounter++;
@@ -345,6 +346,12 @@ public class LockstepManager : MonoBehaviour
         {
             // Thus far nothing needs to be added, may be changed later though 
         }
+        else if ((ActionTypes)action.ActionType == ActionTypes.BuyUnit)
+        {
+            // Buy Action needs to add an int for the buy index
+            BuyUnitAction BuyAction = action as BuyUnitAction;
+            message.AddInt(BuyAction.UnitBuyIndex);
+        }
 
         return message;
     }
@@ -370,7 +377,15 @@ public class LockstepManager : MonoBehaviour
             if ((ActionTypes)TypeOfAction == ActionTypes.NoAction)
             {
                 // For Now do nothing - Get And Add Variables for other actions
-                NewAction = new NoAction();
+                //NewAction = new NoAction();
+            }
+            else if ((ActionTypes)TypeOfAction == ActionTypes.BuyUnit)
+            {
+                // Buy Action needs to add an int for the buy index
+                //NewAction = action as BuyUnitAction;
+                //message.AddInt(BuyAction.UnitBuyIndex);
+                int buyIndex = message.GetInt();
+                messageToSend.AddInt(buyIndex);
             }
             else
             {
@@ -403,10 +418,19 @@ public class LockstepManager : MonoBehaviour
             {
                 // For Now do nothing - Get And Add Variables for other actions
                 NewAction = new NoAction();
+                NewAction.OwningPlayer = SentFromPlayerID;
+            }
+            else if ((ActionTypes)TypeOfAction == ActionTypes.BuyUnit)
+            {
+                // Buy Action needs to add an int for the buy index
+                int buyIndex = message.GetInt();
+                NewAction = new BuyUnitAction(buyIndex);
+                NewAction.OwningPlayer = SentFromPlayerID;
             }
             else
             {
                 NewAction = new CorruptAction();
+                NewAction.OwningPlayer = SentFromPlayerID;
             }
 
             if (NewAction != null)
@@ -600,6 +624,7 @@ public enum ActionTypes : int
 {
     Corrupt = 0,
     NoAction = 1,
+    BuyUnit = 2,
 }
 
 [System.Serializable]
@@ -611,6 +636,7 @@ public class NoAction : IAction
     public NoAction()
     {
         ActionType = (int)ActionTypes.NoAction;
+        OwningPlayer = PlayerManager.Instance.LocalPlayer.PlayerID;
     }
 
     public void ProcessAction()
@@ -628,6 +654,7 @@ public class CorruptAction : IAction
     public CorruptAction()
     {
         ActionType = (int)ActionTypes.Corrupt;
+        OwningPlayer = PlayerManager.Instance.LocalPlayer.PlayerID;
     }
 
     public void ProcessAction()

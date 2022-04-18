@@ -83,6 +83,7 @@ public class CustomGamePage : MonoBehaviour
     public RaceDataScriptableObject OpponentSelectedRace { get; set; }
     public Perk OpponentSelectedPerk1 { get; set; }
     public Perk OpponentSelectedPerk2 { get; set; }
+    public PlayerData OpponentPlayerData { get; set; }
 
     public bool PlayerReady { get; set; }
     public bool OpponentReady { get; set; }
@@ -111,6 +112,15 @@ public class CustomGamePage : MonoBehaviour
         OpponentRaceButton.interactable = false;
         OpponentPerk1Button.interactable = false;
         OpponentPerk2Button.interactable = false;
+
+        PlayerSelectedRace = null;
+        PlayerSelectedPerk1 = null;
+        PlayerSelectedPerk2 = null;
+
+        OpponentPlayerData = null;
+        OpponentSelectedRace = null;
+        OpponentSelectedPerk1 = null;
+        OpponentSelectedPerk2 = null;
 
         if (MultiplayerStatus == MultiplayStatus.Searching)
         {
@@ -163,6 +173,7 @@ public class CustomGamePage : MonoBehaviour
                 UiObject.SetActive(false);
             }
         }
+        PlayerManager.Instance.SetMatchData(this, true);
     }
 
     public void OpenRaceSelectorForPlayer()
@@ -193,6 +204,8 @@ public class CustomGamePage : MonoBehaviour
         {
             SendGameData();
         }
+
+        PlayerManager.Instance.SetMatchData(this);
     }
 
     public void CancelPlayerRaceSelection()
@@ -241,6 +254,8 @@ public class CustomGamePage : MonoBehaviour
         {
             SendGameData();
         }
+
+        PlayerManager.Instance.SetMatchData(this);
     }
 
     public void CancelPlayerPerk1Selection()
@@ -288,6 +303,8 @@ public class CustomGamePage : MonoBehaviour
             OpponentPerk2Image.sprite = NoPerkSprite;
             OpponentPerk2Text.text = "No Perk Selected";
         }
+
+        PlayerManager.Instance.SetMatchData(this);
     }
 
     public void ClearOpponentPerks()
@@ -309,6 +326,7 @@ public class CustomGamePage : MonoBehaviour
             return;
         }
 
+        PlayerManager.Instance.SetMatchData(this);
         SceneLoadManager.Instance.LoadScene("Game", true);
     }
 
@@ -528,6 +546,7 @@ public class CustomGamePage : MonoBehaviour
 
     public void FoundCustomGameOpponent(PlayerData Player)
     {
+        OpponentPlayerData = Player;
         MultiplayerStatus = MultiplayStatus.FoundMatch;
         OpponentNameText.text = Player.UserName;
         LoadOpponentPlayer(null, null, null);
