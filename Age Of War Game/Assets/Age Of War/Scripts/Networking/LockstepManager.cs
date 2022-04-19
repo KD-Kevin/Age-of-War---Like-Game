@@ -10,6 +10,9 @@ public class LockstepManager : MonoBehaviour
 {
     [SerializeField]
     private bool TryToResendOnWait = false;
+    [SerializeField]
+    [Tooltip("Game Turn / ms")]
+    private float AttemptGameTurnEvery = 40; // ms
     public ActionTurn CurrentTurn { get; set; }
     public ActionTurn PendingTurn { get; set; }
     public ActionTurn ConfirmedTurn { get; set; }
@@ -43,6 +46,8 @@ public class LockstepManager : MonoBehaviour
     public PlayerActions LocalPlayersCurrentTurn { get; set; }
     public List<PlayerActions> ActionPendingList { get; set; }
     private int LastAskForResentSec = -1;
+    private float GameTurnHalfTime = 0;
+    private float GameTurnTimer = 0;
 
     private void Awake()
     {
@@ -54,6 +59,7 @@ public class LockstepManager : MonoBehaviour
         PendingTurn = null;
         ConfirmedTurn = null;
         ProcessingTurn = null;
+        GameTurnHalfTime = AttemptGameTurnEvery / 2000;
     }
 
     private void Update()
@@ -145,13 +151,15 @@ public class LockstepManager : MonoBehaviour
             {
                 CountDown = false;
                 SecondsTillReconnect = 0;
-                Debug.Log($"Finished Countdown on -> {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
+                //Debug.Log($"Finished Countdown on -> {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
             }
             else
             {
                 SecondsTillReconnect = Mathf.FloorToInt((ReconnectOnSecond - System.DateTime.Now.Ticks) / 10000000);
             }
         }
+
+        GameUpdate();
     }
 
     private List<ushort> GetWaitingPlayersID()
@@ -178,7 +186,7 @@ public class LockstepManager : MonoBehaviour
         return WaitingOnPLayers;
     }
 
-    private void FixedUpdate()
+    private void GameUpdate()
     {
         if (!SimulationStarted)
         {
@@ -205,16 +213,21 @@ public class LockstepManager : MonoBehaviour
             return;
         }
 
-        //Debug.Log($"Fixed Delta Times ({Time.fixedDeltaTime})");
-        FixedFrameCounter++;
-        if (FixedFrameCounter == NumberOfFixedUpdatesPerGameTurn)
+        GameTurnTimer += Time.deltaTime;
+        while (GameTurnTimer >= GameTurnHalfTime)
         {
-            FixedFrameCounter = 0;
-            GameTurn();
-        }
-        else
-        {
-            AsyncGameTurn();
+            //Debug.Log($"Fixed Delta Times ({Time.fixedDeltaTime})");
+            GameTurnTimer -= GameTurnHalfTime;
+            FixedFrameCounter++;
+            if (FixedFrameCounter == NumberOfFixedUpdatesPerGameTurn)
+            {
+                FixedFrameCounter = 0;
+                GameTurn();
+            }
+            else
+            {
+                AsyncGameTurn();
+            }
         }
     }
 
