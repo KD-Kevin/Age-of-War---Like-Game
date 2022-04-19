@@ -8,6 +8,8 @@ using System;
 [System.Runtime.InteropServices.Guid("3749176F-32B4-4DB0-9BA8-F4493743DA0B")]
 public class LockstepManager : MonoBehaviour
 {
+    [SerializeField]
+    private bool TryToResendOnWait = false;
     public ActionTurn CurrentTurn { get; set; }
     public ActionTurn PendingTurn { get; set; }
     public ActionTurn ConfirmedTurn { get; set; }
@@ -71,7 +73,7 @@ public class LockstepManager : MonoBehaviour
             }
             Reconnecting = !WaitingOnPlayer;
 
-            if (WaitingOnPlayer && LastAskForResentSec != Mathf.FloorToInt(WaitTime))
+            if (TryToResendOnWait && WaitingOnPlayer && LastAskForResentSec != Mathf.FloorToInt(WaitTime))
             {
                 LastAskForResentSec = Mathf.FloorToInt(WaitTime);
                 List<ushort> WaitingOnPlayerIndexs = GetWaitingPlayersID(); 
