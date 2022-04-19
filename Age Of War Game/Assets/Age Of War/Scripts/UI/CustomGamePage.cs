@@ -87,6 +87,7 @@ public class CustomGamePage : MonoBehaviour
 
     public bool PlayerReady { get; set; }
     public bool OpponentReady { get; set; }
+    public bool PlayerButtonWasPressed { get; set; }
 
     public MultiplayStatus MultiplayerStatus { get; set; }
     public static CustomGamePage Instance = null;
@@ -94,6 +95,7 @@ public class CustomGamePage : MonoBehaviour
 
     private void Awake()
     {
+        PlayerButtonWasPressed = false;
         Instance = this;
     }
 
@@ -103,6 +105,11 @@ public class CustomGamePage : MonoBehaviour
         {
             MainMenu.Instance.MainMenuMode = MainMenuModes.FrontMenu;
         }
+    }
+
+    private void Update()
+    {
+        HostButton.interactable = NetworkManager.Instance.IsHost && !PlayerButtonWasPressed;
     }
 
     public void OpenPage()
@@ -326,6 +333,7 @@ public class CustomGamePage : MonoBehaviour
             return;
         }
 
+        PlayerButtonWasPressed = true;
         PlayerManager.Instance.SetMatchData(this);
         SceneLoadManager.Instance.LoadScene("Game", true);
     }
