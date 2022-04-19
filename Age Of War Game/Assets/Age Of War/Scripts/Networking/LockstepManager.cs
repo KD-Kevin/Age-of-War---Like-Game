@@ -693,30 +693,34 @@ public class ActionTurn
         {
             // Recieved Everyones Actions
             bool containsActionsFromEveryone = LockstepManager.Instance.PendingTurnContainActionsFromAllPlayers(LockStepTurnNumber);
-            if (containsActionsFromEveryone)
+            bool containsActionsInTurnFromEveryone = ContainsActionsFromAllPlayers();
+            if (containsActionsFromEveryone || containsActionsInTurnFromEveryone)
             {
-                List<PlayerActions> RemoveList = new List<PlayerActions>();
-                foreach(PlayerActions action in LockstepManager.Instance.ActionPendingList)
+                if (!containsActionsInTurnFromEveryone)
                 {
-                    if (action.TurnNumber == LockStepTurnNumber)
+                    List<PlayerActions> RemoveList = new List<PlayerActions>();
+                    foreach (PlayerActions action in LockstepManager.Instance.ActionPendingList)
                     {
-                        RemoveList.Add(action);
-                        AddActionSet(action);
+                        if (action.TurnNumber == LockStepTurnNumber)
+                        {
+                            RemoveList.Add(action);
+                            AddActionSet(action);
+                        }
                     }
-                }
-                foreach (PlayerActions action in RemoveList)
-                {
-                    if (action.TurnNumber == LockStepTurnNumber)
+                    foreach (PlayerActions action in RemoveList)
                     {
-                        LockstepManager.Instance.ActionPendingList.Remove(action);
+                        if (action.TurnNumber == LockStepTurnNumber)
+                        {
+                            LockstepManager.Instance.ActionPendingList.Remove(action);
+                        }
                     }
+                    LockstepManager.Instance.SendConfirmation(LockStepTurnNumber);
                 }
-                LockstepManager.Instance.SendConfirmation(LockStepTurnNumber);
-                return containsActionsFromEveryone;
+                return containsActionsFromEveryone || containsActionsInTurnFromEveryone;
             }
             else
             {
-                return containsActionsFromEveryone;
+                return false;
             }
         }
         else
