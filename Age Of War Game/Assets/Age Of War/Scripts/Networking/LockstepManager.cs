@@ -391,6 +391,7 @@ public class LockstepManager : MonoBehaviour
         Message message = Message.Create(MessageSendMode.reliable, MessageId.SendTurnActions);
         int NumberOfActions = LocalPlayersCurrentTurn.ActionsDone.Count;
         message.AddInt(NumberOfActions);
+        message.AddInt(PreviousLocalPlayersCurrentTurn.TurnNumber);
         message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
 
         foreach(IAction action in LocalPlayersCurrentTurn.ActionsDone)
@@ -407,6 +408,7 @@ public class LockstepManager : MonoBehaviour
         Message message = Message.Create(MessageSendMode.reliable, MessageId.SendTurnActions);
         int NumberOfActions = PreviousLocalPlayersCurrentTurn.ActionsDone.Count;
         message.AddInt(NumberOfActions);
+        message.AddInt(PreviousLocalPlayersCurrentTurn.TurnNumber);
         message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
 
         foreach (IAction action in PreviousLocalPlayersCurrentTurn.ActionsDone)
@@ -439,11 +441,13 @@ public class LockstepManager : MonoBehaviour
     {
         //Debug.Log("Server Recieved - Send actions");
         int NumberOfActions = message.GetInt();
+        int TurnNumber = message.GetInt();
         ushort SentFromPlayerID = message.GetUShort();
 
         // ResendData
         Message messageToSend = Message.Create(MessageSendMode.reliable, MessageId.SendTurnActions);
         messageToSend.AddInt(NumberOfActions);
+        messageToSend.AddInt(TurnNumber);
         messageToSend.AddUShort(SentFromPlayerID);
         for (int actionIndex = 0; actionIndex < NumberOfActions; actionIndex++)
         {
@@ -479,11 +483,13 @@ public class LockstepManager : MonoBehaviour
     private static void SendTurnActions(Message message)
     {
         int NumberOfActions = message.GetInt();
+        int TurnNumber = message.GetInt();
         ushort SentFromPlayerID = message.GetUShort();
         Debug.Log($"Cient Recieved - Actions from Player {SentFromPlayerID}");
 
         // ResendData
         PlayerActions PlayerAction = new PlayerActions(SentFromPlayerID);
+        PlayerAction.TurnNumber = TurnNumber;
         for (int actionIndex = 0; actionIndex < NumberOfActions; actionIndex++)
         {
             int TypeOfAction = message.GetInt();
