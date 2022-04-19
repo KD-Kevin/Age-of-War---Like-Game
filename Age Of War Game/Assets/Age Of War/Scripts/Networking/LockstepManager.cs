@@ -70,7 +70,7 @@ public class LockstepManager : MonoBehaviour
 
             if (LockstepTurnCounter > 1)
             {
-                WaitingOnPlayer = !(PendingTurn.ReadyForNextTurn() && ConfirmedTurn.ReadyForNextTurn());
+                WaitingOnPlayer = !PendingTurn.ReadyForNextTurn() || !ConfirmedTurn.ReadyForNextTurn();
             }
             // Turn 2
             else if (LockstepTurnCounter > 0)
@@ -339,6 +339,12 @@ public class LockstepManager : MonoBehaviour
     {
         if (ProcessingTurn != null)
         {
+            if (ProcessingTurn.AllActionsDone == null)
+            {
+                Debug.LogWarning($"No Action List Created for lockstep turn: {ProcessingTurn.LockStepTurnNumber}");
+                ProcessingTurn.NextTurn();
+                return;
+            }
             foreach(PlayerActions PlayerAction in ProcessingTurn.AllActionsDone)
             {
                 foreach(IAction Action in PlayerAction.ActionsDone)
