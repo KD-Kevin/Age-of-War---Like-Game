@@ -18,11 +18,11 @@ public class LockstepManager : MonoBehaviour
     public static LockstepManager Instance = null;
     private int NumberOfGameTurnsPerLockstepTurn = 4; // Adjusts based on the connection ei: average time per round trip = 167, game now does 5 game turns per lockstep (Math.Ciel(167/40) = 5)
     private int NumberOfFixedUpdatesPerGameTurn = 2;
-    private int GameTurnCounter = 0;
     private float WaitTime = 0;
     private bool ReconnectOnNextGameTurn = false;
     private bool CountDown = false;
 
+    public int GameTurnCounter { get; set; }
     public int SecondsTillReconnect { get; set; }
     public long ReconnectOnSecond { get; set; }
 
@@ -37,9 +37,11 @@ public class LockstepManager : MonoBehaviour
     public bool SimulationPaused { get; set; }
 
     public bool WaitingOnPlayer { get; set; }
+    public List<PlayerActions> ActionPendingList { get; set; }
 
     private void Awake()
     {
+        ActionPendingList = new List<PlayerActions>();
         Instance = this;
         FixedFrameCounter = 0;
         FixedGameTurnCounter = 0;
@@ -81,11 +83,6 @@ public class LockstepManager : MonoBehaviour
                 ReconnectOnNextGameTurn = true;
                 ReconnectOnSecond = System.DateTime.Now.Ticks + 10000000 - NetworkManager.Instance.HostSystemTimeDifference; // seconds to 100 nano seconds ~ 10*7
                 SecondsTillReconnect = 2;
-
-                if (ReconnectOnSecond > 60)
-                {
-                    ReconnectOnSecond -= 60;
-                }
             }
             else
             {
@@ -94,11 +91,6 @@ public class LockstepManager : MonoBehaviour
                 ReconnectOnNextGameTurn = true;
                 ReconnectOnSecond = System.DateTime.Now.Ticks + 10 * 10000000 - NetworkManager.Instance.HostSystemTimeDifference; // seconds to 100 nano seconds ~ 10*7
                 SecondsTillReconnect = 10;
-
-                if (ReconnectOnSecond > 60)
-                {
-                    ReconnectOnSecond -= 60;
-                }
             }
             WaitTime = 0;
             Reconnecting = false;
@@ -231,9 +223,10 @@ public class LockstepManager : MonoBehaviour
         // Turn 1
         else
         {
+            CurrentTurn = new ActionTurn(LockstepTurnCounter, 0);
             LockstepTurnCounter++;
-            CurrentTurn = new ActionTurn(LockstepTurnCounter, GameTurnCounter);
             CurrentTurn.NextTurn();
+            CurrentTurn = new ActionTurn(LockstepTurnCounter, GameTurnCounter);
         }
 
         Debug.Log($"Lockstep Update -> {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
@@ -242,7 +235,7 @@ public class LockstepManager : MonoBehaviour
     public void ReconnectedLockstepTurn()
     {
         // Turn 3 and above
-        if (PendingTurn != null && ConfirmedTurn != null)
+        if (LockstepTurnCounter > 1)
         {
             WaitingOnPlayer = !PendingTurn.ReadyForNextTurn() || !ConfirmedTurn.ReadyForNextTurn();
             if (!WaitingOnPlayer)
@@ -255,7 +248,7 @@ public class LockstepManager : MonoBehaviour
             }
         }
         // Turn 2
-        else if (PendingTurn != null)
+        else if (LockstepTurnCounter > 0)
         {
             WaitingOnPlayer = !PendingTurn.ReadyForNextTurn();
             if (!WaitingOnPlayer)
@@ -269,9 +262,10 @@ public class LockstepManager : MonoBehaviour
         // Turn 1
         else
         {
+            CurrentTurn = new ActionTurn(LockstepTurnCounter, 0);
             LockstepTurnCounter++;
-            CurrentTurn = new ActionTurn(LockstepTurnCounter, GameTurnCounter);
             CurrentTurn.NextTurn();
+            CurrentTurn = new ActionTurn(LockstepTurnCounter, GameTurnCounter);
         }
     }
 
@@ -314,46 +308,32 @@ public class LockstepManager : MonoBehaviour
 
     public void RecievePlayerAction(PlayerActions PendingActionToTrack)
     {
-        if (PendingTurn == null)
-        {
-            LateRecievedAction.Add(PendingActionToTrack);
-            if (!RecievingLateActions)
-            {
-                RecievingLateActions = true;
-                Invoke(nameof(RecievePlayerActionLate), 0.02f);
-            }
-            return;
-        }
-        PendingTurn.AddActionSet(PendingActionToTrack);
-
-        if (PendingTurn.ContainsActionsFromAllPlayers())
-        {
-            // Send Confirmation that you recieved all the player actions - RPC call
-            SendConfirmation();
-        }
+        ActionPendingList.Add(PendingActionToTrack);
     }
-    private bool RecievingLateActions = false;
-    private List<PlayerActions> LateRecievedAction = new List<PlayerActions>();
-    private void RecievePlayerActionLate()
+
+    public bool PendingTurnContainActionsFromAllPlayers()
     {
-        if (PendingTurn == null)
+        foreach (NetworkPlayer player in PlayerManager.Instance.ConnectedPlayers.Values)
         {
-            Invoke(nameof(RecievePlayerActionLate), 0.02f);
-            return;
+            if (!ContainsActionFromPlayer(player.PlayerID))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public bool ContainsActionFromPlayer(int PlayerID)
+    {
+        foreach (PlayerActions action in ActionPendingList)
+        {
+            if (action.PlayerID == PlayerID)
+            {
+                return true;
+            }
         }
 
-        foreach(PlayerActions action in LateRecievedAction)
-        {
-            PendingTurn.AddActionSet(action);
-        }
-
-        if (PendingTurn.ContainsActionsFromAllPlayers())
-        {
-            // Send Confirmation that you recieved all the player actions - RPC call
-            SendConfirmation();
-        }
-        LateRecievedAction.Clear();
-        RecievingLateActions = false;
+        return false;
     }
 
     public void SendTurnActions()
@@ -422,7 +402,7 @@ public class LockstepManager : MonoBehaviour
             }
             else
             {
-                NewAction = new CorruptAction();
+                // Corrupted or Unkown action
             }
         }
 
@@ -584,7 +564,21 @@ public class ActionTurn
         else if (CurrentState == ActionStates.Pending)
         {
             // Recieved Everyones Actions
-            return ContainsActionsFromAllPlayers();
+            bool containsActionsFromEveryone = LockstepManager.Instance.PendingTurnContainActionsFromAllPlayers();
+            if (containsActionsFromEveryone)
+            {
+                foreach(PlayerActions action in LockstepManager.Instance.ActionPendingList)
+                {
+                    AddActionSet(action);
+                }
+                LockstepManager.Instance.ActionPendingList.Clear();
+                LockstepManager.Instance.SendConfirmation();
+                return containsActionsFromEveryone;
+            }
+            else
+            {
+                return containsActionsFromEveryone;
+            }
         }
         else
         {
@@ -627,7 +621,7 @@ public class ActionTurn
         {
             CurrentState = ActionStates.Completed;
             // Move into Turn History
-            CompletedOnGameTurn = LockstepManager.Instance.FixedGameTurnCounter;
+            CompletedOnGameTurn = LockstepManager.Instance.GameTurnCounter;
             LockstepManager.Instance.ActionTurnHistory.CompleteTurn(this);
         }
 
