@@ -123,7 +123,7 @@ public class LockstepManager : MonoBehaviour
 
         if (CountDown)
         {
-            if (System.DateTime.Now.Second == ReconnectOnSecond)
+            if (SecondsTillReconnect == -1)
             {
                 CountDown = false;
                 SecondsTillReconnect = 0;
@@ -131,7 +131,7 @@ public class LockstepManager : MonoBehaviour
             }
             else
             {
-                SecondsTillReconnect = Mathf.RoundToInt((System.DateTime.Now.Ticks - ReconnectOnSecond) / 10000000);
+                SecondsTillReconnect = Mathf.FloorToInt((ReconnectOnSecond - System.DateTime.Now.Ticks) / 10000000);
             }
         }
     }
