@@ -109,7 +109,7 @@ public class CustomGamePage : MonoBehaviour
 
     private void Update()
     {
-        HostButton.interactable = NetworkManager.Instance.IsHost && !PlayerButtonWasPressed;
+        PlayButton.interactable = NetworkManager.Instance.IsHost && !PlayerButtonWasPressed;
     }
 
     public void OpenPage()
