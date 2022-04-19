@@ -555,7 +555,7 @@ public class LockstepManager : MonoBehaviour
         Message messageToSend = Message.Create(MessageSendMode.reliable, MessageId.TurnConfirmation);
         int ConfirmedTurn = message.GetInt();
         messageToSend.AddUShort(newPlayerId);
-        message.AddInt(ConfirmedTurn);
+        messageToSend.AddInt(ConfirmedTurn);
 
         foreach (NetworkPlayer player in PlayerManager.Instance.ConnectedPlayers.Values)
         {
