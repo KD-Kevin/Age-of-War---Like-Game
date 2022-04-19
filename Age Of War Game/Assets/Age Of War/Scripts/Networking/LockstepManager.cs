@@ -40,7 +40,7 @@ public class LockstepManager : MonoBehaviour
     public PlayerActions PreviousLocalPlayersCurrentTurn { get; set; }
     public PlayerActions LocalPlayersCurrentTurn { get; set; }
     public List<PlayerActions> ActionPendingList { get; set; }
-    private int LastAskForResentSec = 0;
+    private int LastAskForResentSec = -1;
 
     private void Awake()
     {
@@ -86,6 +86,10 @@ public class LockstepManager : MonoBehaviour
                         SendForActionResend(playerID);
                     }
                 }
+            }
+            else
+            {
+                LastAskForResentSec = -1;
             }
         }
         else if (Reconnecting)
@@ -610,6 +614,7 @@ public class LockstepManager : MonoBehaviour
         ushort newPlayerId = message.GetUShort();
         ushort otherPlayer = message.GetUShort();
         Message messageToSend = Message.Create(MessageSendMode.reliable, MessageId.RequestForActionResend);
+        messageToSend.Add(newPlayerId);
 
         NetworkManager.Instance.Server.Send(messageToSend, otherPlayer);
     }
