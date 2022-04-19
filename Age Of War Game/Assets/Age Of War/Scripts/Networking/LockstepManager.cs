@@ -269,6 +269,7 @@ public class LockstepManager : MonoBehaviour
                 PendingTurn?.NextTurn();
                 CurrentTurn?.NextTurn();
                 CurrentTurn = new ActionTurn(LockstepTurnCounter, GameTurnCounter);
+                Debug.Log($"Lockstep Update -> {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
             }
         }
         // Turn 2
@@ -281,6 +282,7 @@ public class LockstepManager : MonoBehaviour
                 PendingTurn?.NextTurn();
                 CurrentTurn?.NextTurn();
                 CurrentTurn = new ActionTurn(LockstepTurnCounter, GameTurnCounter);
+                Debug.Log($"Lockstep Update -> {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
             }
         }
         // Turn 1
@@ -290,9 +292,9 @@ public class LockstepManager : MonoBehaviour
             LockstepTurnCounter++;
             CurrentTurn.NextTurn();
             CurrentTurn = new ActionTurn(LockstepTurnCounter, GameTurnCounter);
+            Debug.Log($"Lockstep Update -> {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
         }
 
-        Debug.Log($"Lockstep Update -> {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
     }
 
     public void ReconnectedLockstepTurn()
@@ -345,11 +347,6 @@ public class LockstepManager : MonoBehaviour
                 }
             }
             ProcessingTurn.NextTurn();
-        }
-
-        foreach (NetworkPlayer Player in PlayerManager.Instance.ConnectedPlayers.Values)
-        {
-            Player.ReadyForNextTurn = false;
         }
     }
 
@@ -541,12 +538,12 @@ public class LockstepManager : MonoBehaviour
         Instance.RecievePlayerAction(PlayerAction);
     }
 
-    public void SendConfirmation()
+    public void SendConfirmation(int ConfirmedTurnNumber)
     {
         //Debug.Log("Send Sent - Confirmation");
         Message message = Message.Create(MessageSendMode.reliable, MessageId.TurnConfirmation);
         message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
-        message.AddBool(true);
+        message.AddInt(ConfirmedTurnNumber);
         NetworkManager.Instance.Client.Send(message);
     }
 
@@ -556,9 +553,9 @@ public class LockstepManager : MonoBehaviour
         //Debug.Log("Server Recieved - Send Confirmation");
         ushort newPlayerId = message.GetUShort();
         Message messageToSend = Message.Create(MessageSendMode.reliable, MessageId.TurnConfirmation);
-        bool Confirmed = message.GetBool();
+        int ConfirmedTurn = message.GetInt();
         messageToSend.AddUShort(newPlayerId);
-        messageToSend.AddBool(Confirmed);
+        message.AddInt(ConfirmedTurn);
 
         foreach (NetworkPlayer player in PlayerManager.Instance.ConnectedPlayers.Values)
         {
@@ -571,13 +568,27 @@ public class LockstepManager : MonoBehaviour
     {
         ushort confirmedPlayer = message.GetUShort();
         Debug.Log($"Client Recieved - Send Confirmation From Player {confirmedPlayer}");
-        bool Confirmed = message.GetBool();
+        int ConfirmedTurn = message.GetInt();
 
-        foreach (NetworkPlayer player in PlayerManager.Instance.ConnectedPlayers.Values)
+        if (Instance.PendingTurn.LockStepTurnNumber == ConfirmedTurn)
         {
-            if (player.PlayerID == confirmedPlayer)
+            if (!Instance.PendingTurn.ConfirmedPlayers.Contains(confirmedPlayer))
             {
-                player.ReadyForNextTurn = Confirmed;
+                Instance.PendingTurn.ConfirmedPlayers.Add(ConfirmedTurn);
+            }
+        }
+        else if (Instance.ConfirmedTurn.LockStepTurnNumber == ConfirmedTurn)
+        {
+            if (!Instance.ConfirmedTurn.ConfirmedPlayers.Contains(confirmedPlayer))
+            {
+                Instance.ConfirmedTurn.ConfirmedPlayers.Add(ConfirmedTurn);
+            }
+        }
+        else if (Instance.CurrentTurn.LockStepTurnNumber == ConfirmedTurn)
+        {
+            if (!Instance.CurrentTurn.ConfirmedPlayers.Contains(confirmedPlayer))
+            {
+                Instance.CurrentTurn.ConfirmedPlayers.Add(ConfirmedTurn);
             }
         }
     }
@@ -657,6 +668,7 @@ public class ActionTurn
     public int LockStepTurnNumber = -1;
     public int GameTurnNumber = -1;
     public int CompletedOnGameTurn = -1;
+    public List<int> ConfirmedPlayers = new List<int>();
 
     public ActionTurn(int LockStepNumber = -1, int GameTurn = -1)
     {
@@ -685,7 +697,7 @@ public class ActionTurn
                     AddActionSet(action);
                 }
                 LockstepManager.Instance.ActionPendingList.Clear();
-                LockstepManager.Instance.SendConfirmation();
+                LockstepManager.Instance.SendConfirmation(LockStepTurnNumber);
                 return containsActionsFromEveryone;
             }
             else
@@ -695,16 +707,27 @@ public class ActionTurn
         }
         else
         {
-            // Process Everyone Turn
-            foreach(NetworkPlayer Player in PlayerManager.Instance.ConnectedPlayers.Values)
+            bool EveryoneConfirmed = true;
+            foreach (NetworkPlayer player in PlayerManager.Instance.ConnectedPlayers.Values)
             {
-                if (!Player.ReadyForNextTurn)
+                bool ContainedPlayer = false;
+                foreach (int playerIdConfirmed in ConfirmedPlayers)
                 {
-                    return false;
+                    if (player.PlayerID == playerIdConfirmed)
+                    {
+                        ContainedPlayer = true;
+                        break;
+                    }
+                }
+
+                if (!ContainedPlayer)
+                {
+                    EveryoneConfirmed = false;
+                    break;
                 }
             }
 
-            return true;
+            return EveryoneConfirmed;
         }
     }
 

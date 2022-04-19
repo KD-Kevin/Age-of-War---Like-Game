@@ -7,7 +7,6 @@ public class NetworkPlayer : MonoBehaviour
 {
     public ushort PlayerID = 0;
     public bool IsLocalPlayer = false;
-    public bool ReadyForNextTurn = false;
     public bool ReadyToStart = false;
     public string UserName = "Guest";
 
