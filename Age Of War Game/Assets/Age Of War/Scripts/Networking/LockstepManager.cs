@@ -450,8 +450,6 @@ public class LockstepManager : MonoBehaviour
             int TypeOfAction = message.GetInt();
             messageToSend.AddInt(TypeOfAction);
 
-            IAction NewAction = null;
-
             if ((ActionTypes)TypeOfAction == ActionTypes.NoAction)
             {
                 // For Now do nothing - Get And Add Variables for other actions
@@ -816,11 +814,11 @@ public class PlayerActions
 
     public PlayerActions(ushort playerID = 0, bool UpdateTurnCounter = false)
     {
+        TurnNumber = TurnCounter;
         if (UpdateTurnCounter)
         {
             TurnCounter++;
         }
-        TurnNumber = TurnCounter;
         PlayerID = playerID;
 
         AddAction(new NoAction());
