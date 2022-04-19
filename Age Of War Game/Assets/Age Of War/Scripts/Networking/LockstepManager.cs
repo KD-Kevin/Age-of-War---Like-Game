@@ -372,11 +372,11 @@ public class LockstepManager : MonoBehaviour
         ActionPendingList.Add(PendingActionToTrack);
     }
 
-    public bool PendingTurnContainActionsFromAllPlayers()
+    public bool PendingTurnContainActionsFromAllPlayers(int ForTurnNumber)
     {
         foreach (NetworkPlayer player in PlayerManager.Instance.ConnectedPlayers.Values)
         {
-            if (!ContainsActionFromPlayer(player.PlayerID))
+            if (!ContainsActionFromPlayer(player.PlayerID, ForTurnNumber))
             {
                 return false;
             }
@@ -384,13 +384,16 @@ public class LockstepManager : MonoBehaviour
         return true;
     }
 
-    public bool ContainsActionFromPlayer(int PlayerID)
+    public bool ContainsActionFromPlayer(int PlayerID, int ForTurnNumber)
     {
         foreach (PlayerActions action in ActionPendingList)
         {
-            if (action.PlayerID == PlayerID)
+            if (action.TurnNumber == ForTurnNumber)
             {
-                return true;
+                if (action.PlayerID == PlayerID)
+                {
+                    return true;
+                }
             }
         }
 
@@ -403,7 +406,7 @@ public class LockstepManager : MonoBehaviour
         Message message = Message.Create(MessageSendMode.reliable, MessageId.SendTurnActions);
         int NumberOfActions = LocalPlayersCurrentTurn.ActionsDone.Count;
         message.AddInt(NumberOfActions);
-        message.AddInt(PreviousLocalPlayersCurrentTurn.TurnNumber);
+        message.AddInt(LocalPlayersCurrentTurn.TurnNumber);
         message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
 
         foreach(IAction action in LocalPlayersCurrentTurn.ActionsDone)
@@ -689,14 +692,25 @@ public class ActionTurn
         else if (CurrentState == ActionStates.Pending)
         {
             // Recieved Everyones Actions
-            bool containsActionsFromEveryone = LockstepManager.Instance.PendingTurnContainActionsFromAllPlayers();
+            bool containsActionsFromEveryone = LockstepManager.Instance.PendingTurnContainActionsFromAllPlayers(LockStepTurnNumber);
             if (containsActionsFromEveryone)
             {
+                List<PlayerActions> RemoveList = new List<PlayerActions>();
                 foreach(PlayerActions action in LockstepManager.Instance.ActionPendingList)
                 {
-                    AddActionSet(action);
+                    if (action.TurnNumber == LockStepTurnNumber)
+                    {
+                        RemoveList.Add(action);
+                        AddActionSet(action);
+                    }
                 }
-                LockstepManager.Instance.ActionPendingList.Clear();
+                foreach (PlayerActions action in RemoveList)
+                {
+                    if (action.TurnNumber == LockStepTurnNumber)
+                    {
+                        LockstepManager.Instance.ActionPendingList.Remove(action);
+                    }
+                }
                 LockstepManager.Instance.SendConfirmation(LockStepTurnNumber);
                 return containsActionsFromEveryone;
             }
