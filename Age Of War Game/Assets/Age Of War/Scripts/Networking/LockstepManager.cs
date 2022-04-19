@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using RiptideNetworking;
 using RiptideNetworking.Utils;
+using System;
 
 [System.Runtime.InteropServices.Guid("3749176F-32B4-4DB0-9BA8-F4493743DA0B")]
 public class LockstepManager : MonoBehaviour
 {
     public ActionTurn CurrentTurn { get; set; }
-    public PlayerActions LocalPlayersCurrentTurn { get; set; }
     public ActionTurn PendingTurn { get; set; }
     public ActionTurn ConfirmedTurn { get; set; }
     public ActionTurn ProcessingTurn { get; set; }
@@ -37,7 +37,10 @@ public class LockstepManager : MonoBehaviour
     public bool SimulationPaused { get; set; }
 
     public bool WaitingOnPlayer { get; set; }
+    public PlayerActions PreviousLocalPlayersCurrentTurn { get; set; }
+    public PlayerActions LocalPlayersCurrentTurn { get; set; }
     public List<PlayerActions> ActionPendingList { get; set; }
+    private int LastAskForResentSec = 0;
 
     private void Awake()
     {
@@ -57,16 +60,33 @@ public class LockstepManager : MonoBehaviour
         {
             WaitTime += Time.deltaTime;
 
-            if (PendingTurn != null && ConfirmedTurn != null)
+            if (LockstepTurnCounter > 1)
             {
                 WaitingOnPlayer = !(PendingTurn.ReadyForNextTurn() && ConfirmedTurn.ReadyForNextTurn());
             }
             // Turn 2
-            else if (PendingTurn != null)
+            else if (LockstepTurnCounter > 0)
             {
                 WaitingOnPlayer = !PendingTurn.ReadyForNextTurn();
             }
             Reconnecting = !WaitingOnPlayer;
+
+            if (WaitingOnPlayer && LastAskForResentSec != Mathf.FloorToInt(WaitTime))
+            {
+                LastAskForResentSec = Mathf.FloorToInt(WaitTime);
+                List<ushort> WaitingOnPlayerIndexs = GetWaitingPlayersID(); 
+                foreach(ushort playerID in WaitingOnPlayerIndexs)
+                {
+                    if (playerID == PlayerManager.Instance.LocalPlayer.PlayerID)
+                    {
+                        ResendTurnActions();
+                    }
+                    else
+                    {
+                        SendForActionResend(playerID);
+                    }
+                }
+            }
         }
         else if (Reconnecting)
         {
@@ -126,6 +146,30 @@ public class LockstepManager : MonoBehaviour
                 SecondsTillReconnect = Mathf.FloorToInt((ReconnectOnSecond - System.DateTime.Now.Ticks) / 10000000);
             }
         }
+    }
+
+    private List<ushort> GetWaitingPlayersID()
+    {
+        List<ushort> WaitingOnPLayers = new List<ushort>();
+        foreach (NetworkPlayer player in PlayerManager.Instance.ConnectedPlayers.Values)
+        {
+            bool ContainsPlayerID = false;
+            foreach (PlayerActions action in ActionPendingList)
+            {
+                if (action.PlayerID == player.PlayerID)
+                {
+                    ContainsPlayerID = true;
+                    break;
+                }
+            }
+
+            if (!ContainsPlayerID)
+            {
+                WaitingOnPLayers.Add(player.PlayerID);
+            }
+        }
+
+        return WaitingOnPLayers;
     }
 
     private void FixedUpdate()
@@ -303,6 +347,7 @@ public class LockstepManager : MonoBehaviour
         SendTurnActions();
 
         // Set New Current Actions
+        PreviousLocalPlayersCurrentTurn = LocalPlayersCurrentTurn;
         LocalPlayersCurrentTurn = new PlayerActions(PlayerManager.Instance.LocalPlayer.PlayerID, true);
     }
 
@@ -345,6 +390,22 @@ public class LockstepManager : MonoBehaviour
         message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
 
         foreach(IAction action in LocalPlayersCurrentTurn.ActionsDone)
+        {
+            AddActionToMessage(action, message);
+        }
+
+        NetworkManager.Instance.Client.Send(message);
+    }
+
+    public void ResendTurnActions()
+    {
+        //Debug.Log("Client Sent - Send actions");
+        Message message = Message.Create(MessageSendMode.reliable, MessageId.SendTurnActions);
+        int NumberOfActions = PreviousLocalPlayersCurrentTurn.ActionsDone.Count;
+        message.AddInt(NumberOfActions);
+        message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
+
+        foreach (IAction action in PreviousLocalPlayersCurrentTurn.ActionsDone)
         {
             AddActionToMessage(action, message);
         }
@@ -417,7 +478,7 @@ public class LockstepManager : MonoBehaviour
     {
         int NumberOfActions = message.GetInt();
         ushort SentFromPlayerID = message.GetUShort();
-        Debug.Log($"Cient Recieved - Send actions from Player {SentFromPlayerID}");
+        Debug.Log($"Cient Recieved - Actions from Player {SentFromPlayerID}");
 
         // ResendData
         PlayerActions PlayerAction = new PlayerActions(SentFromPlayerID);
@@ -531,6 +592,34 @@ public class LockstepManager : MonoBehaviour
         Debug.Log($"Client Recieved - Reconnect on Second {sec}");
 
         Instance.ReconnectOnSecond = sec;
+    }
+
+    public void SendForActionResend(ushort ForPlayer)
+    {
+        //Debug.Log("Send Sent - Confirmation");
+        Message message = Message.Create(MessageSendMode.reliable, MessageId.RequestForActionResend);
+        message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
+        message.AddUShort(ForPlayer);
+        NetworkManager.Instance.Client.Send(message);
+    }
+
+    [MessageHandler((ushort)MessageId.RequestForActionResend)]
+    private static void SendForActionResend(ushort fromClientId, Message message)
+    {
+        //Debug.Log("Server Recieved - Send Confirmation");
+        ushort newPlayerId = message.GetUShort();
+        ushort otherPlayer = message.GetUShort();
+        Message messageToSend = Message.Create(MessageSendMode.reliable, MessageId.RequestForActionResend);
+
+        NetworkManager.Instance.Server.Send(messageToSend, otherPlayer);
+    }
+
+    [MessageHandler((ushort)MessageId.RequestForActionResend)]
+    private static void SendForActionResend(Message message)
+    {
+        ushort confirmedPlayer = message.GetUShort();
+        Debug.Log($"Got Resend Request from Player {confirmedPlayer}");
+        Instance.ResendTurnActions();
     }
 }
 

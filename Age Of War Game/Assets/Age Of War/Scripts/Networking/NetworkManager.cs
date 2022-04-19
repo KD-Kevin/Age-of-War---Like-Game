@@ -186,4 +186,7 @@ internal enum MessageId : ushort
     // Countdown
     SendStartCoundDownSec = 8,
     PingHost = 9,
+
+    // Resend
+    RequestForActionResend = 10,
 }
