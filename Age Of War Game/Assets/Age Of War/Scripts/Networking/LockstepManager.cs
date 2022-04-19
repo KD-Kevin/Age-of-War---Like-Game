@@ -202,6 +202,7 @@ public class LockstepManager : MonoBehaviour
 
     public void LockstepTurn()
     {
+        NetworkManager.Instance.PingHost();
         // Turn 3 and above
         if (LockstepTurnCounter > 1)
         {

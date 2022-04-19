@@ -103,6 +103,7 @@ public class NetworkManager : MonoBehaviour
 
     private void DidConnect(object sender, EventArgs e)
     {
+        PingHost();
         NetworkPlayer.Spawn(Client.Id, PlayerManager.Instance.LocalPlayerData.Data.UserName, Vector3.zero, true);
     }
 
