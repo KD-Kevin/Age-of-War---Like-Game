@@ -79,7 +79,7 @@ public class PlayerManager : MonoBehaviour
     // Online
     public void SendReadyToStart()
     {
-        Debug.Log("Client Sent - Send Ready Confirmation");
+        //Debug.Log("Client Sent - Send Ready Confirmation");
         Message message = Message.Create(MessageSendMode.reliable, MessageId.SendPlayerReadyForSimulation);
         message.AddUShort(Instance.LocalPlayer.PlayerID);
         message.AddBool(true);
@@ -89,7 +89,7 @@ public class PlayerManager : MonoBehaviour
     [MessageHandler((ushort)MessageId.SendPlayerReadyForSimulation)]
     private static void SendReadyToStart(ushort fromClientId, Message message)
     {
-        Debug.Log("Server Recieved - Send Ready Confirmation");
+        //Debug.Log("Server Recieved - Send Ready Confirmation");
         ushort newPlayerId = message.GetUShort();
         Message messageToSend = Message.Create(MessageSendMode.reliable, MessageId.SendPlayerReadyForSimulation);
         bool Confirmed = message.GetBool();
@@ -112,7 +112,7 @@ public class PlayerManager : MonoBehaviour
     [MessageHandler((ushort)MessageId.SendPlayerReadyForSimulation)]
     private static void SendReadyToStart(Message message)
     {
-        Debug.Log("Client Recieved - Send Ready Confirmation");
+        //Debug.Log("Client Recieved - Send Ready Confirmation");
         ushort confirmedPlayer = message.GetUShort();
         bool Confirmed = message.GetBool();
 

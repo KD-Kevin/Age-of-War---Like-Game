@@ -24,7 +24,7 @@ public class LockstepManager : MonoBehaviour
     private bool CountDown = false;
 
     public int SecondsTillReconnect { get; set; }
-    public int ReconnectOnSecond { get; set; }
+    public long ReconnectOnSecond { get; set; }
 
     public int FixedFrameCounter { get; private set; }
     public int FixedGameTurnCounter { get; private set; }
@@ -79,7 +79,7 @@ public class LockstepManager : MonoBehaviour
                 // Small Disconnect
                 CountDown = true;
                 ReconnectOnNextGameTurn = true;
-                ReconnectOnSecond = System.DateTime.Now.Second + 2;
+                ReconnectOnSecond = System.DateTime.Now.Ticks + 10000000 - NetworkManager.Instance.HostSystemTimeDifference; // seconds to 100 nano seconds ~ 10*7
                 SecondsTillReconnect = 2;
 
                 if (ReconnectOnSecond > 60)
@@ -92,7 +92,7 @@ public class LockstepManager : MonoBehaviour
                 // Large Disconnect
                 CountDown = true;
                 ReconnectOnNextGameTurn = true;
-                ReconnectOnSecond = System.DateTime.Now.Second + 10;
+                ReconnectOnSecond = System.DateTime.Now.Ticks + 10 * 10000000 - NetworkManager.Instance.HostSystemTimeDifference; // seconds to 100 nano seconds ~ 10*7
                 SecondsTillReconnect = 10;
 
                 if (ReconnectOnSecond > 60)
@@ -108,17 +108,12 @@ public class LockstepManager : MonoBehaviour
             if (PlayerManager.Instance.EveryoneIsReadyForStart())
             {
                 CountDown = true;
-                ReconnectOnSecond = System.DateTime.Now.Second + 6;
-                if (NetworkManager.Instance.IsHost)
-                {
-                    SendCountdown(ReconnectOnSecond);
-                }
+                ReconnectOnSecond = System.DateTime.Now.Ticks + 6 * 10000000 - NetworkManager.Instance.HostSystemTimeDifference; // seconds to 100 nano seconds ~ 10*7
+                //if (NetworkManager.Instance.IsHost)
+                //{
+                //    SendCountdown(ReconnectOnSecond);
+                //}
                 SecondsTillReconnect = 6;
-
-                if (ReconnectOnSecond >= 60)
-                {
-                    ReconnectOnSecond -= 60;
-                }
 
                 SimulationStarted = true;
 
@@ -136,15 +131,7 @@ public class LockstepManager : MonoBehaviour
             }
             else
             {
-                int CurrentSecond = System.DateTime.Now.Second;
-                if (CurrentSecond > ReconnectOnSecond)
-                {
-                    SecondsTillReconnect = 60 + ReconnectOnSecond - CurrentSecond;
-                }
-                else
-                {
-                    SecondsTillReconnect = ReconnectOnSecond - CurrentSecond;
-                }
+                SecondsTillReconnect = Mathf.RoundToInt((System.DateTime.Now.Ticks - ReconnectOnSecond) / 10000000);
             }
         }
     }
@@ -210,7 +197,7 @@ public class LockstepManager : MonoBehaviour
             LockstepTurn();
         }
 
-        Debug.Log($"Game Update -> {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
+        //Debug.Log($"Game Update -> {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
     }
 
     public void LockstepTurn()

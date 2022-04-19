@@ -21,8 +21,14 @@ public class NetworkManager : MonoBehaviour
     public NetworkPlayer PlayerPrefab => playerPrefab;
     public NetworkPlayer LocalPlayerPrefab => localPlayerPrefab;
 
+    public long HostSystemTimeDifference { get; set; }
+    public long LastPing { get; set; }
+    public int LastPingMS { get; set; }
+    private long PingStartTime_ns = 0;
+
     private void Awake()
     {
+        HostSystemTimeDifference = -1;
         if (Instance == null)
         {
             Instance = this;
@@ -66,6 +72,8 @@ public class NetworkManager : MonoBehaviour
 
     internal void StartHost()
     {
+        IsHost = true;
+        HostSystemTimeDifference = 0;
         Server.Start(port, 2);
         Client.Connect($"127.0.0.1:{port}");
     }
@@ -78,12 +86,14 @@ public class NetworkManager : MonoBehaviour
 
     internal void LeaveGame()
     {
+        HostSystemTimeDifference = -1;
         Server.Stop();
         DisconnectClient();
     }
 
     private void DisconnectClient()
     {
+        HostSystemTimeDifference = -1;
         Client.Disconnect();
         foreach (NetworkPlayer player in PlayerManager.Instance.ConnectedPlayers.Values)
         {
@@ -113,9 +123,44 @@ public class NetworkManager : MonoBehaviour
 
     private void DidDisconnect(object sender, EventArgs e)
     {
+        HostSystemTimeDifference = -1;
         foreach (NetworkPlayer player in PlayerManager.Instance.ConnectedPlayers.Values)
         {
             Destroy(player.gameObject);
+        }
+    }
+
+    public void PingHost()
+    {
+        PingStartTime_ns = System.DateTime.Now.Ticks;
+        Message message = Message.Create(MessageSendMode.reliable, MessageId.PingHost);
+        Client.Send(message);
+    }
+
+
+    [MessageHandler((ushort)MessageId.PingHost)]
+    private static void PingHost(ushort fromClientId, Message message)
+    {
+        Message messageToSend = Message.Create(MessageSendMode.reliable, MessageId.PingHost);
+        messageToSend.AddLong(System.DateTime.Now.Ticks);
+        NetworkManager.Instance.Server.Send(messageToSend, fromClientId);
+    }
+
+    [MessageHandler((ushort)MessageId.PingHost)]
+    private static void PingHost(Message message)
+    {
+        long Host100NanoSec = message.GetLong();
+
+        // Time Difference from ping to ping back
+        long Client100NanoSec = System.DateTime.Now.Ticks;
+        Instance.LastPing = Client100NanoSec - Instance.PingStartTime_ns;
+        Instance.LastPingMS = Mathf.RoundToInt((float)Instance.LastPing / 10000); // One MS per 10000 (100 - Nanoseconds)
+
+        if (Instance.HostSystemTimeDifference == -1)
+        {
+            //                            (         Estimate Time when Ping was             )
+            long EstimatedHostTime = Host100NanoSec - Instance.LastPing / 2;
+            Instance.HostSystemTimeDifference = Instance.PingStartTime_ns - EstimatedHostTime;
         }
     }
 }
@@ -139,4 +184,5 @@ internal enum MessageId : ushort
 
     // Countdown
     SendStartCoundDownSec = 8,
+    PingHost = 9,
 }

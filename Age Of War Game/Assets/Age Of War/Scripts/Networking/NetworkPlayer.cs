@@ -34,7 +34,20 @@ public class NetworkPlayer : MonoBehaviour
 
         player.PlayerID = id;
         player.UserName = username;
-        player.name = $"Player {id} ({username})";
+
+        if (player.IsLocalPlayer)
+        {
+            player.name = "Local ";
+        }
+        else
+        {
+            player.name = "Connecting ";
+        }
+        player.name += $"Player {id}: ({username})";
+        if (NetworkManager.Instance.IsHost)
+        {
+            player.name += $" (Host)";
+        }
 
         PlayerManager.Instance.ConnectedPlayers.Add(id, player);
         if (shouldSendSpawn)

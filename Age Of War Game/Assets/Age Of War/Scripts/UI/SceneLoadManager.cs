@@ -54,7 +54,7 @@ public class SceneLoadManager : MonoBehaviour
 
             if (SendNetworkCall)
             {
-                Debug.Log("Change Scene");
+                //Debug.Log("Change Scene");
                 Message message = Message.Create(MessageSendMode.reliable, MessageId.ChangeScene);
                 message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
                 message.AddString(name);
@@ -66,7 +66,7 @@ public class SceneLoadManager : MonoBehaviour
     [MessageHandler((ushort)MessageId.ChangeScene)]
     private static void LoadScene(ushort fromClientId, Message message)
     {
-        Debug.Log("Change Scene");
+        //Debug.Log("Change Scene");
         ushort newPlayerId = message.GetUShort();
         Message messageToSend = Message.Create(MessageSendMode.reliable, MessageId.ChangeScene);
         string Scenename = message.GetString();
@@ -81,7 +81,7 @@ public class SceneLoadManager : MonoBehaviour
     [MessageHandler((ushort)MessageId.ChangeScene)]
     private static void SendConfirmation(Message message)
     {
-        Debug.Log("Change Scene");
+        //Debug.Log("Change Scene");
         ushort newPlayerId = message.GetUShort();
         string Scenename = message.GetString();
 
