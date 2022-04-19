@@ -574,21 +574,21 @@ public class LockstepManager : MonoBehaviour
         {
             if (!Instance.PendingTurn.ConfirmedPlayers.Contains(confirmedPlayer))
             {
-                Instance.PendingTurn.ConfirmedPlayers.Add(ConfirmedTurn);
+                Instance.PendingTurn.ConfirmedPlayers.Add(confirmedPlayer);
             }
         }
         else if (Instance.ConfirmedTurn.LockStepTurnNumber == ConfirmedTurn)
         {
             if (!Instance.ConfirmedTurn.ConfirmedPlayers.Contains(confirmedPlayer))
             {
-                Instance.ConfirmedTurn.ConfirmedPlayers.Add(ConfirmedTurn);
+                Instance.ConfirmedTurn.ConfirmedPlayers.Add(confirmedPlayer);
             }
         }
         else if (Instance.CurrentTurn.LockStepTurnNumber == ConfirmedTurn)
         {
             if (!Instance.CurrentTurn.ConfirmedPlayers.Contains(confirmedPlayer))
             {
-                Instance.CurrentTurn.ConfirmedPlayers.Add(ConfirmedTurn);
+                Instance.CurrentTurn.ConfirmedPlayers.Add(confirmedPlayer);
             }
         }
     }
