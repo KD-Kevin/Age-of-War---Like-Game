@@ -49,7 +49,7 @@ public class NetworkManager : MonoBehaviour
         Client.Disconnected += DidDisconnect;
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
         if (Server.IsRunning)
         {
