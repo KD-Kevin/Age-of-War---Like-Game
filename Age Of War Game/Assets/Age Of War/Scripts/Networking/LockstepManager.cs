@@ -140,7 +140,7 @@ public class LockstepManager : MonoBehaviour
             if (PlayerManager.Instance.EveryoneIsReadyForStart())
             {
                 CountDown = true;
-                ReconnectOnSecond = System.DateTime.Now.Ticks + 6 * 10000000 + NetworkManager.Instance.HostSystemTimeDifference; // seconds to 100 nano seconds ~ 10*7
+                ReconnectOnSecond = System.DateTime.Now.Ticks + 6 * 10000000 - NetworkManager.Instance.HostSystemTimeDifference; // seconds to 100 nano seconds ~ 10*7
                 //if (NetworkManager.Instance.IsHost)
                 //{
                 //    SendCountdown(ReconnectOnSecond);
