@@ -269,7 +269,7 @@ public class LockstepManager : MonoBehaviour
                 PendingTurn?.NextTurn();
                 CurrentTurn?.NextTurn();
                 CurrentTurn = new ActionTurn(LockstepTurnCounter, GameTurnCounter);
-                Debug.Log($"Lockstep Update -> {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
+                Debug.Log($"Turn Number {LockstepTurnCounter} Lockstep Update at Time: {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
             }
         }
         // Turn 2
@@ -282,7 +282,7 @@ public class LockstepManager : MonoBehaviour
                 PendingTurn?.NextTurn();
                 CurrentTurn?.NextTurn();
                 CurrentTurn = new ActionTurn(LockstepTurnCounter, GameTurnCounter);
-                Debug.Log($"Lockstep Update -> {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
+                Debug.Log($"Turn Number {LockstepTurnCounter} Lockstep Update at Time: {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
             }
         }
         // Turn 1
@@ -292,7 +292,7 @@ public class LockstepManager : MonoBehaviour
             LockstepTurnCounter++;
             CurrentTurn.NextTurn();
             CurrentTurn = new ActionTurn(LockstepTurnCounter, GameTurnCounter);
-            Debug.Log($"Lockstep Update -> {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
+            Debug.Log($"Turn Number {LockstepTurnCounter} Lockstep Update at Time: {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
         }
 
     }
@@ -310,6 +310,7 @@ public class LockstepManager : MonoBehaviour
                 PendingTurn?.NextTurn();
                 CurrentTurn?.NextTurn();
                 CurrentTurn = new ActionTurn(LockstepTurnCounter, GameTurnCounter);
+                Debug.Log($"Turn Number {LockstepTurnCounter} Reconnect Lockstep Update at Time: {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
             }
         }
         // Turn 2
@@ -322,6 +323,7 @@ public class LockstepManager : MonoBehaviour
                 PendingTurn?.NextTurn();
                 CurrentTurn?.NextTurn();
                 CurrentTurn = new ActionTurn(LockstepTurnCounter, GameTurnCounter);
+                Debug.Log($"Turn Number {LockstepTurnCounter} Reconnect Lockstep Update at Time: {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
             }
         }
         // Turn 1
@@ -331,6 +333,7 @@ public class LockstepManager : MonoBehaviour
             LockstepTurnCounter++;
             CurrentTurn.NextTurn();
             CurrentTurn = new ActionTurn(LockstepTurnCounter, GameTurnCounter);
+            Debug.Log($"Turn Number {LockstepTurnCounter} Reconnect Lockstep Update at Time: {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
         }
     }
 
@@ -376,6 +379,18 @@ public class LockstepManager : MonoBehaviour
     public void RecievePlayerAction(PlayerActions PendingActionToTrack)
     {
         ActionPendingList.Add(PendingActionToTrack);
+        if (CurrentTurn.LockStepTurnNumber == PendingActionToTrack.TurnNumber)
+        {
+            CurrentTurn.CheckForActions();
+        }
+        else if (PendingTurn.LockStepTurnNumber == PendingActionToTrack.TurnNumber)
+        {
+            PendingTurn.CheckForActions();
+        }
+        else if (ConfirmedTurn.LockStepTurnNumber == PendingActionToTrack.TurnNumber)
+        {
+            ConfirmedTurn.CheckForActions();
+        }
     }
 
     public bool PendingTurnContainActionsFromAllPlayers(int ForTurnNumber)
@@ -506,7 +521,7 @@ public class LockstepManager : MonoBehaviour
         int NumberOfActions = message.GetInt();
         int TurnNumber = message.GetInt();
         ushort SentFromPlayerID = message.GetUShort();
-        Debug.Log($"Cient Recieved - Actions from Player {SentFromPlayerID}");
+        Debug.Log($"Turn Number {TurnNumber} From {SentFromPlayerID} For Actions RPC");
 
         // ResendData
         PlayerActions PlayerAction = new PlayerActions(SentFromPlayerID);
@@ -576,8 +591,8 @@ public class LockstepManager : MonoBehaviour
     private static void SendConfirmation(Message message)
     {
         ushort confirmedPlayer = message.GetUShort();
-        Debug.Log($"Client Recieved - Send Confirmation From Player {confirmedPlayer}");
         int ConfirmedTurn = message.GetInt();
+        Debug.Log($"Turn Number {ConfirmedTurn} From {confirmedPlayer} For Confirmation RPC");
 
         if (Instance.PendingTurn.LockStepTurnNumber == ConfirmedTurn)
         {
@@ -689,6 +704,31 @@ public class ActionTurn
         GameTurnNumber = GameTurn;
     }
 
+    public void CheckForActions()
+    {
+        bool containsActionsFromEveryone = LockstepManager.Instance.PendingTurnContainActionsFromAllPlayers(LockStepTurnNumber);
+        if (containsActionsFromEveryone)
+        {
+            List<PlayerActions> RemoveList = new List<PlayerActions>();
+            foreach (PlayerActions action in LockstepManager.Instance.ActionPendingList)
+            {
+                if (action.TurnNumber == LockStepTurnNumber)
+                {
+                    RemoveList.Add(action);
+                    AddActionSet(action);
+                }
+            }
+            foreach (PlayerActions action in RemoveList)
+            {
+                if (action.TurnNumber == LockStepTurnNumber)
+                {
+                    LockstepManager.Instance.ActionPendingList.Remove(action);
+                }
+            }
+            LockstepManager.Instance.SendConfirmation(LockStepTurnNumber);
+        }
+    }
+
     public bool ReadyForNextTurn()
     {
         if (CurrentState == ActionStates.New)
@@ -698,36 +738,33 @@ public class ActionTurn
         else if (CurrentState == ActionStates.Pending)
         {
             // Recieved Everyones Actions
-            bool containsActionsFromEveryone = LockstepManager.Instance.PendingTurnContainActionsFromAllPlayers(LockStepTurnNumber);
             bool containsActionsInTurnFromEveryone = ContainsActionsFromAllPlayers();
-            if (containsActionsFromEveryone || containsActionsInTurnFromEveryone)
+            if (containsActionsInTurnFromEveryone)
             {
-                if (!containsActionsInTurnFromEveryone)
+                return containsActionsInTurnFromEveryone;
+            }
+            bool containsActionsFromEveryone = LockstepManager.Instance.PendingTurnContainActionsFromAllPlayers(LockStepTurnNumber);
+            if (containsActionsFromEveryone)
+            {
+                List<PlayerActions> RemoveList = new List<PlayerActions>();
+                foreach (PlayerActions action in LockstepManager.Instance.ActionPendingList)
                 {
-                    List<PlayerActions> RemoveList = new List<PlayerActions>();
-                    foreach (PlayerActions action in LockstepManager.Instance.ActionPendingList)
+                    if (action.TurnNumber == LockStepTurnNumber)
                     {
-                        if (action.TurnNumber == LockStepTurnNumber)
-                        {
-                            RemoveList.Add(action);
-                            AddActionSet(action);
-                        }
+                        RemoveList.Add(action);
+                        AddActionSet(action);
                     }
-                    foreach (PlayerActions action in RemoveList)
-                    {
-                        if (action.TurnNumber == LockStepTurnNumber)
-                        {
-                            LockstepManager.Instance.ActionPendingList.Remove(action);
-                        }
-                    }
-                    LockstepManager.Instance.SendConfirmation(LockStepTurnNumber);
                 }
-                return containsActionsFromEveryone || containsActionsInTurnFromEveryone;
+                foreach (PlayerActions action in RemoveList)
+                {
+                    if (action.TurnNumber == LockStepTurnNumber)
+                    {
+                        LockstepManager.Instance.ActionPendingList.Remove(action);
+                    }
+                }
+                LockstepManager.Instance.SendConfirmation(LockStepTurnNumber);
             }
-            else
-            {
-                return false;
-            }
+            return containsActionsFromEveryone;
         }
         else
         {
