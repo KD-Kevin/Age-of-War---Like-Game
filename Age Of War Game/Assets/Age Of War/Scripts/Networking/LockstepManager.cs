@@ -438,35 +438,32 @@ public class LockstepManager : MonoBehaviour
     public void SendTurnActions()
     {
         //Debug.Log("Client Sent - Send actions");
-        Message message = Message.Create(MessageSendMode.reliable, MessageId.SendTurnActions);
         int NumberOfActions = LocalPlayersCurrentTurn.ActionsDone.Count;
-        message.AddInt(NumberOfActions);
-        message.AddInt(LocalPlayersCurrentTurn.TurnNumber);
-        message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
-
-        foreach(IAction action in LocalPlayersCurrentTurn.ActionsDone)
+        foreach (IAction action in LocalPlayersCurrentTurn.ActionsDone)
         {
+            Message message = Message.Create(MessageSendMode.reliable, MessageId.SendTurnActions);
+            message.Add(NumberOfActions);
+            message.AddInt(LocalPlayersCurrentTurn.TurnNumber);
+            message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
             AddActionToMessage(action, message);
+            NetworkManager.Instance.Client.Send(message);
         }
 
-        NetworkManager.Instance.Client.Send(message);
     }
 
     public void ResendTurnActions()
     {
         //Debug.Log("Client Sent - Send actions");
-        Message message = Message.Create(MessageSendMode.reliable, MessageId.SendTurnActions);
-        int NumberOfActions = PreviousLocalPlayersCurrentTurn.ActionsDone.Count;
-        message.AddInt(NumberOfActions);
-        message.AddInt(PreviousLocalPlayersCurrentTurn.TurnNumber);
-        message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
-
-        foreach (IAction action in PreviousLocalPlayersCurrentTurn.ActionsDone)
+        int NumberOfActions = LocalPlayersCurrentTurn.ActionsDone.Count;
+        foreach (IAction action in LocalPlayersCurrentTurn.ActionsDone)
         {
+            Message message = Message.Create(MessageSendMode.reliable, MessageId.SendTurnActions);
+            message.AddInt(PreviousLocalPlayersCurrentTurn.TurnNumber);
+            message.AddInt(NumberOfActions);
+            message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
             AddActionToMessage(action, message);
+            NetworkManager.Instance.Client.Send(message);
         }
-
-        NetworkManager.Instance.Client.Send(message);
     }
 
     private Message AddActionToMessage(IAction action, Message message)
@@ -490,37 +487,35 @@ public class LockstepManager : MonoBehaviour
     private static void SendTurnActions(ushort fromClientId, Message message)
     {
         //Debug.Log("Server Recieved - Send actions");
-        int NumberOfActions = message.GetInt();
         int TurnNumber = message.GetInt();
+        int NumberOfActions = message.GetInt();
         ushort SentFromPlayerID = message.GetUShort();
 
         // ResendData
         Message messageToSend = Message.Create(MessageSendMode.reliable, MessageId.SendTurnActions);
-        messageToSend.AddInt(NumberOfActions);
         messageToSend.AddInt(TurnNumber);
+        messageToSend.AddInt(NumberOfActions);
         messageToSend.AddUShort(SentFromPlayerID);
-        for (int actionIndex = 0; actionIndex < NumberOfActions; actionIndex++)
-        {
-            int TypeOfAction = message.GetInt();
-            messageToSend.AddInt(TypeOfAction);
 
-            if ((ActionTypes)TypeOfAction == ActionTypes.NoAction)
-            {
-                // For Now do nothing - Get And Add Variables for other actions
-                //NewAction = new NoAction();
-            }
-            else if ((ActionTypes)TypeOfAction == ActionTypes.BuyUnit)
-            {
-                // Buy Action needs to add an int for the buy index
-                //NewAction = action as BuyUnitAction;
-                //message.AddInt(BuyAction.UnitBuyIndex);
-                int buyIndex = message.GetInt();
-                messageToSend.AddInt(buyIndex);
-            }
-            else
-            {
-                // Corrupted or Unkown action
-            }
+        int TypeOfAction = message.GetInt();
+        messageToSend.AddInt(TypeOfAction);
+
+        if ((ActionTypes)TypeOfAction == ActionTypes.NoAction)
+        {
+            // For Now do nothing - Get And Add Variables for other actions
+            //NewAction = new NoAction();
+        }
+        else if ((ActionTypes)TypeOfAction == ActionTypes.BuyUnit)
+        {
+            // Buy Action needs to add an int for the buy index
+            //NewAction = action as BuyUnitAction;
+            //message.AddInt(BuyAction.UnitBuyIndex);
+            int buyIndex = message.GetInt();
+            messageToSend.AddInt(buyIndex);
+        }
+        else
+        {
+            // Corrupted or Unkown action
         }
 
         foreach (NetworkPlayer player in PlayerManager.Instance.ConnectedPlayers.Values)
@@ -529,51 +524,67 @@ public class LockstepManager : MonoBehaviour
         }
     }
 
+    private static Dictionary<(ushort, int), PlayerActions> PartitioningActions = new Dictionary<(ushort, int), PlayerActions>();
     [MessageHandler((ushort)MessageId.SendTurnActions)]
     private static void SendTurnActions(Message message)
     {
-        int NumberOfActions = message.GetInt();
         int TurnNumber = message.GetInt();
+        int NumberOfActions = message.GetInt();
         ushort SentFromPlayerID = message.GetUShort();
         //Debug.Log($"Turn Number {TurnNumber} From {SentFromPlayerID} For Actions RPC");
 
-        // ResendData
-        PlayerActions PlayerAction = new PlayerActions(SentFromPlayerID);
-        PlayerAction.TurnNumber = TurnNumber;
-        for (int actionIndex = 0; actionIndex < NumberOfActions; actionIndex++)
+        PlayerActions PlayerAction;
+        if (PartitioningActions.ContainsKey((SentFromPlayerID, TurnNumber)))
         {
-            int TypeOfAction = message.GetInt();
-
-            IAction NewAction = null;
-
-            if ((ActionTypes)TypeOfAction == ActionTypes.NoAction)
-            {
-                // For Now do nothing - Get And Add Variables for other actions
-                NewAction = new NoAction();
-                NewAction.OwningPlayer = SentFromPlayerID;
-            }
-            else if ((ActionTypes)TypeOfAction == ActionTypes.BuyUnit)
-            {
-                // Buy Action needs to add an int for the buy index
-                int buyIndex = message.GetInt();
-                NewAction = new BuyUnitAction(buyIndex);
-                NewAction.OwningPlayer = SentFromPlayerID;
-            }
-            else
-            {
-                NewAction = new CorruptAction();
-                NewAction.OwningPlayer = SentFromPlayerID;
-            }
-
-            if (NewAction != null)
-            {
-                NewAction.ActionType = TypeOfAction;
-                NewAction.OwningPlayer = SentFromPlayerID;
-                PlayerAction.AddAction(NewAction);
-            }
+            PlayerAction = PartitioningActions[(SentFromPlayerID, TurnNumber)];
+        }
+        else
+        {
+            PlayerAction = new PlayerActions(SentFromPlayerID);
+            PlayerAction.TurnNumber = TurnNumber;
         }
 
-        Instance.RecievePlayerAction(PlayerAction);
+
+        int TypeOfAction = message.GetInt();
+
+        IAction NewAction;
+
+        if ((ActionTypes)TypeOfAction == ActionTypes.NoAction)
+        {
+            // For Now do nothing - Get And Add Variables for other actions
+            NewAction = new NoAction();
+            NewAction.OwningPlayer = SentFromPlayerID;
+        }
+        else if ((ActionTypes)TypeOfAction == ActionTypes.BuyUnit)
+        {
+            // Buy Action needs to add an int for the buy index
+            int buyIndex = message.GetInt();
+            NewAction = new BuyUnitAction(buyIndex);
+            NewAction.OwningPlayer = SentFromPlayerID;
+        }
+        else
+        {
+            NewAction = new CorruptAction();
+            NewAction.OwningPlayer = SentFromPlayerID;
+        }
+
+        if (NewAction != null)
+        {
+            NewAction.ActionType = TypeOfAction;
+            NewAction.OwningPlayer = SentFromPlayerID;
+            PlayerAction.AddAction(NewAction);
+        }
+
+        if (NumberOfActions > 1 && !PartitioningActions.ContainsKey((SentFromPlayerID, TurnNumber)))
+        {
+            PartitioningActions.Add((SentFromPlayerID, TurnNumber), PlayerAction);
+        }
+
+        if (NumberOfActions == PlayerAction.ActionsDone.Count)
+        {
+            PartitioningActions.Remove((SentFromPlayerID, TurnNumber));
+            Instance.RecievePlayerAction(PlayerAction);
+        }
     }
 
     public void SendConfirmation(int ConfirmedTurnNumber)
