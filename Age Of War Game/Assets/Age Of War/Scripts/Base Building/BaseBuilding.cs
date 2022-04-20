@@ -73,23 +73,24 @@ public class BaseBuilding : MonoBehaviour, IHealth, ITeam
         BuildingData = new BaseBuildingData();
     }
 
-    private void Update()
+    public static void UpdateBases()
     {
-        FrameCounter++;
+        foreach(BaseBuilding Base in TeamBuildings.Values)
+        {
+            Base.BaseUpdate();
+        }
+    }
 
+    private void BaseUpdate()
+    {
         if (BuyUnitBuffer.Count > 0)
         {
-            if (FrameCounter > 6)
+            // Check to see if we can buy unit
+            RayHits = Physics2D.RaycastAll(UnitSpawnTransform.position, UnitSpawnTransform.forward, 3, UnitRaycastLayer);
+            if (RayHits.Length == 0)
             {
-                FrameCounter = 0;
-
-                // Check to see if we can buy unit
-                RayHits = Physics2D.RaycastAll(UnitSpawnTransform.position, UnitSpawnTransform.forward, 3, UnitRaycastLayer);
-                if (RayHits.Length == 0)
-                {
-                    SpawnUnit(BuyUnitBuffer[0]);
-                    BuyUnitBuffer.RemoveAt(0);
-                }
+                SpawnUnit(BuyUnitBuffer[0]);
+                BuyUnitBuffer.RemoveAt(0);
             }
         }
 
@@ -97,7 +98,7 @@ public class BaseBuilding : MonoBehaviour, IHealth, ITeam
         {
             if (CurrentHealth < MaxHealth || CurrentArmor < MaxArmor || CurrentMagicArmor < MaxMagicArmor)
             {
-                RepairHealRestoreTimer += Time.deltaTime;
+                RepairHealRestoreTimer += LockstepManager.Instance.StepTime;
                 if (RepairHealRestoreTimer > 1f)
                 {
                     RepairHealRestoreTimer = 0;

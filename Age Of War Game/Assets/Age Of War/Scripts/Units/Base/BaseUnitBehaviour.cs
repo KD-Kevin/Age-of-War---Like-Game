@@ -538,94 +538,99 @@ public class BaseUnitBehaviour : MonoBehaviour, IHealth, ITeam
         return Fighter;
     }
 
+    public static void UpdateUnits()
+    {
+        foreach(List<BaseUnitBehaviour> unitList in AllActiveTeamUnits.Values)
+        {
+            foreach (BaseUnitBehaviour unit in unitList)
+            {
+                unit.UpdateUnit();
+            }
+        }
+    }
+
     protected void UpdateUnit()
     {
-        FrameCounter++;
+        RayHits = Physics2D.RaycastAll(LookTransform.position, LookTransform.forward, LongestRaycastDistance, RaycastLayers);
 
-        if (FrameCounter == 9)
+        bool NewMovingValue = false;
+        if (RayHits.Length == 0)
         {
-            FrameCounter = 0;
-            RayHits = Physics2D.RaycastAll(LookTransform.position, LookTransform.forward, LongestRaycastDistance, RaycastLayers);
-
-            bool NewMovingValue = false;
-            if (RayHits.Length == 0)
+            NewMovingValue = true;
+        }
+        else
+        {
+            BaseUnitBehaviour ClosestUnitHit = null;
+            BaseBuilding EnemyBase = null;
+            foreach (RaycastHit2D hit in RayHits)
             {
-                NewMovingValue = true;
-            }
-            else
-            {
-                BaseUnitBehaviour ClosestUnitHit = null;
-                BaseBuilding EnemyBase = null;
-                foreach (RaycastHit2D hit in RayHits)
+                //Debug.Log($"Object In Front {hit.collider.gameObject.name}");
+                IHealth TempHit = hit.collider.gameObject.GetComponent<IHealth>();
+                if (TempHit is BaseBuilding)
                 {
-                    //Debug.Log($"Object In Front {hit.collider.gameObject.name}");
-                    IHealth TempHit = hit.collider.gameObject.GetComponent<IHealth>();
-                    if (TempHit is BaseBuilding)
+                    //Debug.Log("Found base");
+                    BaseBuilding unit = TempHit as BaseBuilding;
+                    if (unit.Team == TeamID)
                     {
-                        //Debug.Log("Found base");
-                        BaseBuilding unit = TempHit as BaseBuilding;
-                        if (unit.Team == TeamID)
-                        {
-                            NewMovingValue = true;
-                            break;
-                        }
-                        else
-                        {
-                            EnemyBase = unit;
-                            NewMovingValue = false;
-                            break;
-                        }
-                    }
-
-                    if (TempHit is BaseUnitBehaviour)
-                    {
-                        BaseUnitBehaviour unit = TempHit as BaseUnitBehaviour;
-                        if (ClosestUnitHit == null)
-                        {
-                            ClosestUnitHit = unit;
-                        }
-                    }
-                }
-
-                if (ClosestUnitHit != null)
-                {
-                    float Distance = Vector3.Distance(ClosestUnitHit.transform.position, transform.position);
-                    if (ClosestUnitHit.Team == TeamID)
-                    {
-                        NewMovingValue = Distance > AlliedUnitStopDistance;
-                        //Debug.Log($"Stop At {Distance} for Allies ({AlliedUnitStopDistance})");
+                        NewMovingValue = true;
+                        break;
                     }
                     else
                     {
-                        NewMovingValue = Distance > StopDistance;
+                        EnemyBase = unit;
+                        NewMovingValue = false;
+                        break;
                     }
                 }
 
-                if (!NewMovingValue && EnemyBase != null)
+                if (TempHit is BaseUnitBehaviour)
                 {
-                    float Distance = Vector3.Distance(EnemyBase.transform.position, transform.position);
-                    NewMovingValue = Distance < StopDistance;
+                    BaseUnitBehaviour unit = TempHit as BaseUnitBehaviour;
+                    if (ClosestUnitHit == null)
+                    {
+                        ClosestUnitHit = unit;
+                    }
                 }
             }
 
-            if (NewMovingValue != Moving)
+            if (ClosestUnitHit != null)
             {
-                if (NewMovingValue)
+                float Distance = Vector3.Distance(ClosestUnitHit.transform.position, transform.position);
+                if (ClosestUnitHit.Team == TeamID)
                 {
-                    StartingToMoving();
+                    NewMovingValue = Distance > AlliedUnitStopDistance;
+                    //Debug.Log($"Stop At {Distance} for Allies ({AlliedUnitStopDistance})");
                 }
                 else
                 {
-                    StoppedMoving();
+                    NewMovingValue = Distance > StopDistance;
                 }
             }
 
-            Moving = NewMovingValue;
+            if (!NewMovingValue && EnemyBase != null)
+            {
+                float Distance = Vector3.Distance(EnemyBase.transform.position, transform.position);
+                NewMovingValue = Distance < StopDistance;
+            }
         }
+
+        if (NewMovingValue != Moving)
+        {
+            if (NewMovingValue)
+            {
+                StartingToMoving();
+            }
+            else
+            {
+                StoppedMoving();
+            }
+        }
+
+        Moving = NewMovingValue;
 
         if (Moving)
         {
-            transform.position += LookTransform.forward * MovementSpeed * Time.deltaTime;
+            transform.position += LookTransform.forward * MovementSpeed * LockstepManager.Instance.HalfStepTime;
             if (HealthTarget != null)
             {
                 HealthTarget = null;

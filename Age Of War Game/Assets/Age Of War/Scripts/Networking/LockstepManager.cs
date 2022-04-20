@@ -48,6 +48,8 @@ public class LockstepManager : MonoBehaviour
     private int LastAskForResentSec = -1;
     private float GameTurnHalfTime = 0;
     private float GameTurnTimer = 0;
+    public float HalfStepTime { get; set; }
+    public float StepTime { get; set; }
 
     private void Awake()
     {
@@ -60,6 +62,8 @@ public class LockstepManager : MonoBehaviour
         ConfirmedTurn = null;
         ProcessingTurn = null;
         GameTurnHalfTime = AttemptGameTurnEvery / 2000;
+        HalfStepTime = GameTurnHalfTime;
+        StepTime = 2 * HalfStepTime;
     }
 
     private void Update()
@@ -237,6 +241,7 @@ public class LockstepManager : MonoBehaviour
 
     public void AsyncGameTurn()
     {
+        BaseUnitBehaviour.UpdateUnits();
         //Debug.Log($"Async Update {System.DateTime.Now.Hour} hr / {System.DateTime.Now.Minute} min / {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
     }
 
@@ -256,6 +261,9 @@ public class LockstepManager : MonoBehaviour
             LockstepTurn();
         }
 
+        BaseBuilding.UpdateBases();
+        BaseUnitBehaviour.UpdateUnits();
+        BuyUnitUI.UpdateAllBuyUi();
         //Debug.Log($"Game Update -> {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
     }
 
@@ -267,7 +275,7 @@ public class LockstepManager : MonoBehaviour
             WaitingOnPlayer = !ConfirmedTurn.ReadyForNextTurn();
             if (!WaitingOnPlayer)
             {
-                Debug.Log($"Turn Number {LockstepTurnCounter} Lockstep Update at Time: {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
+                //Debug.Log($"Turn Number {LockstepTurnCounter} Lockstep Update at Time: {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
                 LockstepTurnCounter++;
                 ConfirmedTurn?.NextTurn();
                 PendingTurn?.NextTurn();
@@ -281,7 +289,7 @@ public class LockstepManager : MonoBehaviour
             WaitingOnPlayer = !PendingTurn.ReadyForNextTurn();
             if (!WaitingOnPlayer)
             {
-                Debug.Log($"Turn Number {LockstepTurnCounter} Lockstep Update at Time: {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
+                //Debug.Log($"Turn Number {LockstepTurnCounter} Lockstep Update at Time: {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
                 LockstepTurnCounter++;
                 PendingTurn?.NextTurn();
                 CurrentTurn?.NextTurn();
@@ -291,7 +299,7 @@ public class LockstepManager : MonoBehaviour
         // Turn 1
         else
         {
-            Debug.Log($"Turn Number {LockstepTurnCounter} Lockstep Update at Time: {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
+            //Debug.Log($"Turn Number {LockstepTurnCounter} Lockstep Update at Time: {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
             CurrentTurn = new ActionTurn(LockstepTurnCounter, 0);
             LockstepTurnCounter++;
             CurrentTurn.NextTurn();
@@ -308,7 +316,7 @@ public class LockstepManager : MonoBehaviour
             WaitingOnPlayer = !ConfirmedTurn.ReadyForNextTurn();
             if (!WaitingOnPlayer)
             {
-                Debug.Log($"Turn Number {LockstepTurnCounter} Reconnect Lockstep Update at Time: {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
+                //Debug.Log($"Turn Number {LockstepTurnCounter} Reconnect Lockstep Update at Time: {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
                 LockstepTurnCounter++;
                 ConfirmedTurn?.NextTurn();
                 PendingTurn?.NextTurn();
@@ -322,7 +330,7 @@ public class LockstepManager : MonoBehaviour
             WaitingOnPlayer = !PendingTurn.ReadyForNextTurn();
             if (!WaitingOnPlayer)
             {
-                Debug.Log($"Turn Number {LockstepTurnCounter} Reconnect Lockstep Update at Time: {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
+                //Debug.Log($"Turn Number {LockstepTurnCounter} Reconnect Lockstep Update at Time: {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
                 LockstepTurnCounter++;
                 PendingTurn?.NextTurn();
                 CurrentTurn?.NextTurn();
@@ -332,7 +340,7 @@ public class LockstepManager : MonoBehaviour
         // Turn 1
         else
         {
-            Debug.Log($"Turn Number {LockstepTurnCounter} Reconnect Lockstep Update at Time: {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
+            //Debug.Log($"Turn Number {LockstepTurnCounter} Reconnect Lockstep Update at Time: {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
             CurrentTurn = new ActionTurn(LockstepTurnCounter, 0);
             LockstepTurnCounter++;
             CurrentTurn.NextTurn();
@@ -524,7 +532,7 @@ public class LockstepManager : MonoBehaviour
         int NumberOfActions = message.GetInt();
         int TurnNumber = message.GetInt();
         ushort SentFromPlayerID = message.GetUShort();
-        Debug.Log($"Turn Number {TurnNumber} From {SentFromPlayerID} For Actions RPC");
+        //Debug.Log($"Turn Number {TurnNumber} From {SentFromPlayerID} For Actions RPC");
 
         // ResendData
         PlayerActions PlayerAction = new PlayerActions(SentFromPlayerID);
@@ -595,7 +603,7 @@ public class LockstepManager : MonoBehaviour
     {
         ushort confirmedPlayer = message.GetUShort();
         int ConfirmedTurn = message.GetInt();
-        Debug.Log($"Turn Number {ConfirmedTurn} From {confirmedPlayer} For Confirmation RPC");
+        //Debug.Log($"Turn Number {ConfirmedTurn} From {confirmedPlayer} For Confirmation RPC");
 
         if (Instance.PendingTurn.LockStepTurnNumber == ConfirmedTurn)
         {
@@ -650,7 +658,7 @@ public class LockstepManager : MonoBehaviour
     {
         ushort confirmedPlayer = message.GetUShort();
         int sec = message.GetInt();
-        Debug.Log($"Client Recieved - Reconnect on Second {sec}");
+        //Debug.Log($"Client Recieved - Reconnect on Second {sec}");
 
         Instance.ReconnectOnSecond = sec;
     }
@@ -680,7 +688,7 @@ public class LockstepManager : MonoBehaviour
     private static void SendForActionResend(Message message)
     {
         ushort confirmedPlayer = message.GetUShort();
-        Debug.Log($"Got Resend Request from Player {confirmedPlayer}");
+        //Debug.Log($"Got Resend Request from Player {confirmedPlayer}");
         Instance.ResendTurnActions();
     }
 }

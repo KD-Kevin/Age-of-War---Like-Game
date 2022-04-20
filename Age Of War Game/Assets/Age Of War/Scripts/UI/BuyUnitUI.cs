@@ -25,6 +25,40 @@ public class BuyUnitUI : MonoBehaviour
     public BaseUnitBehaviour BuyUnit { get; private set; }
     public int BuyUnitIndex { get; private set; }
 
+    public static List<BuyUnitUI> AllUnitBuyUi = new List<BuyUnitUI>();
+
+    private void OnDestroy()
+    {
+        if (AllUnitBuyUi.Contains(this))
+        {
+            AllUnitBuyUi.Remove(this);
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (AllUnitBuyUi.Contains(this))
+        {
+            AllUnitBuyUi.Remove(this);
+        }
+    }
+
+    private void OnEnable()
+    {
+        if (!AllUnitBuyUi.Contains(this))
+        {
+            AllUnitBuyUi.Add(this);
+        }
+    }
+
+    private void Awake()
+    {
+        if (!AllUnitBuyUi.Contains(this))
+        {
+            AllUnitBuyUi.Add(this);
+        }
+    }
+
     public void OnClick()
     {
         if (PlayerUiManager.Instance.CanAffordUnit(BuyUnit))
@@ -61,7 +95,15 @@ public class BuyUnitUI : MonoBehaviour
         }
     }
 
-    private void Update()
+    public static void UpdateAllBuyUi()
+    {
+        foreach(BuyUnitUI ui in AllUnitBuyUi)
+        {
+            ui.UpdateUI();
+        }
+    }
+
+    private void UpdateUI()
     {
         if (BuildTimer > 0)
         {
@@ -70,7 +112,7 @@ public class BuyUnitUI : MonoBehaviour
                 BuildProgressBar.gameObject.SetActive(true);
             }
 
-            BuildTimer -= Time.deltaTime;
+            BuildTimer -= LockstepManager.Instance.StepTime;
 
             BuildProgressBar.ChangeValue(100 - BuildTimer * 100 / BuildTime);
 
@@ -101,7 +143,7 @@ public class BuyUnitUI : MonoBehaviour
                 CooldownImage.gameObject.SetActive(true);
             }
 
-            CooldownTimer -= Time.deltaTime;
+            CooldownTimer -= LockstepManager.Instance.StepTime;
 
             CooldownImage.fillAmount = CooldownTimer / CooldownTime;
         }
