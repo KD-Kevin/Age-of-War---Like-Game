@@ -811,8 +811,8 @@ public class ActionTurn
         {
             CurrentState = ActionStates.Processing;
             // Process Everyone Turn
-            LockstepManager.Instance.ProcessTurn();
             LockstepManager.Instance.ProcessingTurn = this;
+            LockstepManager.Instance.ProcessTurn();
         }
         else if (CurrentState == ActionStates.Processing)
         {
