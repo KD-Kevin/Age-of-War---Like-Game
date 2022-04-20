@@ -77,6 +77,10 @@ public class LockstepManager : MonoBehaviour
             {
                 WaitingOnPlayer = !PendingTurn.ReadyForNextTurn();
             }
+            if (!WaitingOnPlayer)
+            {
+                Debug.Log($"wait Time {WaitTime}");
+            }
             //Reconnecting = !WaitingOnPlayer;
 
             //if (TryToResendOnWait && WaitingOnPlayer && LastAskForResentSec != Mathf.FloorToInt(WaitTime))
