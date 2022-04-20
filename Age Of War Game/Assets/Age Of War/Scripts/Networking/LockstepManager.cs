@@ -390,15 +390,15 @@ public class LockstepManager : MonoBehaviour
     public void RecievePlayerAction(PlayerActions PendingActionToTrack)
     {
         ActionPendingList.Add(PendingActionToTrack);
-        if (CurrentTurn.LockStepTurnNumber == PendingActionToTrack.TurnNumber)
+        if (CurrentTurn != null && CurrentTurn.LockStepTurnNumber == PendingActionToTrack.TurnNumber)
         {
             CurrentTurn.CheckForActions();
         }
-        else if (PendingTurn.LockStepTurnNumber == PendingActionToTrack.TurnNumber)
+        else if (PendingTurn != null && PendingTurn.LockStepTurnNumber == PendingActionToTrack.TurnNumber)
         {
             PendingTurn.CheckForActions();
         }
-        else if (ConfirmedTurn.LockStepTurnNumber == PendingActionToTrack.TurnNumber)
+        else if (ConfirmedTurn != null && ConfirmedTurn.LockStepTurnNumber == PendingActionToTrack.TurnNumber)
         {
             ConfirmedTurn.CheckForActions();
         }
