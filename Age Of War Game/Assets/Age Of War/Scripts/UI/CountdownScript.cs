@@ -10,7 +10,7 @@ public class CountdownScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (LockstepManager.Instance.SecondsTillReconnect == -1)
+        if (LockstepManager.Instance.SecondsTillReconnect <= -1)
         {
             gameObject.SetActive(false);
         }

@@ -103,7 +103,7 @@ public class NetworkManager : MonoBehaviour
 
     private void DidConnect(object sender, EventArgs e)
     {
-        PingHost();
+        PingHost(true);
         NetworkPlayer.Spawn(Client.Id, PlayerManager.Instance.LocalPlayerData.Data.UserName, Vector3.zero, true);
     }
 
@@ -131,10 +131,12 @@ public class NetworkManager : MonoBehaviour
         }
     }
 
-    public void PingHost()
+    public void PingHost(bool ReliableSend = false)
     {
         PingStartTime_ns = System.DateTime.Now.Ticks;
-        Message message = Message.Create(MessageSendMode.reliable, MessageId.PingHost);
+        MessageSendMode SendMode = ReliableSend ? MessageSendMode.reliable : MessageSendMode.unreliable;
+        Message message = Message.Create(SendMode, MessageId.PingHost);
+        message.Add(ReliableSend);
         Client.Send(message);
     }
 
@@ -142,7 +144,9 @@ public class NetworkManager : MonoBehaviour
     [MessageHandler((ushort)MessageId.PingHost)]
     private static void PingHost(ushort fromClientId, Message message)
     {
-        Message messageToSend = Message.Create(MessageSendMode.reliable, MessageId.PingHost);
+        bool ReliableSend = message.GetBool();
+        MessageSendMode SendMode = ReliableSend ? MessageSendMode.reliable : MessageSendMode.unreliable;
+        Message messageToSend = Message.Create(SendMode, MessageId.PingHost);
         messageToSend.AddLong(System.DateTime.Now.Ticks);
         NetworkManager.Instance.Server.Send(messageToSend, fromClientId);
     }
@@ -162,6 +166,8 @@ public class NetworkManager : MonoBehaviour
             //                            (         Estimate Time when Ping was             )
             long EstimatedHostTime = Host100NanoSec - Instance.LastPing / 2;
             Instance.HostSystemTimeDifference = Instance.PingStartTime_ns - EstimatedHostTime;
+            float MSDifference = Mathf.RoundToInt((float)Instance.HostSystemTimeDifference / 10000);
+            Debug.Log($"Host/Client System MS Difference {MSDifference}");
         }
     }
 }

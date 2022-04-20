@@ -260,6 +260,10 @@ public class LockstepManager : MonoBehaviour
             FixedGameTurnCounter = 0;
             LockstepTurn();
         }
+        else if(FixedGameTurnCounter == 1)
+        {
+            NetworkManager.Instance.PingHost();
+        }
 
         BaseBuilding.UpdateBases();
         BaseUnitBehaviour.UpdateUnits();
@@ -305,7 +309,6 @@ public class LockstepManager : MonoBehaviour
             CurrentTurn.NextTurn();
             CurrentTurn = new ActionTurn(LockstepTurnCounter, GameTurnCounter);
         }
-        NetworkManager.Instance.PingHost();
     }
 
     public void ReconnectedLockstepTurn()
