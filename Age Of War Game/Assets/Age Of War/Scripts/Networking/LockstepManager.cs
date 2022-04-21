@@ -438,8 +438,8 @@ public class LockstepManager : MonoBehaviour
         foreach (IAction action in LocalPlayersCurrentTurn.ActionsDone)
         {
             Message message = Message.Create(MessageSendMode.reliable, MessageId.SendTurnActions);
-            message.Add(NumberOfActions);
             message.AddInt(LocalPlayersCurrentTurn.TurnNumber);
+            message.Add(NumberOfActions);
             message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
             AddActionToMessage(action, message);
             NetworkManager.Instance.Client.Send(message);
@@ -450,8 +450,8 @@ public class LockstepManager : MonoBehaviour
     public void ResendTurnActions()
     {
         //Debug.Log("Client Sent - Send actions");
-        int NumberOfActions = LocalPlayersCurrentTurn.ActionsDone.Count;
-        foreach (IAction action in LocalPlayersCurrentTurn.ActionsDone)
+        int NumberOfActions = PreviousLocalPlayersCurrentTurn.ActionsDone.Count;
+        foreach (IAction action in PreviousLocalPlayersCurrentTurn.ActionsDone)
         {
             Message message = Message.Create(MessageSendMode.reliable, MessageId.SendTurnActions);
             message.AddInt(PreviousLocalPlayersCurrentTurn.TurnNumber);
