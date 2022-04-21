@@ -50,6 +50,7 @@ public class LockstepManager : MonoBehaviour
     private float GameTurnTimer = 0;
     public float HalfStepTime { get; set; }
     public float StepTime { get; set; }
+    private float ResendConfirmationTImer = 0;
 
     private void Awake()
     {
@@ -71,10 +72,17 @@ public class LockstepManager : MonoBehaviour
         if (WaitingOnPlayer)
         {
             WaitTime += Time.deltaTime;
-
             if (LockstepTurnCounter > 1)
             {
                 WaitingOnPlayer = !ConfirmedTurn.ReadyForNextTurn();
+                ResendConfirmationTImer += Time.deltaTime;
+                if (ResendConfirmationTImer >= 0.08f)
+                {
+                    if (ConfirmedTurn.Reconfirm())
+                    {
+
+                    }
+                }
             }
             // Turn 2
             else if (LockstepTurnCounter > 0)
@@ -85,6 +93,7 @@ public class LockstepManager : MonoBehaviour
             {
                 Debug.Log($"wait Time {WaitTime}");
             }
+            LastAskForResentSec = Mathf.FloorToInt(WaitTime);
             //Reconnecting = !WaitingOnPlayer;
 
             //if (TryToResendOnWait && WaitingOnPlayer && LastAskForResentSec != Mathf.FloorToInt(WaitTime))
@@ -585,10 +594,10 @@ public class LockstepManager : MonoBehaviour
             PartitioningActions.Remove((SentFromPlayerID, TurnNumber));
             Instance.RecievePlayerAction(PlayerAction);
         }
-        else
-        {
-            Debug.Log($"Logged {PlayerAction.ActionsDone.Count} of {NumberOfActions} on Turn {TurnNumber} -> Action Count {NumberOfActions} -> Player {SentFromPlayerID}");
-        }
+        //else
+        //{
+        //    Debug.Log($"Logged {PlayerAction.ActionsDone.Count} of {NumberOfActions} on Turn {TurnNumber} -> Action Count {NumberOfActions} -> Player {SentFromPlayerID}");
+        //}
     }
 
     public void SendConfirmation(int ConfirmedTurnNumber)
@@ -914,6 +923,19 @@ public class ActionTurn
         {
             AllActionsDone.Add(Action);
         }
+    }
+
+    public void Reconfirm()
+    {
+        foreach(int confirmedPlayer in ConfirmedPlayers)
+        {
+            if (confirmedPlayer == PlayerManager.Instance.LocalPlayer.PlayerID)
+            {
+                return;
+            }
+        }
+
+        LockstepManager.Instance.SendConfirmation(LockStepTurnNumber);
     }
 }
 
