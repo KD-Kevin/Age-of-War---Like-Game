@@ -568,12 +568,13 @@ public class LockstepManager : MonoBehaviour
         {
             NewAction.ActionType = TypeOfAction;
             NewAction.OwningPlayer = SentFromPlayerID;
-            Debug.Log($"Add Action {(ActionTypes)TypeOfAction} on Turn {TurnNumber}");
+            Debug.Log($"Add Action {(ActionTypes)TypeOfAction} on Turn {TurnNumber} -> Action Count {NumberOfActions}");
             PlayerAction.AddAction(NewAction);
         }
 
-        if (NumberOfActions > 1 && !PartitioningActions.ContainsKey((SentFromPlayerID, TurnNumber)))
+        if (NumberOfActions > 1 && NumberOfActions != PlayerAction.ActionsDone.Count && !PartitioningActions.ContainsKey((SentFromPlayerID, TurnNumber)))
         {
+            Debug.Log($"Add To Partition -> Turn {TurnNumber} -> Action Count {NumberOfActions}");
             PartitioningActions.Add((SentFromPlayerID, TurnNumber), PlayerAction);
         }
 

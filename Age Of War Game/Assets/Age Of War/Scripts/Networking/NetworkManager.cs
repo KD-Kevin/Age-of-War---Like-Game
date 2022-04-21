@@ -7,6 +7,8 @@ using System;
 
 public class NetworkManager : MonoBehaviour
 {
+    [SerializeField]
+    private int KeepAveragePingOverSeconds = 10;
     public static NetworkManager Instance = null;
 
     [SerializeField] private ushort port;
@@ -29,7 +31,7 @@ public class NetworkManager : MonoBehaviour
     public int AveragePingTally { get; set; }
     private long PingStartTime_ns = 0;
     private float PingTimer = 0;
-
+    private int AveragePingNumber;
     private void Awake()
     {
         HostSystemTimeDifference = -1;
@@ -38,7 +40,8 @@ public class NetworkManager : MonoBehaviour
             Instance = this;
         }
         AveragePingTally = 0;
-        AveragePingQueue = new Queue<int>(10);
+        AveragePingNumber = KeepAveragePingOverSeconds;
+        AveragePingQueue = new Queue<int>(AveragePingNumber);
     }
 
     private void Start()
@@ -72,6 +75,7 @@ public class NetworkManager : MonoBehaviour
         PingTimer += Time.deltaTime;
         if (PingTimer >= 1)
         {
+            PingTimer = 0;
             PingHost();
         }
     }
@@ -184,14 +188,14 @@ public class NetworkManager : MonoBehaviour
 
         Instance.AveragePingTally += Instance.LastPingMS;
         int RemovedValue = 0;
-        if (Instance.AveragePingQueue.Count == 10)
+        if (Instance.AveragePingQueue.Count == Instance.AveragePingNumber)
         {
             RemovedValue = Instance.AveragePingQueue.Dequeue();
         }
 
         Instance.AveragePingTally -= RemovedValue;
         Instance.AveragePingQueue.Enqueue(Instance.LastPingMS);
-        Instance.AveragePingMS = Instance.AveragePingTally / 10;
+        Instance.AveragePingMS = Instance.AveragePingTally / Instance.AveragePingNumber;
     }
 }
 
