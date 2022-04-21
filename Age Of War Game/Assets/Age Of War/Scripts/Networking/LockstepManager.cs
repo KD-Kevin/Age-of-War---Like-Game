@@ -121,7 +121,7 @@ public class LockstepManager : MonoBehaviour
                 // Small Disconnect
                 CountDown = true;
                 ReconnectOnNextGameTurn = true;
-                ReconnectOnSecond = System.DateTime.Now.Ticks + 10000000 - NetworkManager.Instance.HostSystemTimeDifference; // seconds to 100 nano seconds ~ 10*7
+                ReconnectOnSecond = System.DateTime.Now.Ticks + 1600000 - NetworkManager.Instance.LastPing / 2; // seconds to 100 nano seconds ~ 10*7
                 SecondsTillReconnect = 2;
             }
             else
@@ -129,7 +129,7 @@ public class LockstepManager : MonoBehaviour
                 // Large Disconnect
                 CountDown = true;
                 ReconnectOnNextGameTurn = true;
-                ReconnectOnSecond = System.DateTime.Now.Ticks + 10 * 10000000 - NetworkManager.Instance.HostSystemTimeDifference; // seconds to 100 nano seconds ~ 10*7
+                ReconnectOnSecond = System.DateTime.Now.Ticks + 10 * 10000000 - NetworkManager.Instance.LastPing / 2; // seconds to 100 nano seconds ~ 10*7
                 SecondsTillReconnect = 10;
             }
             WaitTime = 0;
@@ -140,7 +140,7 @@ public class LockstepManager : MonoBehaviour
             if (PlayerManager.Instance.EveryoneIsReadyForStart())
             {
                 CountDown = true;
-                ReconnectOnSecond = System.DateTime.Now.Ticks + 6 * 10000000 - NetworkManager.Instance.HostSystemTimeDifference; // seconds to 100 nano seconds ~ 10*7
+                ReconnectOnSecond = System.DateTime.Now.Ticks + 6 * 10000000 - NetworkManager.Instance.LastPing / 2; // seconds to 100 nano seconds ~ 10*7
                 //if (NetworkManager.Instance.IsHost)
                 //{
                 //    SendCountdown(ReconnectOnSecond);
@@ -259,10 +259,6 @@ public class LockstepManager : MonoBehaviour
         {
             FixedGameTurnCounter = 0;
             LockstepTurn();
-        }
-        else if(FixedGameTurnCounter == 1)
-        {
-            NetworkManager.Instance.PingHost();
         }
 
         BaseBuilding.UpdateBases();
@@ -572,6 +568,7 @@ public class LockstepManager : MonoBehaviour
         {
             NewAction.ActionType = TypeOfAction;
             NewAction.OwningPlayer = SentFromPlayerID;
+            Debug.Log($"Add Action {(ActionTypes)TypeOfAction} on Turn {TurnNumber}");
             PlayerAction.AddAction(NewAction);
         }
 
@@ -582,6 +579,7 @@ public class LockstepManager : MonoBehaviour
 
         if (NumberOfActions == PlayerAction.ActionsDone.Count)
         {
+            Debug.Log($"Turn {TurnNumber} Recieved Action Set for player {SentFromPlayerID} -> Action Count {NumberOfActions}");
             PartitioningActions.Remove((SentFromPlayerID, TurnNumber));
             Instance.RecievePlayerAction(PlayerAction);
         }

@@ -24,7 +24,11 @@ public class NetworkManager : MonoBehaviour
     public long HostSystemTimeDifference { get; set; }
     public long LastPing { get; set; }
     public int LastPingMS { get; set; }
+    public int AveragePingMS { get; set; } // Average ping over last ten seconds
+    public Queue<int> AveragePingQueue { get; set; }
+    public int AveragePingTally { get; set; }
     private long PingStartTime_ns = 0;
+    private float PingTimer = 0;
 
     private void Awake()
     {
@@ -33,6 +37,8 @@ public class NetworkManager : MonoBehaviour
         {
             Instance = this;
         }
+        AveragePingTally = 0;
+        AveragePingQueue = new Queue<int>(10);
     }
 
     private void Start()
@@ -62,6 +68,12 @@ public class NetworkManager : MonoBehaviour
         }
 
         Client.Tick();
+
+        PingTimer += Time.deltaTime;
+        if (PingTimer >= 1)
+        {
+            PingHost();
+        }
     }
 
     private void OnApplicationQuit()
@@ -169,6 +181,17 @@ public class NetworkManager : MonoBehaviour
             float MSDifference = Mathf.RoundToInt((float)Instance.HostSystemTimeDifference / 10000);
             Debug.Log($"Host/Client System MS Difference {MSDifference}");
         }
+
+        Instance.AveragePingTally += Instance.LastPingMS;
+        int RemovedValue = 0;
+        if (Instance.AveragePingQueue.Count == 10)
+        {
+            RemovedValue = Instance.AveragePingQueue.Dequeue();
+        }
+
+        Instance.AveragePingTally -= RemovedValue;
+        Instance.AveragePingQueue.Enqueue(Instance.LastPingMS);
+        Instance.AveragePingMS = Instance.AveragePingTally / 10;
     }
 }
 
