@@ -1,5 +1,6 @@
 using BitStrap;
 using RiptideNetworking;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -243,6 +244,34 @@ public class PlayerManager : MonoBehaviour
         {
             Instance.ConfirmationCustomGameOpponentCallback(SentPlayersData);
         }
+    }
+
+    public BaseUnitBehaviour GetUnitByIndex(int unitBuyIndex, ushort owningPlayer)
+    {
+        if (CurrentMatchData.PlayMode == PlayModes.CustomGame || CurrentMatchData.PlayMode == PlayModes.Ranked || CurrentMatchData.PlayMode == PlayModes.Quickplay)
+        {
+            if (owningPlayer == LocalPlayer.PlayerID)
+            {
+                return CurrentMatchData.PlayerSelectedRace.StartingUnitsBlueprints[unitBuyIndex];
+            }
+            else
+            {
+                return CurrentMatchData.OpponentSelectedRace.StartingUnitsBlueprints[unitBuyIndex];
+            }
+        }
+        else
+        {
+            // Player ID may not be the way it should work in local run games
+            if (owningPlayer == 1)
+            {
+                return CurrentMatchData.PlayerSelectedRace.StartingUnitsBlueprints[unitBuyIndex];
+            }
+            else
+            {
+                return CurrentMatchData.OpponentSelectedRace.StartingUnitsBlueprints[unitBuyIndex];
+            }
+        }
+        return null;
     }
 
     // Quickplay

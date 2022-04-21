@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -56,7 +57,8 @@ public class BaseBuilding : MonoBehaviour, IHealth, ITeam
     [HideInInspector]
     public List<BaseUnitBehaviour> BuyUnitBuffer = new List<BaseUnitBehaviour>();
     [HideInInspector]
-    public List<int> HoldPopulationSpot = new List<int>(); 
+    public List<int> HoldPopulationSpot = new List<int>();
+    public List<BuildOrder> BuildOrders = new List<BuildOrder>();
 
     private void Awake()
     {
@@ -108,6 +110,17 @@ public class BaseBuilding : MonoBehaviour, IHealth, ITeam
                 }
             }
         }
+
+        for (int buildOrderIndex = BuildOrders.Count - 1; buildOrderIndex >= 0; buildOrderIndex--)
+        {
+            BuildOrders[buildOrderIndex].BuildTime -= LockstepManager.Instance.StepTime;
+            if (BuildOrders[buildOrderIndex].BuildTime <= 0)
+            {
+                BuyUnit(BuildOrders[buildOrderIndex].Order);
+                PlayerUiManager.Instance.UpdatePopulationText();
+                PlayerUiManager.Instance.UpdateCurrencyText();
+            }
+        }
     }
 
     public void BuyUnit(BaseUnitBehaviour UnitPrefab)
@@ -141,6 +154,15 @@ public class BaseBuilding : MonoBehaviour, IHealth, ITeam
         }
 
         BuildingData = Data;
+    }
+
+    public static void AddBuildOrder(BuildOrder buildOrder)
+    {
+        if (buildOrder.OwnerID == 0 || buildOrder.OwnerID > 2)
+        {
+            return;
+        }
+        TeamBuildings[buildOrder.OwnerID].BuildOrders.Add(buildOrder);
     }
 
     public int GetPopulation()

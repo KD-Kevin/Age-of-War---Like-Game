@@ -575,19 +575,22 @@ public class LockstepManager : MonoBehaviour
         {
             NewAction.ActionType = TypeOfAction;
             NewAction.OwningPlayer = SentFromPlayerID;
-            Debug.Log($"Add Action '{(ActionTypes)TypeOfAction}' on Turn {TurnNumber} -> Action Count {NumberOfActions} -> Player {SentFromPlayerID}");
+            if ((ActionTypes)TypeOfAction != ActionTypes.NoAction)
+            {
+                Debug.Log($"Add Action '{(ActionTypes)TypeOfAction}' on Turn {TurnNumber} -> Action Count {NumberOfActions} -> Player {SentFromPlayerID}");
+            }
             PlayerAction.AddAction(NewAction);
         }
 
         if (NumberOfActions > 1 && NumberOfActions != PlayerAction.ActionsDone.Count && !PartitioningActions.ContainsKey((SentFromPlayerID, TurnNumber)))
         {
-            Debug.Log($"Add To Partition -> Turn {TurnNumber} -> Action Count {NumberOfActions} -> Player {SentFromPlayerID}");
+            //Debug.Log($"Add To Partition -> Turn {TurnNumber} -> Action Count {NumberOfActions} -> Player {SentFromPlayerID}");
             PartitioningActions.Add((SentFromPlayerID, TurnNumber), PlayerAction);
         }
 
         if (NumberOfActions == PlayerAction.ActionsDone.Count)
         {
-            Debug.Log($"Turn {TurnNumber} Recieved Action Set for player {SentFromPlayerID} -> Action Count {NumberOfActions} -> Player {SentFromPlayerID}");
+            //Debug.Log($"Turn {TurnNumber} Recieved Action Set for player {SentFromPlayerID} -> Action Count {NumberOfActions} -> Player {SentFromPlayerID}");
             PartitioningActions.Remove((SentFromPlayerID, TurnNumber));
             Instance.RecievePlayerAction(PlayerAction);
         }
