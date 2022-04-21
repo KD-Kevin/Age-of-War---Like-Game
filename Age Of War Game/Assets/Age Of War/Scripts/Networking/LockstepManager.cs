@@ -78,10 +78,7 @@ public class LockstepManager : MonoBehaviour
                 ResendConfirmationTImer += Time.deltaTime;
                 if (ResendConfirmationTImer >= 0.08f)
                 {
-                    if (ConfirmedTurn.Reconfirm())
-                    {
-
-                    }
+                    ConfirmedTurn.Reconfirm();
                 }
             }
             // Turn 2
