@@ -537,6 +537,7 @@ public class LockstepManager : MonoBehaviour
         else
         {
             PlayerAction = new PlayerActions(SentFromPlayerID);
+            PlayerAction.ActionsDone.Clear();
             PlayerAction.TurnNumber = TurnNumber;
         }
 
