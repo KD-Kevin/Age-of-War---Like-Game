@@ -9,6 +9,8 @@ public class NetworkManager : MonoBehaviour
 {
     [SerializeField]
     private int KeepAveragePingOverSeconds = 10;
+    [SerializeField]
+    private float TickRate = 120;
     public static NetworkManager Instance = null;
 
     [SerializeField] private ushort port;
@@ -32,6 +34,9 @@ public class NetworkManager : MonoBehaviour
     private long PingStartTime_ns = 0;
     private float PingTimer = 0;
     private int AveragePingNumber;
+    private float TimePerTick;
+    private float TickRateTimer = 0;
+
     private void Awake()
     {
         HostSystemTimeDifference = -1;
@@ -42,6 +47,7 @@ public class NetworkManager : MonoBehaviour
         AveragePingTally = 0;
         AveragePingNumber = KeepAveragePingOverSeconds;
         AveragePingQueue = new Queue<int>(AveragePingNumber);
+        TimePerTick = 1 / TickRate;
     }
 
     private void Start()
@@ -60,17 +66,23 @@ public class NetworkManager : MonoBehaviour
 
     private void Update()
     {
-        if (Server.IsRunning)
-        {
-            IsHost = true;
-            Server.Tick();
-        }
-        else if (IsHost)
-        {
-            IsHost = false;
-        }
+        TickRateTimer += Time.deltaTime;
 
-        Client.Tick();
+        if (TickRateTimer > TimePerTick)
+        {
+            TickRateTimer = 0;
+            if (Server.IsRunning)
+            {
+                IsHost = true;
+                Server.Tick();
+            }
+            else if (IsHost)
+            {
+                IsHost = false;
+            }
+
+            Client.Tick();
+        }
 
         PingTimer += Time.deltaTime;
         if (PingTimer >= 1)
