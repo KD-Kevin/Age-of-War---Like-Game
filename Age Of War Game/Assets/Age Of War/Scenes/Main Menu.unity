@@ -5556,7 +5556,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 598285090}
   m_HandleRect: {fileID: 598285089}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -45733,6 +45733,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 131107b05aafd524fbab62f4893b9fcd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  KeepAveragePingOverSeconds: 10
+  TickRate: 90
   port: 7777
   playerPrefab: {fileID: 6626655243087335873, guid: 49e5212dbf059b843aa7ec833aef210b, type: 3}
   localPlayerPrefab: {fileID: 3825994902970435639, guid: 275d847c84f101647a775109a6425354, type: 3}
@@ -45748,6 +45750,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f30ad0bf315aa4444add90572bca24b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TryToResendOnWait: 0
+  AttemptGameTurnEvery: 40
   ActionTurnHistory:
     AllTurnsCompleted: []
 --- !u!1 &1668818620
