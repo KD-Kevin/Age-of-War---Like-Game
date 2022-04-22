@@ -109,7 +109,10 @@ public class CustomGamePage : MonoBehaviour
 
     private void Update()
     {
-        PlayButton.interactable = NetworkManager.Instance.IsHost && !PlayerButtonWasPressed;
+        if (PlayerManager.Instance.NetworkType == NetworkingTypes.Riptide)
+        {
+            PlayButton.interactable = AOW.RiptideNetworking.NetworkManager.Instance.IsHost && !PlayerButtonWasPressed;
+        }
     }
 
     public void OpenPage()
@@ -353,18 +356,25 @@ public class CustomGamePage : MonoBehaviour
 
         // RPC Call
         Debug.Log("Client Sent - Ready To Go - Custom Game");
-        Message message = Message.Create(MessageSendMode.reliable, MessageId.ReadyButtonPressed);
-        message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
-        message.AddBool(PlayerReady);
-        NetworkManager.Instance.Client.Send(message);
+        if (PlayerManager.Instance.NetworkType == NetworkingTypes.Riptide)
+        {
+            Message message = Message.Create(MessageSendMode.reliable, AOW.RiptideNetworking.MessageId.ReadyButtonPressed);
+            message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
+            message.AddBool(PlayerReady);
+            AOW.RiptideNetworking.NetworkManager.Instance.Client.Send(message);
+        }
     }
 
-    [MessageHandler((ushort)MessageId.ReadyButtonPressed)]
+    #region Ready RPC
+
+    #region Riptide
+
+    [MessageHandler((ushort)AOW.RiptideNetworking.MessageId.ReadyButtonPressed)]
     private static void ReadyButtonPressed(ushort fromClientId, Message message)
     {
         Debug.Log("Server Recieved - Ready To Go - Custom Game");
         ushort newPlayerId = message.GetUShort();
-        Message messageToSend = Message.Create(MessageSendMode.reliable, MessageId.ReadyButtonPressed);
+        Message messageToSend = Message.Create(MessageSendMode.reliable, AOW.RiptideNetworking.MessageId.ReadyButtonPressed);
         bool Ready = message.GetBool();
         messageToSend.AddUShort(newPlayerId);
         messageToSend.AddBool(Ready);
@@ -374,7 +384,7 @@ public class CustomGamePage : MonoBehaviour
             {
                 continue;
             }
-            NetworkManager.Instance.Server.Send(messageToSend, player.PlayerID);
+            AOW.RiptideNetworking.NetworkManager.Instance.Server.Send(messageToSend, player.PlayerID);
         }
 
         if (newPlayerId == PlayerManager.Instance.LocalPlayer.PlayerID)
@@ -389,10 +399,10 @@ public class CustomGamePage : MonoBehaviour
         }
     }
 
-    [MessageHandler((ushort)MessageId.ReadyButtonPressed)]
+    [MessageHandler((ushort)AOW.RiptideNetworking.MessageId.ReadyButtonPressed)]
     private static void SendConfirmation(Message message)
     {
-        if (NetworkManager.Instance.IsHost)
+        if (AOW.RiptideNetworking.NetworkManager.Instance.IsHost)
         {
             return;
         }
@@ -412,6 +422,9 @@ public class CustomGamePage : MonoBehaviour
             Instance.OpponentReadyObject.gameObject.SetActive(Ready);
         }
     }
+    #endregion
+
+    #endregion
 
     public void BackButtonPressed()
     {
@@ -424,15 +437,21 @@ public class CustomGamePage : MonoBehaviour
         {
             // Forfiet match?
             MultiplayerStatus = MultiplayStatus.NoSearching;
-            NetworkManager.Instance.LeaveGame();
+            if (PlayerManager.Instance.NetworkType == NetworkingTypes.Riptide)
+            {
+                AOW.RiptideNetworking.NetworkManager.Instance.LeaveGame();
+            }
             gameObject.SetActive(false);
             return;
         }
 
         MultiplayerStatus = MultiplayStatus.NoSearching;
-        if (NetworkManager.Instance.Server.IsRunning)
+        if (PlayerManager.Instance.NetworkType == NetworkingTypes.Riptide)
         {
-            NetworkManager.Instance.LeaveGame();
+            if (AOW.RiptideNetworking.NetworkManager.Instance.Server.IsRunning)
+            {
+                AOW.RiptideNetworking.NetworkManager.Instance.LeaveGame();
+            }
         }
 
         gameObject.SetActive(false);
@@ -481,7 +500,10 @@ public class CustomGamePage : MonoBehaviour
             UiObject.SetActive(false);
         }
 
-        NetworkManager.Instance.StartHost();
+        if (PlayerManager.Instance.NetworkType == NetworkingTypes.Riptide)
+        {
+            AOW.RiptideNetworking.NetworkManager.Instance.StartHost();
+        }
         PlayerManager.Instance.RequestOpponentCustomGame(FoundCustomGameOpponent, CancelSearch);
     }
 
@@ -507,7 +529,7 @@ public class CustomGamePage : MonoBehaviour
             UiObject.SetActive(false);
         }
 
-        NetworkManager.Instance.LeaveGame();
+        AOW.RiptideNetworking.NetworkManager.Instance.LeaveGame();
     }
 
     public void WaitingForInvitedPlayer()
@@ -597,33 +619,40 @@ public class CustomGamePage : MonoBehaviour
         }
     }
 
+
+    #region Game Data RPC
     public void SendGameData()
     {
         // RPC Call
         Debug.Log("Client Sent - Send Game Data - Custom Game");
-        Message message = Message.Create(MessageSendMode.reliable, MessageId.SendCustomGameRacePerkData);
-        message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
-        message.AddInt(RaceSelector.Instance.GetRaceIndex(PlayerSelectedRace));
-        if (PlayerSelectedRace != null)
+        if (PlayerManager.Instance.NetworkType == NetworkingTypes.Riptide)
         {
-            message.AddInt(PlayerSelectedRace.GetPerkIndex(PlayerSelectedPerk1));
-            message.AddInt(PlayerSelectedRace.GetPerkIndex(PlayerSelectedPerk2));
-        }
-        else
-        {
-            message.AddInt(-1);
-            message.AddInt(-1);
-        }
+            Message message = Message.Create(MessageSendMode.reliable, AOW.RiptideNetworking.MessageId.SendCustomGameRacePerkData);
+            message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
+            message.AddInt(RaceSelector.Instance.GetRaceIndex(PlayerSelectedRace));
+            if (PlayerSelectedRace != null)
+            {
+                message.AddInt(PlayerSelectedRace.GetPerkIndex(PlayerSelectedPerk1));
+                message.AddInt(PlayerSelectedRace.GetPerkIndex(PlayerSelectedPerk2));
+            }
+            else
+            {
+                message.AddInt(-1);
+                message.AddInt(-1);
+            }
 
-        NetworkManager.Instance.Client.Send(message);
+            AOW.RiptideNetworking.NetworkManager.Instance.Client.Send(message);
+        }
     }
 
-    [MessageHandler((ushort)MessageId.SendCustomGameRacePerkData)]
+    #region Riptide
+
+    [MessageHandler((ushort)AOW.RiptideNetworking.MessageId.SendCustomGameRacePerkData)]
     private static void SendGameData(ushort fromClientId, Message message)
     {
         Debug.Log("Server Recieved - Send Game Data - Custom Game");
         ushort newPlayerId = message.GetUShort();
-        Message messageToSend = Message.Create(MessageSendMode.reliable, MessageId.SendCustomGameRacePerkData);
+        Message messageToSend = Message.Create(MessageSendMode.reliable, AOW.RiptideNetworking.MessageId.SendCustomGameRacePerkData);
         int RaceIndex = message.GetInt();
         int Perk1Index = message.GetInt();
         int Perk2Index = message.GetInt();
@@ -637,7 +666,7 @@ public class CustomGamePage : MonoBehaviour
             {
                 continue;
             }
-            NetworkManager.Instance.Server.Send(messageToSend, player.PlayerID);
+            AOW.RiptideNetworking.NetworkManager.Instance.Server.Send(messageToSend, player.PlayerID);
         }
 
 
@@ -687,11 +716,11 @@ public class CustomGamePage : MonoBehaviour
         Instance.LoadOpponentPlayer(SelectedRace, SelectedPerk1, SelectedPerk2);
     }
 
-    [MessageHandler((ushort)MessageId.SendCustomGameRacePerkData)]
+    [MessageHandler((ushort)AOW.RiptideNetworking.MessageId.SendCustomGameRacePerkData)]
     private static void SendGameData(Message message)
     {
         Debug.Log("Client Recieved - Send Game Data - Custom Game");
-        if (NetworkManager.Instance.IsHost)
+        if (AOW.RiptideNetworking.NetworkManager.Instance.IsHost)
         {
             return;
         }
@@ -740,4 +769,15 @@ public class CustomGamePage : MonoBehaviour
 
         Instance.LoadOpponentPlayer(SelectedRace, SelectedPerk1, SelectedPerk2);
     }
+
+    #endregion
+
+    #endregion
+}
+
+public enum NetworkingTypes
+{ 
+    Riptide,
+    Fishynet,
+    Darkrift2,
 }

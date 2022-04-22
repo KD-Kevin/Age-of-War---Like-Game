@@ -55,30 +55,36 @@ public class SceneLoadManager : MonoBehaviour
             if (SendNetworkCall)
             {
                 //Debug.Log("Change Scene");
-                Message message = Message.Create(MessageSendMode.reliable, MessageId.ChangeScene);
-                message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
-                message.AddString(name);
-                NetworkManager.Instance.Client.Send(message);
+                if (PlayerManager.Instance.NetworkType == NetworkingTypes.Riptide)
+                {
+                    Message message = Message.Create(MessageSendMode.reliable, AOW.RiptideNetworking.MessageId.ChangeScene);
+                    message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
+                    message.AddString(name);
+                    AOW.RiptideNetworking.NetworkManager.Instance.Client.Send(message);
+                }
             }
         }
     }
 
-    [MessageHandler((ushort)MessageId.ChangeScene)]
+    #region Load Scene RPC
+
+    #region Riptide
+    [MessageHandler((ushort)AOW.RiptideNetworking.MessageId.ChangeScene)]
     private static void LoadScene(ushort fromClientId, Message message)
     {
         //Debug.Log("Change Scene");
         ushort newPlayerId = message.GetUShort();
-        Message messageToSend = Message.Create(MessageSendMode.reliable, MessageId.ChangeScene);
+        Message messageToSend = Message.Create(MessageSendMode.reliable, AOW.RiptideNetworking.MessageId.ChangeScene);
         string Scenename = message.GetString();
         messageToSend.AddUShort(newPlayerId);
         messageToSend.AddString(Scenename);
         foreach (NetworkPlayer player in PlayerManager.Instance.ConnectedPlayers.Values)
         {
-            NetworkManager.Instance.Server.Send(messageToSend, player.PlayerID);
+            AOW.RiptideNetworking.NetworkManager.Instance.Server.Send(messageToSend, player.PlayerID);
         }
     }
 
-    [MessageHandler((ushort)MessageId.ChangeScene)]
+    [MessageHandler((ushort)AOW.RiptideNetworking.MessageId.ChangeScene)]
     private static void SendConfirmation(Message message)
     {
         //Debug.Log("Change Scene");
@@ -87,6 +93,10 @@ public class SceneLoadManager : MonoBehaviour
 
         Instance.LoadScene(Scenename);
     }
+
+    #endregion
+
+    #endregion
 
     private IEnumerator FadeCanvasOut()
     {

@@ -14,7 +14,7 @@ using UnityEditor;
 namespace FishNet.Object
 {
     [DisallowMultipleComponent]
-    public sealed partial class NetworkObject : MonoBehaviour
+    public partial class NetworkObject : MonoBehaviour
     {
         #region Public.
         /// <summary>

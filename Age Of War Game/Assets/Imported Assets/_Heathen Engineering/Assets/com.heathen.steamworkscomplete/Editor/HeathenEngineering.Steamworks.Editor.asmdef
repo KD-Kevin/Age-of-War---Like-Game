@@ -1,0 +1,22 @@
+{
+    "name": "HeathenEngineering.Steamworks.Editor",
+    "rootNamespace": "",
+    "references": [
+        "Heathen.Core",
+        "com.rlabrecque.steamworks.net",
+        "HeathenEngineering.Steamworks",
+        "HeathenEngineering.Steamworks.Complete.Editor",
+        "Mirror"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

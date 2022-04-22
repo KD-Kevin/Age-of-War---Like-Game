@@ -1,0 +1,39 @@
+v2019.2.17.3
+
+Note:
+This asset is dependent on Steamworks.NET and System Core 
+Both Steamworks.NET and System Core can be installed via the Package Manager or by downloading the code from Git Hub.
+This asset will assist you in installing both Steamworks.NET and System Core or you can follow the instructions on our Knowledge Base
+
+This asset is a copy of what is available on Heathen's SourceRepo on GitHub. you can gain access to Heathen's SourceRepo by becoming a GitHub supporter.
+https://github.com/sponsors/heathen-engineering
+At the 10 USD level you get full source access to Steamworks Complete, PhysKit Complete and UX Complete plus additional assets not available on Unity Asset Store
+such as Steam uGUI Tools and dedicated support, issue tracking and feedback systems.
+
+Heathen Knowledge Base
+
+GitHub
+- Updated to be in line with the GitHub version, GitHub is now the primary source for Steamworks Complete Unity Asset Store will be mainted as a copy but may be a few versions behind.
+
+Added
+- Added support to read clam chat members from the Clan object
+
+Fixed
+- Corrected a bug where the Steam Game Server query was not reading Internet servers correctly
+- Corrected a bug where the system might perform a check for Steam running out side of the editor before checking if restart required causing the check to miss the restart if required 
+
+
+====================
+PLEASE NOTE
+====================
+
+If you have issues where in Steam attempts to launch your game (or Spacewar) when you start simulating in Unity the most likely cause of this issue is that you do not have steam_appid.txt located in the root of your project.
+steam_appid.txt is a simple text file that should be located in the root of your project (beside not in the Asset folder) it should contain only your app ID.
+
+An example of a valid steam_appid.txt follows, only the content between the dashed lines should be used e.g. only the number 480 should be in the file.
+               
+               Start File
+-----------------------------------------------
+480
+-----------------------------------------------
+               End File

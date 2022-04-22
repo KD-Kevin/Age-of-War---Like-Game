@@ -127,7 +127,10 @@ public class LockstepManager : MonoBehaviour
                 // Small Disconnect
                 CountDown = true;
                 ReconnectOnNextGameTurn = true;
-                ReconnectOnSecond = System.DateTime.Now.Ticks + 1600000 - NetworkManager.Instance.LastPing / 2; // seconds to 100 nano seconds ~ 10*7
+                if (PlayerManager.Instance.NetworkType == NetworkingTypes.Riptide)
+                {
+                    ReconnectOnSecond = System.DateTime.Now.Ticks + 1600000 - AOW.RiptideNetworking.NetworkManager.Instance.LastPing / 2; // seconds to 100 nano seconds ~ 10*7
+                }
                 SecondsTillReconnect = 2;
             }
             else
@@ -135,7 +138,10 @@ public class LockstepManager : MonoBehaviour
                 // Large Disconnect
                 CountDown = true;
                 ReconnectOnNextGameTurn = true;
-                ReconnectOnSecond = System.DateTime.Now.Ticks + 10 * 10000000 - NetworkManager.Instance.LastPing / 2; // seconds to 100 nano seconds ~ 10*7
+                if (PlayerManager.Instance.NetworkType == NetworkingTypes.Riptide)
+                {
+                    ReconnectOnSecond = System.DateTime.Now.Ticks + 10 * 10000000 - AOW.RiptideNetworking.NetworkManager.Instance.LastPing / 2; // seconds to 100 nano seconds ~ 10*7
+                }
                 SecondsTillReconnect = 10;
             }
             WaitTime = 0;
@@ -146,7 +152,10 @@ public class LockstepManager : MonoBehaviour
             if (PlayerManager.Instance.EveryoneIsReadyForStart())
             {
                 CountDown = true;
-                ReconnectOnSecond = System.DateTime.Now.Ticks + 6 * 10000000 - NetworkManager.Instance.LastPing / 2; // seconds to 100 nano seconds ~ 10*7
+                if (PlayerManager.Instance.NetworkType == NetworkingTypes.Riptide)
+                {
+                    ReconnectOnSecond = System.DateTime.Now.Ticks + 6 * 10000000 - AOW.RiptideNetworking.NetworkManager.Instance.LastPing / 2; // seconds to 100 nano seconds ~ 10*7
+                }
                 //if (NetworkManager.Instance.IsHost)
                 //{
                 //    SendCountdown(ReconnectOnSecond);
@@ -437,36 +446,44 @@ public class LockstepManager : MonoBehaviour
         return false;
     }
 
+    #region Send Actions RPC
     public void SendTurnActions()
     {
         //Debug.Log("Client Sent - Send actions");
-        int NumberOfActions = LocalPlayersCurrentTurn.ActionsDone.Count;
-        foreach (IAction action in LocalPlayersCurrentTurn.ActionsDone)
+        if (PlayerManager.Instance.NetworkType == NetworkingTypes.Riptide)
         {
-            Message message = Message.Create(MessageSendMode.reliable, MessageId.SendTurnActions);
-            message.AddInt(LocalPlayersCurrentTurn.TurnNumber);
-            message.Add(NumberOfActions);
-            message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
-            AddActionToMessage(action, message);
-            NetworkManager.Instance.Client.Send(message);
+            int NumberOfActions = LocalPlayersCurrentTurn.ActionsDone.Count;
+            foreach (IAction action in LocalPlayersCurrentTurn.ActionsDone)
+            {
+                Message message = Message.Create(MessageSendMode.reliable, AOW.RiptideNetworking.MessageId.SendTurnActions);
+                message.AddInt(LocalPlayersCurrentTurn.TurnNumber);
+                message.Add(NumberOfActions);
+                message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
+                AddActionToMessage(action, message);
+                AOW.RiptideNetworking.NetworkManager.Instance.Client.Send(message);
+            }
         }
-
     }
 
     public void ResendTurnActions()
     {
         //Debug.Log("Client Sent - Send actions");
-        int NumberOfActions = PreviousLocalPlayersCurrentTurn.ActionsDone.Count;
-        foreach (IAction action in PreviousLocalPlayersCurrentTurn.ActionsDone)
+        if (PlayerManager.Instance.NetworkType == NetworkingTypes.Riptide)
         {
-            Message message = Message.Create(MessageSendMode.reliable, MessageId.SendTurnActions);
-            message.AddInt(PreviousLocalPlayersCurrentTurn.TurnNumber);
-            message.AddInt(NumberOfActions);
-            message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
-            AddActionToMessage(action, message);
-            NetworkManager.Instance.Client.Send(message);
+            int NumberOfActions = PreviousLocalPlayersCurrentTurn.ActionsDone.Count;
+            foreach (IAction action in PreviousLocalPlayersCurrentTurn.ActionsDone)
+            {
+                Message message = Message.Create(MessageSendMode.reliable, AOW.RiptideNetworking.MessageId.SendTurnActions);
+                message.AddInt(PreviousLocalPlayersCurrentTurn.TurnNumber);
+                message.AddInt(NumberOfActions);
+                message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
+                AddActionToMessage(action, message);
+                AOW.RiptideNetworking.NetworkManager.Instance.Client.Send(message);
+            }
         }
     }
+
+    #region Riptide
 
     private Message AddActionToMessage(IAction action, Message message)
     {
@@ -485,7 +502,7 @@ public class LockstepManager : MonoBehaviour
         return message;
     }
 
-    [MessageHandler((ushort)MessageId.SendTurnActions)]
+    [MessageHandler((ushort)AOW.RiptideNetworking.MessageId.SendTurnActions)]
     private static void SendTurnActions(ushort fromClientId, Message message)
     {
         //Debug.Log("Server Recieved - Send actions");
@@ -494,7 +511,7 @@ public class LockstepManager : MonoBehaviour
         ushort SentFromPlayerID = message.GetUShort();
 
         // ResendData
-        Message messageToSend = Message.Create(MessageSendMode.reliable, MessageId.SendTurnActions);
+        Message messageToSend = Message.Create(MessageSendMode.reliable, AOW.RiptideNetworking.MessageId.SendTurnActions);
         messageToSend.AddInt(TurnNumber);
         messageToSend.AddInt(NumberOfActions);
         messageToSend.AddUShort(SentFromPlayerID);
@@ -522,12 +539,12 @@ public class LockstepManager : MonoBehaviour
 
         foreach (NetworkPlayer player in PlayerManager.Instance.ConnectedPlayers.Values)
         {
-            NetworkManager.Instance.Server.Send(messageToSend, player.PlayerID);
+            AOW.RiptideNetworking.NetworkManager.Instance.Server.Send(messageToSend, player.PlayerID);
         }
     }
 
     private static Dictionary<(ushort, int), PlayerActions> PartitioningActions = new Dictionary<(ushort, int), PlayerActions>();
-    [MessageHandler((ushort)MessageId.SendTurnActions)]
+    [MessageHandler((ushort)AOW.RiptideNetworking.MessageId.SendTurnActions)]
     private static void SendTurnActions(Message message)
     {
         int TurnNumber = message.GetInt();
@@ -599,33 +616,43 @@ public class LockstepManager : MonoBehaviour
         //    Debug.Log($"Logged {PlayerAction.ActionsDone.Count} of {NumberOfActions} on Turn {TurnNumber} -> Action Count {NumberOfActions} -> Player {SentFromPlayerID}");
         //}
     }
+    #endregion
+
+    #endregion
+
+    #region Send Action Confirmation RPC
 
     public void SendConfirmation(int ConfirmedTurnNumber)
     {
         //Debug.Log("Send Sent - Confirmation");
-        Message message = Message.Create(MessageSendMode.reliable, MessageId.TurnConfirmation);
-        message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
-        message.AddInt(ConfirmedTurnNumber);
-        NetworkManager.Instance.Client.Send(message);
+        if (PlayerManager.Instance.NetworkType == NetworkingTypes.Riptide)
+        {
+            Message message = Message.Create(MessageSendMode.reliable, AOW.RiptideNetworking.MessageId.TurnConfirmation);
+            message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
+            message.AddInt(ConfirmedTurnNumber);
+            AOW.RiptideNetworking.NetworkManager.Instance.Client.Send(message);
+        }
     }
 
-    [MessageHandler((ushort)MessageId.TurnConfirmation)]
+    #region Riptide
+
+    [MessageHandler((ushort)AOW.RiptideNetworking.MessageId.TurnConfirmation)]
     private static void SendConfirmation(ushort fromClientId, Message message)
     {
         //Debug.Log("Server Recieved - Send Confirmation");
         ushort newPlayerId = message.GetUShort();
-        Message messageToSend = Message.Create(MessageSendMode.reliable, MessageId.TurnConfirmation);
+        Message messageToSend = Message.Create(MessageSendMode.reliable, AOW.RiptideNetworking.MessageId.TurnConfirmation);
         int ConfirmedTurn = message.GetInt();
         messageToSend.AddUShort(newPlayerId);
         messageToSend.AddInt(ConfirmedTurn);
 
         foreach (NetworkPlayer player in PlayerManager.Instance.ConnectedPlayers.Values)
         {
-            NetworkManager.Instance.Server.Send(messageToSend, player.PlayerID);
+            AOW.RiptideNetworking.NetworkManager.Instance.Server.Send(messageToSend, player.PlayerID);
         }
     }
 
-    [MessageHandler((ushort)MessageId.TurnConfirmation)]
+    [MessageHandler((ushort)AOW.RiptideNetworking.MessageId.TurnConfirmation)]
     private static void SendConfirmation(Message message)
     {
         ushort confirmedPlayer = message.GetUShort();
@@ -654,33 +681,41 @@ public class LockstepManager : MonoBehaviour
             }
         }
     }
+    #endregion
 
+    #endregion
+
+    #region Send Countdown RPC
     public void SendCountdown(int Sec)
     {
         //Debug.Log("Sent - Reconnect Countdown Sec");
-        Message message = Message.Create(MessageSendMode.reliable, MessageId.SendStartCoundDownSec);
-        message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
-        message.AddInt(Sec);
-        NetworkManager.Instance.Client.Send(message);
+        if (PlayerManager.Instance.NetworkType == NetworkingTypes.Riptide)
+        {
+            Message message = Message.Create(MessageSendMode.reliable, AOW.RiptideNetworking.MessageId.SendStartCoundDownSec);
+            message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
+            message.AddInt(Sec);
+            AOW.RiptideNetworking.NetworkManager.Instance.Client.Send(message);
+        }
     }
 
-    [MessageHandler((ushort)MessageId.SendStartCoundDownSec)]
+    #region Riptide
+    [MessageHandler((ushort)AOW.RiptideNetworking.MessageId.SendStartCoundDownSec)]
     private static void SendCountdown(ushort fromClientId, Message message)
     {
         //Debug.Log("Server Recieved - Send Confirmation");
         ushort newPlayerId = message.GetUShort();
-        Message messageToSend = Message.Create(MessageSendMode.reliable, MessageId.SendStartCoundDownSec);
+        Message messageToSend = Message.Create(MessageSendMode.reliable, AOW.RiptideNetworking.MessageId.SendStartCoundDownSec);
         int Sec = message.GetInt();
         messageToSend.AddUShort(newPlayerId);
         messageToSend.AddInt(Sec);
 
         foreach (NetworkPlayer player in PlayerManager.Instance.ConnectedPlayers.Values)
         {
-            NetworkManager.Instance.Server.Send(messageToSend, player.PlayerID);
+            AOW.RiptideNetworking.NetworkManager.Instance.Server.Send(messageToSend, player.PlayerID);
         }
     }
 
-    [MessageHandler((ushort)MessageId.SendStartCoundDownSec)]
+    [MessageHandler((ushort)AOW.RiptideNetworking.MessageId.SendStartCoundDownSec)]
     private static void SendCountdown(Message message)
     {
         ushort confirmedPlayer = message.GetUShort();
@@ -689,35 +724,47 @@ public class LockstepManager : MonoBehaviour
 
         Instance.ReconnectOnSecond = sec;
     }
+    #endregion
 
+    #endregion
+
+    #region Ask For Action Resend RPC
     public void SendForActionResend(ushort ForPlayer)
     {
         //Debug.Log("Send Sent - Confirmation");
-        Message message = Message.Create(MessageSendMode.reliable, MessageId.RequestForActionResend);
-        message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
-        message.AddUShort(ForPlayer);
-        NetworkManager.Instance.Client.Send(message);
+        if (PlayerManager.Instance.NetworkType == NetworkingTypes.Riptide)
+        {
+            Message message = Message.Create(MessageSendMode.reliable, AOW.RiptideNetworking.MessageId.RequestForActionResend);
+            message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
+            message.AddUShort(ForPlayer);
+            AOW.RiptideNetworking.NetworkManager.Instance.Client.Send(message);
+        }
     }
 
-    [MessageHandler((ushort)MessageId.RequestForActionResend)]
+    #region Riptide
+
+    [MessageHandler((ushort)AOW.RiptideNetworking.MessageId.RequestForActionResend)]
     private static void SendForActionResend(ushort fromClientId, Message message)
     {
         //Debug.Log("Server Recieved - Send Confirmation");
         ushort newPlayerId = message.GetUShort();
         ushort otherPlayer = message.GetUShort();
-        Message messageToSend = Message.Create(MessageSendMode.reliable, MessageId.RequestForActionResend);
+        Message messageToSend = Message.Create(MessageSendMode.reliable, AOW.RiptideNetworking.MessageId.RequestForActionResend);
         messageToSend.Add(newPlayerId);
 
-        NetworkManager.Instance.Server.Send(messageToSend, otherPlayer);
+        AOW.RiptideNetworking.NetworkManager.Instance.Server.Send(messageToSend, otherPlayer);
     }
 
-    [MessageHandler((ushort)MessageId.RequestForActionResend)]
+    [MessageHandler((ushort)AOW.RiptideNetworking.MessageId.RequestForActionResend)]
     private static void SendForActionResend(Message message)
     {
         ushort confirmedPlayer = message.GetUShort();
         //Debug.Log($"Got Resend Request from Player {confirmedPlayer}");
         Instance.ResendTurnActions();
     }
+    #endregion
+
+    #endregion
 }
 
 [System.Serializable]

@@ -53,7 +53,10 @@ public class MainMenu : MonoBehaviour
 
     public void CloseGame()
     {
-        NetworkManager.Instance.LeaveGame();
+        if (PlayerManager.Instance.NetworkType == NetworkingTypes.Riptide)
+        {
+            AOW.RiptideNetworking.NetworkManager.Instance.LeaveGame();
+        }
 #if UNITY_EDITOR
         EditorApplication.ExitPlaymode();
 #endif

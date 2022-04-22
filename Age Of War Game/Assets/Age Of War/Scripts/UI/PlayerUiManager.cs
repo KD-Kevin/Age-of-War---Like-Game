@@ -268,7 +268,7 @@ public class PlayerUiManager : MonoBehaviour
 
     public void GoToMainMenu()
     {
-        NetworkManager.Instance.LeaveGame();
+        AOW.RiptideNetworking.NetworkManager.Instance.LeaveGame();
         SceneManager.LoadScene("Main Menu", LoadSceneMode.Single);
     }
 
