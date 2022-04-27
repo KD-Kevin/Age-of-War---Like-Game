@@ -5,6 +5,8 @@ using TMPro;
 using UnityEngine.UI;
 using Michsky.UI.ModernUIPack;
 using RiptideNetworking;
+using FishNet;
+using FishNet.Transporting;
 
 public class CustomGamePage : MonoBehaviour
 {
@@ -504,6 +506,10 @@ public class CustomGamePage : MonoBehaviour
         {
             AOW.RiptideNetworking.NetworkManager.Instance.StartHost();
         }
+        else if (PlayerManager.Instance.NetworkType == NetworkingTypes.Fishynet)
+        {
+            InstanceFinder.ServerManager.StartConnection();
+        }
         PlayerManager.Instance.RequestOpponentCustomGame(FoundCustomGameOpponent, CancelSearch);
     }
 
@@ -529,7 +535,21 @@ public class CustomGamePage : MonoBehaviour
             UiObject.SetActive(false);
         }
 
-        AOW.RiptideNetworking.NetworkManager.Instance.LeaveGame();
+        if (PlayerManager.Instance.NetworkType == NetworkingTypes.Riptide)
+        {
+            AOW.RiptideNetworking.NetworkManager.Instance.LeaveGame();
+        }
+        else if (PlayerManager.Instance.NetworkType == NetworkingTypes.Fishynet)
+        {
+            if (PlayerManager.Instance.ClientState != LocalConnectionStates.Stopped)
+            {
+                InstanceFinder.ClientManager.StopConnection();
+            }
+            if (PlayerManager.Instance.ServerState != LocalConnectionStates.Stopped)
+            {
+                InstanceFinder.ServerManager.StopConnection(true);
+            }
+        }
     }
 
     public void WaitingForInvitedPlayer()

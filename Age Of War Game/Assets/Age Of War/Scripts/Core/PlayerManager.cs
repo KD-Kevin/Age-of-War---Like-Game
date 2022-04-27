@@ -7,12 +7,17 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using FishNet.Object;
+using FishNet;
+using FishNet.Transporting;
 
 public class PlayerManager : MonoBehaviour
 {
     public NetworkingTypes NetworkType = NetworkingTypes.Fishynet;
     public AOW.RiptideNetworking.NetworkManager RiptideNetworkManager;
     public FishNet.Managing.NetworkManager FishnetNetworkManager;
+    public FishnetNetworkHelper NetworkHelperPrefab;
+    public FishnetNetworkHelper NetworkHelper { get; set;}
 
     public static PlayerManager Instance = null;
     public PlayModes ActiveOnlineMode = PlayModes.None;
@@ -46,9 +51,15 @@ public class PlayerManager : MonoBehaviour
     private System.Action<PlayerData> ConfirmationRankedOpponentCallback = null;
     private System.Action CancellationRankedCallback = null;
 
+    public LocalConnectionStates ClientState { get; set; }
+    public LocalConnectionStates ServerState { get; set; }
+
 
     void Awake()
     {
+        ClientState = LocalConnectionStates.Stopped;
+        ServerState = LocalConnectionStates.Stopped; 
+
         if (Instance != null)
         {
             Destroy(gameObject);
@@ -81,6 +92,8 @@ public class PlayerManager : MonoBehaviour
         else if (NetworkType == NetworkingTypes.Fishynet)
         {
             RiptideNetworkManager.gameObject.SetActive(false);
+            InstanceFinder.ServerManager.OnServerConnectionState += OnServerStateChange;
+            InstanceFinder.ClientManager.OnClientConnectionState += OnClientConnectionStateChange;
         }
         else if (NetworkType == NetworkingTypes.Riptide)
         {
@@ -95,6 +108,19 @@ public class PlayerManager : MonoBehaviour
         {
             PlayerPrefs.SetString("SaveName", LocalPlayerData.Data.UserName);
             LocalPlayerData.Data.SaveLocal(LocalPlayerData.Data.UserName);
+        }
+
+        if (NetworkType == NetworkingTypes.Riptide)
+        {
+        }
+        else if (NetworkType == NetworkingTypes.Fishynet)
+        {
+
+            InstanceFinder.ServerManager.OnServerConnectionState -= OnServerStateChange;
+            InstanceFinder.ClientManager.OnClientConnectionState -= OnClientConnectionStateChange;
+        }
+        else if (NetworkType == NetworkingTypes.Riptide)
+        {
         }
     }
 
@@ -154,6 +180,16 @@ public class PlayerManager : MonoBehaviour
     }
     #endregion
 
+    #region Fishnet
+
+    [Client]
+    public void SendReadyToStartRPC()
+    {
+
+    }
+
+    #endregion
+
     #endregion
 
     public bool EveryoneIsReadyForStart()
@@ -174,6 +210,8 @@ public class PlayerManager : MonoBehaviour
         return true;
     }
 
+    #region Player Joined
+
     public void OtherPlayerJoined()
     {
         Debug.Log("Other Player Joined");
@@ -190,6 +228,42 @@ public class PlayerManager : MonoBehaviour
             }
         }
     }
+
+    public void OnServerStateChange(ServerConnectionStateArgs args)
+    {
+        ServerState = args.ConnectionState;
+    }
+
+    public void OnClientConnectionStateChange(ClientConnectionStateArgs args)
+    {
+        ClientState = args.ConnectionState;
+    }
+
+    public void OtherNetworkPlayerConnected(NetworkPlayer Player)
+    {
+        if (NetworkType == NetworkingTypes.Fishynet)
+        {
+            NetworkHelper?.SendDataToNetworkPlayer(Player, LocalPlayerData.Data.SerializeToJSON());
+        }
+    }
+
+    public void RecievePlayerData(PlayerData OtherPlayersData)
+    {
+        if (Instance.ActiveOnlineMode == PlayModes.Ranked)
+        {
+            Instance.ConfirmationRankedOpponentCallback(OtherPlayersData);
+        }
+        else if (Instance.ActiveOnlineMode == PlayModes.Quickplay)
+        {
+            Instance.ConfirmationQuickplayOpponentCallback(OtherPlayersData);
+        }
+        else if (Instance.ActiveOnlineMode == PlayModes.CustomGame)
+        {
+            Instance.ConfirmationCustomGameOpponentCallback(OtherPlayersData);
+        }
+    }
+
+    #endregion
 
     #region Send Player Data RPC
     public void SendPlayerData()
@@ -348,7 +422,15 @@ public class PlayerManager : MonoBehaviour
         ActiveOnlineMode = PlayModes.CustomGame;
         ConfirmationCustomGameOpponentCallback = FindPlayer;
         CancellationCustomGameOpponentCallback = CannotFindPlayer;
-        AOW.RiptideNetworking.NetworkManager.Instance.JoinGame(directConnectIp);
+        if (NetworkType == NetworkingTypes.Riptide)
+        {
+            AOW.RiptideNetworking.NetworkManager.Instance.JoinGame(directConnectIp);
+        }
+        else
+        {
+            InstanceFinder.TransportManager.Transport.SetClientAddress(directConnectIp);
+            InstanceFinder.ClientManager.StartConnection();
+        }
     }
 
     public void FoundCustomGameOpponent(PlayerData Player)
@@ -432,7 +514,7 @@ public class PlayerManager : MonoBehaviour
         }
 
         SceneLoadManager.Instance.LoadScene("Game");
-        SceneManager.sceneLoaded += LoadGameScene;
+        UnityEngine.SceneManagement.SceneManager.sceneLoaded += LoadGameScene;
     }
 
     public void StartCampaign()
@@ -443,17 +525,17 @@ public class PlayerManager : MonoBehaviour
         }
 
         SceneLoadManager.Instance.LoadScene(CurrentCampaignSaveData.CampainRace.CampainSceneName);
-        SceneManager.sceneLoaded += LoadCampaignScene;
+        UnityEngine.SceneManagement.SceneManager.sceneLoaded += LoadCampaignScene;
     }
 
     public void LoadGameScene(Scene loadedScene, LoadSceneMode Mode)
     {
-        SceneManager.sceneLoaded -= LoadGameScene;
+        UnityEngine.SceneManagement.SceneManager.sceneLoaded -= LoadGameScene;
     }
 
     public void LoadCampaignScene(Scene loadedScene, LoadSceneMode Mode)
     {
-        SceneManager.sceneLoaded -= LoadCampaignScene;
+        UnityEngine.SceneManagement.SceneManager.sceneLoaded -= LoadCampaignScene;
     }
 
     [Button]
