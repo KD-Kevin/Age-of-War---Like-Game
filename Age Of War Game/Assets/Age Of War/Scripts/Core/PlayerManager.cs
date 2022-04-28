@@ -125,6 +125,18 @@ public class PlayerManager : MonoBehaviour
     }
 
     // Online
+    public void SpawnFishnetNetworkHelper()
+    {
+        if (ServerState == LocalConnectionStates.Started)
+        {
+            FishnetNetworkHelper Helper = Instantiate(NetworkHelperPrefab);
+            InstanceFinder.ServerManager.Spawn(Helper.gameObject, null);
+        }
+        else if (ServerState == LocalConnectionStates.Starting)
+        {
+            Invoke(nameof(SpawnFishnetNetworkHelper), 0.1f);
+        }
+    }
 
     #region Ready To Start RPC
     public void SendReadyToStart()

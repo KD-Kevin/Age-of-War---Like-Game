@@ -11,6 +11,8 @@ public class FishnetNetworkHelper : NetworkBehaviour
         transform.SetParent(NetworkManager.transform);
     }
 
+    #region Send / Recieve Player Data
+
     [Client]
     public  void SendDataToNetworkPlayer(NetworkPlayer OtherPlayer, string YourDataJSON)
     {
@@ -29,4 +31,6 @@ public class FishnetNetworkHelper : NetworkBehaviour
         PlayerData SentPlayersData = PlayerData.Deserialize(YourDataJSON);
         PlayerManager.Instance.RecievePlayerData(SentPlayersData);
     }
+
+    #endregion
 }
