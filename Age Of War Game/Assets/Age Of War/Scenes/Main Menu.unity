@@ -5556,7 +5556,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 598285090}
   m_HandleRect: {fileID: 598285089}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -45774,8 +45774,6 @@ GameObject:
   - component: {fileID: 1667037154}
   - component: {fileID: 1667037153}
   - component: {fileID: 1667037156}
-  - component: {fileID: 1667037157}
-  - component: {fileID: 1667037155}
   m_Layer: 0
   m_Name: PlayerManager
   m_TagString: Untagged
@@ -45798,6 +45796,7 @@ MonoBehaviour:
   NetworkType: 1
   RiptideNetworkManager: {fileID: 1766968649}
   FishnetNetworkManager: {fileID: 1211305128}
+  NetworkHelperPrefab: {fileID: 1193315501137902656, guid: 1fb6451369c797f4f9466c0188b3f548, type: 3}
   ActiveOnlineMode: 0
   LocalPlayerData: {fileID: 11400000, guid: 673fe3e2632e3ed4e94151a696e946fd, type: 2}
   CustomGameOpponentData: {fileID: 11400000, guid: a3feb9e0855ebff46a8c8c0fafcae575, type: 2}
@@ -45841,24 +45840,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1667037155
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1667037152}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c71fd7f855ec523429999fc4e14a1928, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _componentIndexCache: 2
-  _addedNetworkObject: {fileID: 1667037157}
-  _networkObjectCache: {fileID: 1667037157}
-  _overrideType: 2
-  _observerConditions:
-  - {fileID: 11400000, guid: 2033f54fd2794464bae08fa5a55c8996, type: 2}
 --- !u!114 &1667037156
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -45875,34 +45856,6 @@ MonoBehaviour:
   AttemptGameTurnEvery: 40
   ActionTurnHistory:
     AllTurnsCompleted: []
---- !u!114 &1667037157
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1667037152}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 26b716c41e9b56b4baafaf13a523ba2e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  NetworkObserver: {fileID: 0}
-  _prefabId: -1
-  _scenePathHash: 3962731189
-  _sceneId: 17019800860012954437
-  _sceneNetworkObjects:
-  - {fileID: 1667037157}
-  _networkBehaviours:
-  - {fileID: 0}
-  - {fileID: 1667037155}
-  - {fileID: 0}
-  SceneTransformProperties:
-    Position: {x: 0, y: 0, z: 0}
-    Rotation: {x: 0, y: 0, z: 0, w: 1}
-    LocalScale: {x: 1, y: 1, z: 1}
-  _isNetworked: 1
-  ChildNetworkObjects: []
 --- !u!1 &1668818620
 GameObject:
   m_ObjectHideFlags: 0
@@ -57391,6 +57344,10 @@ PrefabInstance:
     - target: {fileID: 4393252310969058995, guid: 0570b6f7f713dc44a90463654bbcd8d0, type: 3}
       propertyPath: m_Name
       value: NetworkHudCanvas
+      objectReference: {fileID: 0}
+    - target: {fileID: 4393252310969058995, guid: 0570b6f7f713dc44a90463654bbcd8d0, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0570b6f7f713dc44a90463654bbcd8d0, type: 3}
