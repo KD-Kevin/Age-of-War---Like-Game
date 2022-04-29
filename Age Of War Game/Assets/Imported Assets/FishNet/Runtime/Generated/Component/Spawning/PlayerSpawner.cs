@@ -98,6 +98,7 @@ namespace FishNet.Component.Spawning
             SetSpawn(_playerPrefab.transform, out position, out rotation);
 
             NetworkObject nob = Instantiate(_playerPrefab, position, rotation);
+            Debug.Log($"Connection Owner ID: {conn.ClientId}");
             _networkManager.ServerManager.Spawn(nob, conn);
 
             //If there are no global scenes 

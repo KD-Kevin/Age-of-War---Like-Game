@@ -32187,6 +32187,10 @@ GameObject:
   - component: {fileID: 1211305131}
   - component: {fileID: 1211305130}
   - component: {fileID: 1211305129}
+  - component: {fileID: 1211305132}
+  - component: {fileID: 1211305133}
+  - component: {fileID: 1211305134}
+  - component: {fileID: 1211305135}
   m_Layer: 0
   m_Name: Fishynet
   m_TagString: Untagged
@@ -32242,7 +32246,7 @@ MonoBehaviour:
   _runInBackground: 1
   _dontDestroyOnLoad: 0
   _persistence: 0
-  _incomingIterationOrder: 1
+  _incomingIterationOrder: 0
   _outgoingIterationOrder: 0
 --- !u!114 &1211305129
 MonoBehaviour:
@@ -32287,6 +32291,71 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15895a51081447d46bda466e7e830c08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1211305132
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1211305125}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ff283ee5ffdbcb46a332bc58f2febe0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1211305133
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1211305125}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fdaae44044276a49a52229c1597e33b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _tickRate: 90
+  _pingInterval: 1
+  _timingInterval: 2
+  _physicsMode: 0
+  _maximumBufferedInputs: 15
+--- !u!114 &1211305134
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1211305125}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68828c85278210948b9d50a8db3aab74, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _authenticator: {fileID: 1211305132}
+  SpawnPacking:
+    Position: 0
+    Rotation: 2
+    Scale: 2
+  _changeFrameRate: 1
+  _frameRate: 240
+  _shareIds: 1
+  _startOnHeadless: 1
+  _limitClientMTU: 1
+--- !u!114 &1211305135
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1211305125}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aca43cf6f20e77c4f8fcc078fd85081f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _changeFrameRate: 1
+  _frameRate: 240
 --- !u!1 &1211547104
 GameObject:
   m_ObjectHideFlags: 0

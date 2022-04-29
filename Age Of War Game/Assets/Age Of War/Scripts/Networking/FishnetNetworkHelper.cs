@@ -6,6 +6,18 @@ using UnityEngine;
 
 public class FishnetNetworkHelper : NetworkBehaviour
 {
+    public static FishnetNetworkHelper Instance = null;
+
+    private void Awake()
+    {
+        if (Instance != null)
+        {
+            Destroy(Instance.gameObject);
+        }
+        Instance = this;
+    }
+
+
     private void Start()
     {
         transform.SetParent(NetworkManager.transform);

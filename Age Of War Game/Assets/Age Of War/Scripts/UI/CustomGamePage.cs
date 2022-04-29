@@ -509,6 +509,7 @@ public class CustomGamePage : MonoBehaviour
         else if (PlayerManager.Instance.NetworkType == NetworkingTypes.Fishynet)
         {
             InstanceFinder.ServerManager.StartConnection();
+            InstanceFinder.ClientManager.StartConnection();
             PlayerManager.Instance.SpawnFishnetNetworkHelper();
         }
         PlayerManager.Instance.RequestOpponentCustomGame(FoundCustomGameOpponent, CancelSearch);

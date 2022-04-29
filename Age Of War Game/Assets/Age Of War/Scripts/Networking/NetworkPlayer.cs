@@ -22,10 +22,12 @@ public class NetworkPlayer : NetworkBehaviour
         PlayerManager.Instance.ConnectedPlayers.Remove(PlayerID);
     }
 
-    private void OnEnable()
+    private void Start()
     {
+        transform.SetParent(PlayerManager.Instance.transform);
         if (PlayerManager.Instance.NetworkType == NetworkingTypes.Fishynet)
         {
+            Debug.Log($"Initialize Network Player -> Owner ID: {Owner.ClientId}");
             if (IsServer)
             {
                 PlayerID = (ushort)(PlayerManager.Instance.ConnectedPlayers.Count + 1);
@@ -35,21 +37,31 @@ public class NetworkPlayer : NetworkBehaviour
                 }
                 else
                 {
-                    NetworkPlayer RemovedPlayer = PlayerManager.Instance.ConnectedPlayers[PlayerID];
-                    PlayerManager.Instance.ConnectedPlayers.Remove(PlayerID);
-                    PlayerManager.Instance.ConnectedPlayers.Add(PlayerID, this);
+                    if (PlayerManager.Instance.ConnectedPlayers[PlayerID] != this)
+                    {
+                        NetworkPlayer RemovedPlayer = PlayerManager.Instance.ConnectedPlayers[PlayerID];
+                        PlayerManager.Instance.ConnectedPlayers.Remove(PlayerID);
+                        PlayerManager.Instance.ConnectedPlayers.Add(PlayerID, this);
 
-                    Debug.Log($"Player {RemovedPlayer.name}#{RemovedPlayer.GetInstanceID()} replaced with {UserName}#{RemovedPlayer.GetInstanceID()}");
+                        Debug.Log($"Player {RemovedPlayer.name}#{RemovedPlayer.GetInstanceID()} replaced with {UserName}#{RemovedPlayer.GetInstanceID()}");
+                    }
                 }
             }
 
-            if (IsOwner)
-            {
-                IsLocalPlayer = true;
-            }
-            else
+            IsLocalPlayer = Owner.IsLocalClient;
+            if (!IsLocalPlayer)
             {
                 Invoke(nameof(SendPlayerDataDelayed), 0.1f);
+            }
+            else if (IsOwner && !IsServer)
+            {
+                // Update Name
+                UpdateUsername(PlayerManager.Instance.LocalPlayerData.Data.UserName);
+            }
+            else if (IsServer)
+            {
+                // Update Name
+                UserName = PlayerManager.Instance.LocalPlayerData.Data.UserName;
             }
         }
         else if (PlayerManager.Instance.NetworkType == NetworkingTypes.Riptide)
@@ -142,6 +154,12 @@ public class NetworkPlayer : NetworkBehaviour
         }
 
         // Update ui??
+    }
+
+    [ServerRpc]
+    public void UpdateUsername(string Username)
+    {
+        UserName = Username;
     }
 
     #endregion
