@@ -94,6 +94,7 @@ public class PlayerManager : MonoBehaviour
             RiptideNetworkManager.gameObject.SetActive(false);
             InstanceFinder.ServerManager.OnServerConnectionState += OnServerStateChange;
             InstanceFinder.ClientManager.OnClientConnectionState += OnClientConnectionStateChange;
+            SceneLoadManager.Instance.InitializeBroadcasts();
         }
         else if (NetworkType == NetworkingTypes.Riptide)
         {
@@ -119,21 +120,28 @@ public class PlayerManager : MonoBehaviour
             InstanceFinder.ServerManager.OnServerConnectionState -= OnServerStateChange;
             InstanceFinder.ClientManager.OnClientConnectionState -= OnClientConnectionStateChange;
         }
-        else if (NetworkType == NetworkingTypes.Riptide)
+        else if (NetworkType == NetworkingTypes.Darkrift2)
         {
         }
     }
 
     // Online
+    public bool WaitingOnSpawn { get; set; }
     public void SpawnFishnetNetworkHelper()
     {
         if (ServerState == LocalConnectionStates.Started)
         {
-            FishnetNetworkHelper Helper = Instantiate(NetworkHelperPrefab);
-            InstanceFinder.ServerManager.Spawn(Helper.gameObject, null);
+            WaitingOnSpawn = false;
+            if (NetworkHelper == null)
+            {
+                FishnetNetworkHelper Helper = Instantiate(NetworkHelperPrefab);
+                NetworkHelper = Helper;
+                InstanceFinder.ServerManager.Spawn(Helper.gameObject, null);
+            }
         }
-        else if (ServerState == LocalConnectionStates.Starting)
+        else if (ServerState == LocalConnectionStates.Starting && !WaitingOnSpawn)
         {
+            WaitingOnSpawn = true;
             Invoke(nameof(SpawnFishnetNetworkHelper), 0.1f);
         }
     }
@@ -148,6 +156,10 @@ public class PlayerManager : MonoBehaviour
             message.AddUShort(Instance.LocalPlayer.PlayerID);
             message.AddBool(true);
             AOW.RiptideNetworking.NetworkManager.Instance.Client.Send(message);
+        }
+        else if (NetworkType == NetworkingTypes.Fishynet)
+        {
+            NetworkHelper.SendReady(LocalPlayer);
         }
     }
 
@@ -190,16 +202,6 @@ public class PlayerManager : MonoBehaviour
             }
         }
     }
-    #endregion
-
-    #region Fishnet
-
-    [Client]
-    public void SendReadyToStartRPC()
-    {
-
-    }
-
     #endregion
 
     #endregion
@@ -255,7 +257,8 @@ public class PlayerManager : MonoBehaviour
     {
         if (NetworkType == NetworkingTypes.Fishynet)
         {
-            NetworkHelper?.SendDataToNetworkPlayer(Player, LocalPlayerData.Data.SerializeToJSON());
+            //Debug.Log(NetworkHelper == null ? "Network Helper Null": LocalPlayerData == null ? "Local Player Data Null" : LocalPlayerData.Data == null ? " Local Player Save Data Null" : LocalPlayerData.Data.SerializeToJSON() == null ? "JSON Save Data is Null" : "Send Player Data");
+            NetworkHelper.SendDataToNetworkPlayer(Player, LocalPlayerData.Data.SerializeToJSON());
         }
     }
 
@@ -271,6 +274,7 @@ public class PlayerManager : MonoBehaviour
         }
         else if (Instance.ActiveOnlineMode == PlayModes.CustomGame)
         {
+            //Debug.Log("Send Player Data 5");
             Instance.ConfirmationCustomGameOpponentCallback(OtherPlayersData);
         }
     }
@@ -438,7 +442,7 @@ public class PlayerManager : MonoBehaviour
         {
             AOW.RiptideNetworking.NetworkManager.Instance.JoinGame(directConnectIp);
         }
-        else
+        else if (NetworkType == NetworkingTypes.Fishynet)
         {
             InstanceFinder.TransportManager.Transport.SetClientAddress(directConnectIp);
             InstanceFinder.ClientManager.StartConnection();

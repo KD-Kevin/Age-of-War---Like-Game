@@ -4,6 +4,10 @@ using UnityEngine;
 using RiptideNetworking;
 using RiptideNetworking.Utils;
 using System;
+using FishNet.Broadcast;
+using FishNet.Connection;
+using FishNet;
+using FishNet.Object;
 
 [System.Runtime.InteropServices.Guid("3749176F-32B4-4DB0-9BA8-F4493743DA0B")]
 public class LockstepManager : MonoBehaviour
@@ -13,6 +17,8 @@ public class LockstepManager : MonoBehaviour
     [SerializeField]
     [Tooltip("Game Turn / ms")]
     private float AttemptGameTurnEvery = 40; // ms
+    [SerializeField]
+    private int KeepAveragePingOverSeconds = 10;
     public ActionTurn CurrentTurn { get; set; }
     public ActionTurn PendingTurn { get; set; }
     public ActionTurn ConfirmedTurn { get; set; }
@@ -65,6 +71,34 @@ public class LockstepManager : MonoBehaviour
         GameTurnHalfTime = AttemptGameTurnEvery / 2000;
         HalfStepTime = GameTurnHalfTime;
         StepTime = 2 * HalfStepTime;
+
+        HostSystemTimeDifference = -1;
+        AveragePingTally = 0;
+        AveragePingNumber = KeepAveragePingOverSeconds;
+        AveragePingQueue = new Queue<int>(AveragePingNumber);
+    }
+
+    public void ResetManager()
+    {
+        ActionPendingList = new List<PlayerActions>();
+        FixedFrameCounter = 0;
+        FixedGameTurnCounter = 0;
+        LockstepTurnCounter = 0;
+        PendingTurn = null;
+        ConfirmedTurn = null;
+        ProcessingTurn = null;
+        GameTurnHalfTime = AttemptGameTurnEvery / 2000;
+        HalfStepTime = GameTurnHalfTime;
+        StepTime = 2 * HalfStepTime;
+
+        HostSystemTimeDifference = -1;
+        AveragePingTally = 0;
+        AveragePingNumber = KeepAveragePingOverSeconds;
+    }
+
+    private void Start()
+    {
+        InitializeBroadcasts();
     }
 
     private void Update()
@@ -131,6 +165,10 @@ public class LockstepManager : MonoBehaviour
                 {
                     ReconnectOnSecond = System.DateTime.Now.Ticks + 1600000 - AOW.RiptideNetworking.NetworkManager.Instance.LastPing / 2; // seconds to 100 nano seconds ~ 10*7
                 }
+                else if (PlayerManager.Instance.NetworkType == NetworkingTypes.Fishynet)
+                {
+                    ReconnectOnSecond = System.DateTime.Now.Ticks + 1600000 - LastPing / 2; // seconds to 100 nano seconds ~ 10*7
+                }
                 SecondsTillReconnect = 2;
             }
             else
@@ -140,7 +178,11 @@ public class LockstepManager : MonoBehaviour
                 ReconnectOnNextGameTurn = true;
                 if (PlayerManager.Instance.NetworkType == NetworkingTypes.Riptide)
                 {
-                    ReconnectOnSecond = System.DateTime.Now.Ticks + 10 * 10000000 - AOW.RiptideNetworking.NetworkManager.Instance.LastPing / 2; // seconds to 100 nano seconds ~ 10*7
+                    ReconnectOnSecond = System.DateTime.Now.Ticks + 100000000 - AOW.RiptideNetworking.NetworkManager.Instance.LastPing / 2; // seconds to 100 nano seconds ~ 10*7
+                }
+                else if (PlayerManager.Instance.NetworkType == NetworkingTypes.Fishynet)
+                {
+                    ReconnectOnSecond = System.DateTime.Now.Ticks + 100000000 - LastPing / 2; // seconds to 100 nano seconds ~ 10*7
                 }
                 SecondsTillReconnect = 10;
             }
@@ -155,6 +197,10 @@ public class LockstepManager : MonoBehaviour
                 if (PlayerManager.Instance.NetworkType == NetworkingTypes.Riptide)
                 {
                     ReconnectOnSecond = System.DateTime.Now.Ticks + 6 * 10000000 - AOW.RiptideNetworking.NetworkManager.Instance.LastPing / 2; // seconds to 100 nano seconds ~ 10*7
+                }
+                else if (PlayerManager.Instance.NetworkType == NetworkingTypes.Fishynet)
+                {
+                    ReconnectOnSecond = System.DateTime.Now.Ticks + 6 * 10000000 - LastPing / 2; // seconds to 100 nano seconds ~ 10*7
                 }
                 //if (NetworkManager.Instance.IsHost)
                 //{
@@ -257,6 +303,7 @@ public class LockstepManager : MonoBehaviour
     public void AsyncGameTurn()
     {
         BaseUnitBehaviour.UpdateUnits();
+        PingHost();
         //Debug.Log($"Async Update {System.DateTime.Now.Hour} hr / {System.DateTime.Now.Minute} min / {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
     }
 
@@ -446,6 +493,35 @@ public class LockstepManager : MonoBehaviour
         return false;
     }
 
+    private bool BroadcastsInitialized = false;
+    public void InitializeBroadcasts()
+    {
+        if (!BroadcastsInitialized)
+        {
+            BroadcastsInitialized = true;
+            /// Actions
+            // No Action
+            InstanceFinder.NetworkManager.ServerManager.RegisterBroadcast<NoActionBroadcast>(NoActionBroadcast_ToServer);
+            InstanceFinder.NetworkManager.ClientManager.RegisterBroadcast<NoActionBroadcast>(NoActionBroadcast_ToClients);
+            // Corrupted Action
+            InstanceFinder.NetworkManager.ServerManager.RegisterBroadcast<CorruptActionBroadcast>(CorruptActionBroadcast_ToServer);
+            InstanceFinder.NetworkManager.ClientManager.RegisterBroadcast<CorruptActionBroadcast>(CorruptActionBroadcast_ToClients);
+            // Buy Unit Action
+            InstanceFinder.NetworkManager.ServerManager.RegisterBroadcast<BuyUnitActionBroadcast>(BuyUnitActionBroadcast_ToServer);
+            InstanceFinder.NetworkManager.ClientManager.RegisterBroadcast<BuyUnitActionBroadcast>(BuyUnitActionBroadcast_ToClients);
+
+            /// Action Confirmation
+            InstanceFinder.NetworkManager.ServerManager.RegisterBroadcast<ActionConfirmationBroadcast>(ActionConfirmationBroadcast_ToServer);
+            InstanceFinder.NetworkManager.ClientManager.RegisterBroadcast<ActionConfirmationBroadcast>(ActionConfirmationBroadcast_ToClients);
+            /// Coundown
+            InstanceFinder.NetworkManager.ServerManager.RegisterBroadcast<CountdownBroadcast>(CountdownBroadcast_ToServer);
+            InstanceFinder.NetworkManager.ClientManager.RegisterBroadcast<CountdownBroadcast>(CountdownBroadcast_ToClients);
+            /// Ping
+            InstanceFinder.NetworkManager.ServerManager.RegisterBroadcast<PingBroadcast>(PingHost_ToServer);
+            InstanceFinder.NetworkManager.ClientManager.RegisterBroadcast<PingBroadcast>(PingHost_ToClients);
+        }
+    }
+
     #region Send Actions RPC
     public void SendTurnActions()
     {
@@ -461,6 +537,15 @@ public class LockstepManager : MonoBehaviour
                 message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
                 AddActionToMessage(action, message);
                 AOW.RiptideNetworking.NetworkManager.Instance.Client.Send(message);
+            }
+        }
+        else if (PlayerManager.Instance.NetworkType == NetworkingTypes.Fishynet)
+        {
+            int NumberOfActions = LocalPlayersCurrentTurn.ActionsDone.Count;
+            //Debug.Log($"Sending {NumberOfActions} Actions");
+            foreach (IAction action in LocalPlayersCurrentTurn.ActionsDone)
+            {
+                SendActionBroadcast(action, LocalPlayersCurrentTurn.TurnNumber, NumberOfActions, PlayerManager.Instance.LocalPlayer.PlayerID);
             }
         }
     }
@@ -479,6 +564,14 @@ public class LockstepManager : MonoBehaviour
                 message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
                 AddActionToMessage(action, message);
                 AOW.RiptideNetworking.NetworkManager.Instance.Client.Send(message);
+            }
+        }
+        else if (PlayerManager.Instance.NetworkType == NetworkingTypes.Fishynet)
+        {
+            int NumberOfActions = PreviousLocalPlayersCurrentTurn.ActionsDone.Count;
+            foreach (IAction action in PreviousLocalPlayersCurrentTurn.ActionsDone)
+            {
+                SendActionBroadcast(action, PreviousLocalPlayersCurrentTurn.TurnNumber, NumberOfActions, PlayerManager.Instance.LocalPlayer.PlayerID);
             }
         }
     }
@@ -559,8 +652,7 @@ public class LockstepManager : MonoBehaviour
         }
         else
         {
-            PlayerAction = new PlayerActions(SentFromPlayerID);
-            PlayerAction.ActionsDone.Clear();
+            PlayerAction = new PlayerActions(SentFromPlayerID, false, false);
             PlayerAction.TurnNumber = TurnNumber;
         }
 
@@ -618,6 +710,144 @@ public class LockstepManager : MonoBehaviour
     }
     #endregion
 
+    #region Fishnet
+
+
+    public void SendActionBroadcast(IAction action, int Turn, int ActionCount, ushort SentBy)
+    {
+        if ((ActionTypes)action.ActionType == ActionTypes.NoAction)
+        {
+            // Thus far nothing needs to be added, may be changed later though 
+            NoActionBroadcast Broadcast = new NoActionBroadcast()
+            {
+                TurnNumber = Turn,
+                NumberOfActions = ActionCount,
+                SentByPlayer = SentBy,
+            };
+
+            InstanceFinder.ClientManager.Broadcast(Broadcast);
+        }
+        else if ((ActionTypes)action.ActionType == ActionTypes.Corrupt)
+        {
+            // Corrupted action
+            CorruptActionBroadcast Broadcast = new CorruptActionBroadcast()
+            {
+                TurnNumber = Turn,
+                NumberOfActions = ActionCount,
+                SentByPlayer = SentBy,
+            };
+
+            InstanceFinder.ClientManager.Broadcast(Broadcast);
+        }
+        else if ((ActionTypes)action.ActionType == ActionTypes.BuyUnit)
+        {
+            // Buy Action needs to add an int for the buy index
+            BuyUnitAction BuyAction = action as BuyUnitAction;
+            BuyUnitActionBroadcast Broadcast = new BuyUnitActionBroadcast()
+            {
+                TurnNumber = Turn,
+                NumberOfActions = ActionCount,
+                SentByPlayer = SentBy,
+                BuyIndex = BuyAction.UnitBuyIndex,
+            };
+
+            //Debug.Log($"Sending {ActionCount} Actions 2");
+            InstanceFinder.ClientManager.Broadcast(Broadcast);
+        }
+    }
+
+    public void NoActionBroadcast_ToServer(NetworkConnection conn, NoActionBroadcast broadcast)
+    {
+        NetworkObject nob = conn.FirstObject;
+        if (nob == null)
+        {
+            return;
+        }
+        //Debug.Log($"Sending {broadcast.NumberOfActions} Actions 3");
+        InstanceFinder.ServerManager.Broadcast(nob, broadcast);
+    }
+
+    public void NoActionBroadcast_ToClients(NoActionBroadcast broadcast)
+    {
+        NoAction NewAction = new NoAction();
+        NewAction.OwningPlayer = broadcast.SentByPlayer;
+        RecieveAction(NewAction, broadcast.SentByPlayer, broadcast.TurnNumber, NewAction.ActionType, broadcast.NumberOfActions);
+    }
+
+    public void CorruptActionBroadcast_ToServer(NetworkConnection conn, CorruptActionBroadcast broadcast)
+    {
+        NetworkObject nob = conn.FirstObject;
+        if (nob == null)
+        {
+            return;
+        }
+        InstanceFinder.ServerManager.Broadcast(nob, broadcast);
+    }
+
+    public void CorruptActionBroadcast_ToClients(CorruptActionBroadcast broadcast)
+    {
+        CorruptAction NewAction = new CorruptAction();
+        NewAction.OwningPlayer = broadcast.SentByPlayer;
+        RecieveAction(NewAction, broadcast.SentByPlayer, broadcast.TurnNumber, NewAction.ActionType, broadcast.NumberOfActions);
+    }
+
+    public void BuyUnitActionBroadcast_ToServer(NetworkConnection conn, BuyUnitActionBroadcast broadcast)
+    {
+        NetworkObject nob = conn.FirstObject;
+        if (nob == null)
+        {
+            return;
+        }
+        InstanceFinder.ServerManager.Broadcast(nob, broadcast);
+    }
+
+    public void BuyUnitActionBroadcast_ToClients(BuyUnitActionBroadcast broadcast)
+    {
+        BuyUnitAction NewAction = new BuyUnitAction();
+        NewAction.UnitBuyIndex = broadcast.BuyIndex;
+        NewAction.OwningPlayer = broadcast.SentByPlayer;
+        RecieveAction(NewAction, broadcast.SentByPlayer, broadcast.TurnNumber, NewAction.ActionType, broadcast.NumberOfActions);
+    }
+
+    public void RecieveAction(IAction NewAction, ushort SentFromPlayerID, int TurnNumber, int TypeOfAction, int NumberOfActions)
+    {
+        PlayerActions PlayerAction;
+        if (PartitioningActions.ContainsKey((SentFromPlayerID, TurnNumber)))
+        {
+            PlayerAction = PartitioningActions[(SentFromPlayerID, TurnNumber)];
+        }
+        else
+        {
+            PlayerAction = new PlayerActions(SentFromPlayerID, false, false);
+            PlayerAction.TurnNumber = TurnNumber;
+        }
+
+        if (NewAction != null)
+        {
+            //if ((ActionTypes)TypeOfAction != ActionTypes.NoAction)
+            //{
+                //Debug.Log($"Add Action '{(ActionTypes)TypeOfAction}' on Turn {TurnNumber} -> Action Count {NumberOfActions} -> Player {SentFromPlayerID}");
+            //}
+            PlayerAction.AddAction(NewAction);
+        }
+        //Debug.Log($"Recieved Action From Player {SentFromPlayerID} -> Action Type {(ActionTypes)NewAction.ActionType} -> Turn Number {TurnNumber} -> Number of Actions {NumberOfActions}");
+
+        if (NumberOfActions > 1 && NumberOfActions != PlayerAction.ActionsDone.Count && !PartitioningActions.ContainsKey((SentFromPlayerID, TurnNumber)))
+        {
+            //Debug.Log($"Add To Partition -> Turn {TurnNumber} -> Action Count {NumberOfActions} -> Player {SentFromPlayerID}");
+            PartitioningActions.Add((SentFromPlayerID, TurnNumber), PlayerAction);
+        }
+
+        if (NumberOfActions == PlayerAction.ActionsDone.Count)
+        {
+            //Debug.Log($"Turn {TurnNumber} Recieved Action Set for player {SentFromPlayerID} -> Action Count {NumberOfActions} -> Player {SentFromPlayerID}");
+            PartitioningActions.Remove((SentFromPlayerID, TurnNumber));
+            Instance.RecievePlayerAction(PlayerAction);
+        }
+    }
+
+    #endregion
+
     #endregion
 
     #region Send Action Confirmation RPC
@@ -631,6 +861,16 @@ public class LockstepManager : MonoBehaviour
             message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
             message.AddInt(ConfirmedTurnNumber);
             AOW.RiptideNetworking.NetworkManager.Instance.Client.Send(message);
+        }
+        else if (PlayerManager.Instance.NetworkType == NetworkingTypes.Fishynet)
+        {
+            ActionConfirmationBroadcast ConfirmationBroadcast = new ActionConfirmationBroadcast()
+            { 
+                TurnNumber = ConfirmedTurnNumber,
+                SentByPlayer = PlayerManager.Instance.LocalPlayer.PlayerID,
+            };
+
+            InstanceFinder.ClientManager.Broadcast(ConfirmationBroadcast);
         }
     }
 
@@ -683,6 +923,45 @@ public class LockstepManager : MonoBehaviour
     }
     #endregion
 
+    #region Fishnet
+
+    public void ActionConfirmationBroadcast_ToServer(NetworkConnection conn, ActionConfirmationBroadcast broadcast)
+    {
+        NetworkObject nob = conn.FirstObject;
+        if (nob == null)
+        {
+            return;
+        }
+        InstanceFinder.ServerManager.Broadcast(nob, broadcast);
+    }
+
+    public void ActionConfirmationBroadcast_ToClients(ActionConfirmationBroadcast broadcast)
+    {
+        if (PendingTurn.LockStepTurnNumber == broadcast.TurnNumber)
+        {
+            if (!PendingTurn.ConfirmedPlayers.Contains(broadcast.SentByPlayer))
+            {
+                PendingTurn.ConfirmedPlayers.Add(broadcast.SentByPlayer);
+            }
+        }
+        else if (ConfirmedTurn.LockStepTurnNumber == broadcast.TurnNumber)
+        {
+            if (!ConfirmedTurn.ConfirmedPlayers.Contains(broadcast.SentByPlayer))
+            {
+                ConfirmedTurn.ConfirmedPlayers.Add(broadcast.SentByPlayer);
+            }
+        }
+        else if (CurrentTurn.LockStepTurnNumber == broadcast.TurnNumber)
+        {
+            if (!CurrentTurn.ConfirmedPlayers.Contains(broadcast.SentByPlayer))
+            {
+                CurrentTurn.ConfirmedPlayers.Add(broadcast.SentByPlayer);
+            }
+        }
+    }
+
+    #endregion
+
     #endregion
 
     #region Send Countdown RPC
@@ -695,6 +974,16 @@ public class LockstepManager : MonoBehaviour
             message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
             message.AddInt(Sec);
             AOW.RiptideNetworking.NetworkManager.Instance.Client.Send(message);
+        }
+        else if (PlayerManager.Instance.NetworkType == NetworkingTypes.Riptide)
+        {
+            CountdownBroadcast Broadcast = new CountdownBroadcast()
+            {
+                SentByPlayer = PlayerManager.Instance.LocalPlayer.PlayerID,
+                ReconnectionSecond = Sec,
+            };
+
+            InstanceFinder.ClientManager.Broadcast(Broadcast);
         }
     }
 
@@ -724,6 +1013,25 @@ public class LockstepManager : MonoBehaviour
 
         Instance.ReconnectOnSecond = sec;
     }
+    #endregion
+
+    #region Fishnet
+
+    public void CountdownBroadcast_ToServer(NetworkConnection conn, CountdownBroadcast broadcast)
+    {
+        NetworkObject nob = conn.FirstObject;
+        if (nob == null)
+        {
+            return;
+        }
+        InstanceFinder.ServerManager.Broadcast(nob, broadcast);
+    }
+
+    public void CountdownBroadcast_ToClients(CountdownBroadcast broadcast)
+    {
+        Instance.ReconnectOnSecond = broadcast.ReconnectionSecond;
+    }
+
     #endregion
 
     #endregion
@@ -763,6 +1071,86 @@ public class LockstepManager : MonoBehaviour
         Instance.ResendTurnActions();
     }
     #endregion
+
+    #endregion
+
+    #region Ping RPC
+
+    public long HostSystemTimeDifference { get; set; }
+    public long LastPing { get; set; }
+    public int LastPingMS { get; set; }
+    public int AveragePingMS { get; set; } // Average ping over last ten seconds
+    public Queue<int> AveragePingQueue { get; set; }
+    public int AveragePingTally { get; set; }
+    private long PingStartTime_ns = 0;
+    private float PingTimer = 0;
+    private int AveragePingNumber;
+    private float TimePerTick;
+    private float TickRateTimer = 0;
+    public void PingHost(bool ReliableSend = false)
+    {
+        PingStartTime_ns = System.DateTime.Now.Ticks;
+        PingBroadcast Ping = new PingBroadcast()
+        {
+            Reliable = ReliableSend,
+            SentByPlayer = PlayerManager.Instance.LocalPlayer.PlayerID,
+            ServerTimeNow = 0,
+        };
+
+        InstanceFinder.ClientManager.Broadcast(Ping);
+    }
+
+    public void PingHost_ToServer(NetworkConnection conn, PingBroadcast broadcast)
+    {
+        NetworkObject nob = conn.FirstObject;
+        if (nob == null)
+        {
+            return;
+        }
+
+        PingBroadcast PingResponse = new PingBroadcast()
+        {
+            Reliable = broadcast.Reliable,
+            SentByPlayer = broadcast.SentByPlayer,
+            ServerTimeNow = System.DateTime.Now.Ticks,
+        };
+
+        InstanceFinder.ServerManager.Broadcast(nob, PingResponse, true, broadcast.Reliable ? FishNet.Transporting.Channel.Reliable : FishNet.Transporting.Channel.Unreliable);
+    }
+
+    public void PingHost_ToClients(PingBroadcast broadcast)
+    {
+        if (broadcast.SentByPlayer != PlayerManager.Instance.LocalPlayer.PlayerID)
+        {
+            return;
+        }
+        long Host100NanoSec = broadcast.ServerTimeNow;
+
+        // Time Difference from ping to ping back
+        long Client100NanoSec = System.DateTime.Now.Ticks;
+        LastPing = Client100NanoSec - PingStartTime_ns;
+        LastPingMS = Mathf.RoundToInt((float)Instance.LastPing / 10000); // One MS per 10000 (100 - Nanoseconds)
+
+        if (HostSystemTimeDifference == -1)
+        {
+            //                            (         Estimate Time when Ping was             )
+            long EstimatedHostTime = Host100NanoSec - Instance.LastPing / 2;
+            HostSystemTimeDifference = PingStartTime_ns - EstimatedHostTime;
+            float MSDifference = Mathf.RoundToInt((float)HostSystemTimeDifference / 10000);
+            Debug.Log($"Host/Client System MS Difference {MSDifference}");
+        }
+
+        AveragePingTally += LastPingMS;
+        int RemovedValue = 0;
+        if (AveragePingQueue.Count == AveragePingNumber)
+        {
+            RemovedValue = Instance.AveragePingQueue.Dequeue();
+        }
+
+        AveragePingTally -= RemovedValue;
+        AveragePingQueue.Enqueue(Instance.LastPingMS);
+        AveragePingMS = Instance.AveragePingTally / AveragePingNumber;
+    }
 
     #endregion
 }
@@ -1015,7 +1403,7 @@ public class PlayerActions
         ActionsDone.Add(Action);
     }
 
-    public PlayerActions(ushort playerID = 0, bool UpdateTurnCounter = false)
+    public PlayerActions(ushort playerID = 0, bool UpdateTurnCounter = false, bool AddNoAction = true)
     {
         TurnNumber = TurnCounter;
         if (UpdateTurnCounter)
@@ -1024,7 +1412,10 @@ public class PlayerActions
         }
         PlayerID = playerID;
 
-        AddAction(new NoAction());
+        if (AddNoAction)
+        {
+            AddAction(new NoAction());
+        }
     }
 }
 
@@ -1062,6 +1453,13 @@ public class NoAction : IAction
     }
 }
 
+public struct NoActionBroadcast : IBroadcast
+{
+    public int TurnNumber;
+    public int NumberOfActions;
+    public ushort SentByPlayer;
+}
+
 [System.Serializable]
 public class CorruptAction : IAction
 {
@@ -1081,10 +1479,36 @@ public class CorruptAction : IAction
     }
 }
 
+public struct CorruptActionBroadcast : IBroadcast
+{
+    public int TurnNumber;
+    public int NumberOfActions;
+    public ushort SentByPlayer;
+}
+
 public interface IAction
 {
     public int ActionType { get; set; }
     public ushort OwningPlayer { get; set; }
 
     public void ProcessAction();
+}
+
+public struct ActionConfirmationBroadcast : IBroadcast
+{
+    public int TurnNumber;
+    public ushort SentByPlayer;
+}
+
+public struct CountdownBroadcast : IBroadcast
+{
+    public int ReconnectionSecond;
+    public ushort SentByPlayer;
+}
+
+public struct PingBroadcast : IBroadcast
+{
+    public bool Reliable;
+    public ushort SentByPlayer;
+    public long ServerTimeNow;
 }

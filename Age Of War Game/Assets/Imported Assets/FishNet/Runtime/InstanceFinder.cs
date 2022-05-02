@@ -156,7 +156,7 @@ namespace FishNet
         /// <summary>
         /// NetworkManager instance.
         /// </summary>
-        private static NetworkManager _networkManager;
+        private static NetworkManager _networkManager = null;
         #endregion
 
 

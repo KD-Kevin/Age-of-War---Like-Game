@@ -213,7 +213,15 @@ public class PlayerUiManager : MonoBehaviour
 
     public void RefeshBaseUi()
     {
-        BaseBuilding PlayerBuilding = BaseBuilding.TeamBuildings[1];
+        BaseBuilding PlayerBuilding;
+        if (PlayerManager.Instance.CurrentMatchData.PlayMode == PlayModes.CustomGame || PlayerManager.Instance.CurrentMatchData.PlayMode == PlayModes.Quickplay || PlayerManager.Instance.CurrentMatchData.PlayMode == PlayModes.Ranked)
+        {
+            PlayerBuilding = BaseBuilding.TeamBuildings[PlayerManager.Instance.LocalPlayer.PlayerID];
+        }
+        else
+        {
+            PlayerBuilding = BaseBuilding.TeamBuildings[1];
+        }
         PlayerHealthBar.maxValue = PlayerBuilding.MaxHealth;
         PlayerHealthBar.ChangeValue(PlayerBuilding.BuildingData.Health);
 
@@ -225,7 +233,22 @@ public class PlayerUiManager : MonoBehaviour
 
         PlayerArmorBar.gameObject.SetActive(PlayerBuilding.MaxArmor > 0);
 
-        BaseBuilding EnemyBuilding = BaseBuilding.TeamBuildings[2];
+        BaseBuilding EnemyBuilding;
+        if (PlayerManager.Instance.CurrentMatchData.PlayMode == PlayModes.CustomGame || PlayerManager.Instance.CurrentMatchData.PlayMode == PlayModes.Quickplay || PlayerManager.Instance.CurrentMatchData.PlayMode == PlayModes.Ranked)
+        {
+            if (PlayerManager.Instance.LocalPlayer.PlayerID == 1)
+            {
+                EnemyBuilding = BaseBuilding.TeamBuildings[2];
+            }
+            else
+            {
+                EnemyBuilding = BaseBuilding.TeamBuildings[1];
+            }
+        }
+        else
+        {
+            EnemyBuilding = BaseBuilding.TeamBuildings[2];
+        }
         EnemyHealthBar.maxValue = EnemyBuilding.MaxHealth;
         EnemyHealthBar.ChangeValue(EnemyBuilding.BuildingData.Health);
 
@@ -240,7 +263,15 @@ public class PlayerUiManager : MonoBehaviour
 
     public void UpdatePopulationText()
     {
-        BaseBuilding PlayerBuilding = BaseBuilding.TeamBuildings[1];
+        BaseBuilding PlayerBuilding;
+        if (PlayerManager.Instance.CurrentMatchData.PlayMode == PlayModes.CustomGame || PlayerManager.Instance.CurrentMatchData.PlayMode == PlayModes.Quickplay || PlayerManager.Instance.CurrentMatchData.PlayMode == PlayModes.Ranked)
+        {
+            PlayerBuilding = BaseBuilding.TeamBuildings[PlayerManager.Instance.LocalPlayer.PlayerID];
+        }
+        else
+        {
+            PlayerBuilding = BaseBuilding.TeamBuildings[1];
+        }
         PopulationText.text = $"{PlayerBuilding.GetPopulation()} / {PlayerBuilding.BuildingData.MaxPopulation}";
     }
 
@@ -251,7 +282,15 @@ public class PlayerUiManager : MonoBehaviour
 
     public void BuyUnit(BaseUnitBehaviour unit)
     {
-        BaseBuilding.TeamBuildings[1].BuyUnit(unit);
+        if (PlayerManager.Instance.CurrentMatchData.PlayMode == PlayModes.CustomGame || PlayerManager.Instance.CurrentMatchData.PlayMode == PlayModes.Quickplay || PlayerManager.Instance.CurrentMatchData.PlayMode == PlayModes.Ranked)
+        {
+            BaseBuilding.TeamBuildings[PlayerManager.Instance.LocalPlayer.PlayerID].BuyUnit(unit);
+        }
+        else
+        {
+            BaseBuilding.TeamBuildings[1].BuyUnit(unit);
+        }
+
         UpdatePopulationText();
         UpdateCurrencyText();
     }

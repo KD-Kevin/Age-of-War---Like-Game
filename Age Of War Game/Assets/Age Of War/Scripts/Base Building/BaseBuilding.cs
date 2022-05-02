@@ -119,6 +119,7 @@ public class BaseBuilding : MonoBehaviour, IHealth, ITeam
                 BuyUnit(BuildOrders[buildOrderIndex].Order);
                 PlayerUiManager.Instance.UpdatePopulationText();
                 PlayerUiManager.Instance.UpdateCurrencyText();
+                BuildOrders.RemoveAt(buildOrderIndex);
             }
         }
     }

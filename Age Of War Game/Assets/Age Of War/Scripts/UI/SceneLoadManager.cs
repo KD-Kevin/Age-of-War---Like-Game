@@ -4,6 +4,10 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using RiptideNetworking;
+using FishNet.Broadcast;
+using FishNet.Connection;
+using FishNet;
+using FishNet.Object;
 
 public class SceneLoadManager : MonoBehaviour
 {
@@ -21,6 +25,7 @@ public class SceneLoadManager : MonoBehaviour
     private float _lerpTime = 2;
     private string _sceneName;
     private bool _loadingScene;
+    private static bool RegisteredBroadcasts = false;
 
     private void Awake()
     {
@@ -62,6 +67,16 @@ public class SceneLoadManager : MonoBehaviour
                     message.AddString(name);
                     AOW.RiptideNetworking.NetworkManager.Instance.Client.Send(message);
                 }
+                else if (PlayerManager.Instance.NetworkType == NetworkingTypes.Fishynet)
+                {
+                    LoadSceneBroadcast SceneLoadBroadcast = new LoadSceneBroadcast()
+                    {
+                        SentFromPlayer = PlayerManager.Instance.LocalPlayer.PlayerID,
+                        SceneName = name,
+                    };
+
+                    InstanceFinder.ClientManager.Broadcast(SceneLoadBroadcast);
+                }
             }
         }
     }
@@ -92,6 +107,28 @@ public class SceneLoadManager : MonoBehaviour
         string Scenename = message.GetString();
 
         Instance.LoadScene(Scenename);
+    }
+
+    #endregion
+
+    #region Fishnet
+
+    public void LoadSceneBroadcast_Server(NetworkConnection Conn, LoadSceneBroadcast Broadcast)
+    {
+        NetworkObject nob = Conn.FirstObject;
+        if (nob == null)
+        {
+            return;
+        }
+        InstanceFinder.ServerManager.Broadcast(nob, Broadcast);
+    }
+
+    public void LoadSceneBroadcast_Client(LoadSceneBroadcast Broadcast)
+    {
+        if (Broadcast.SentFromPlayer != PlayerManager.Instance.LocalPlayer.PlayerID)
+        {
+            LoadScene(Broadcast.SceneName);
+        }
     }
 
     #endregion
@@ -161,4 +198,20 @@ public class SceneLoadManager : MonoBehaviour
         _loadingScene = false;
         gameObject.SetActive(false);
     }
+
+    public void InitializeBroadcasts()
+    {
+        if (InstanceFinder.NetworkManager != null && !RegisteredBroadcasts)
+        {
+            RegisteredBroadcasts = true;
+            InstanceFinder.NetworkManager.ServerManager.RegisterBroadcast<LoadSceneBroadcast>(LoadSceneBroadcast_Server);
+            InstanceFinder.NetworkManager.ClientManager.RegisterBroadcast<LoadSceneBroadcast>(LoadSceneBroadcast_Client);
+        }
+    }
+}
+
+public struct LoadSceneBroadcast : IBroadcast
+{
+    public ushort SentFromPlayer;
+    public string SceneName;
 }

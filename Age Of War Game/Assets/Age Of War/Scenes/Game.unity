@@ -1564,6 +1564,7 @@ MonoBehaviour:
   UnitName: {fileID: 939437483}
   UnitSprite: {fileID: 1529800947}
   UnitCost: {fileID: 113578599}
+  UI_Button: {fileID: 203952398}
 --- !u!1 &146710926
 GameObject:
   m_ObjectHideFlags: 0
@@ -1878,7 +1879,7 @@ MonoBehaviour:
     m_HighlightedColor: {r: 0.84313726, g: 0.84313726, b: 0.84313726, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
     m_SelectedColor: {r: 0.84313726, g: 0.84313726, b: 0.84313726, a: 1}
-    m_DisabledColor: {r: 1, g: 1, b: 1, a: 0.39215687}
+    m_DisabledColor: {r: 1, g: 1, b: 1, a: 1}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -4692,6 +4693,7 @@ MonoBehaviour:
   FloorWeaponSpawnLocations: []
   BuyUnitBuffer: []
   HoldPopulationSpot: 
+  BuildOrders: []
 --- !u!61 &690900943
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -6240,7 +6242,7 @@ MonoBehaviour:
     m_HighlightedColor: {r: 0.84313726, g: 0.84313726, b: 0.84313726, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
     m_SelectedColor: {r: 0.84313726, g: 0.84313726, b: 0.84313726, a: 1}
-    m_DisabledColor: {r: 1, g: 1, b: 1, a: 0.39215687}
+    m_DisabledColor: {r: 1, g: 1, b: 1, a: 1}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -6856,7 +6858,7 @@ MonoBehaviour:
     m_HighlightedColor: {r: 0.84313726, g: 0.84313726, b: 0.84313726, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
     m_SelectedColor: {r: 0.84313726, g: 0.84313726, b: 0.84313726, a: 1}
-    m_DisabledColor: {r: 1, g: 1, b: 1, a: 0.39215687}
+    m_DisabledColor: {r: 1, g: 1, b: 1, a: 1}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -7078,6 +7080,7 @@ MonoBehaviour:
   UnitName: {fileID: 473022823}
   UnitSprite: {fileID: 2077529731}
   UnitCost: {fileID: 815952000}
+  UI_Button: {fileID: 1045080683}
 --- !u!1 &1075439390
 GameObject:
   m_ObjectHideFlags: 0
@@ -7484,7 +7487,7 @@ MonoBehaviour:
     m_HighlightedColor: {r: 0.84313726, g: 0.84313726, b: 0.84313726, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
     m_SelectedColor: {r: 0.84313726, g: 0.84313726, b: 0.84313726, a: 1}
-    m_DisabledColor: {r: 1, g: 1, b: 1, a: 0.39215687}
+    m_DisabledColor: {r: 1, g: 1, b: 1, a: 1}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -8515,6 +8518,7 @@ MonoBehaviour:
   UnitName: {fileID: 1490140280}
   UnitSprite: {fileID: 777513363}
   UnitCost: {fileID: 872152645}
+  UI_Button: {fileID: 1089357413}
 --- !u!1 &1149273530
 GameObject:
   m_ObjectHideFlags: 0
@@ -8549,6 +8553,7 @@ MonoBehaviour:
   UnitName: {fileID: 1114152571}
   UnitSprite: {fileID: 257660556}
   UnitCost: {fileID: 1685835673}
+  UI_Button: {fileID: 885863050}
 --- !u!224 &1149273532
 RectTransform:
   m_ObjectHideFlags: 0
@@ -8920,6 +8925,7 @@ MonoBehaviour:
   FloorWeaponSpawnLocations: []
   BuyUnitBuffer: []
   HoldPopulationSpot: 
+  BuildOrders: []
 --- !u!1 &1197066152
 GameObject:
   m_ObjectHideFlags: 0
@@ -11492,6 +11498,7 @@ MonoBehaviour:
   UnitName: {fileID: 636082516}
   UnitSprite: {fileID: 1348481628}
   UnitCost: {fileID: 84200297}
+  UI_Button: {fileID: 1949706775}
 --- !u!1 &1650028449
 GameObject:
   m_ObjectHideFlags: 0
@@ -12456,7 +12463,19 @@ MonoBehaviour:
   buttonText: Exit Game
   clickEvent:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1998212267}
+        m_TargetAssemblyTypeName: PlayerUiManager, Assembly-CSharp
+        m_MethodName: CloseGame
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   hoverEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -13635,7 +13654,7 @@ MonoBehaviour:
     m_HighlightedColor: {r: 0.84313726, g: 0.84313726, b: 0.84313726, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
     m_SelectedColor: {r: 0.84313726, g: 0.84313726, b: 0.84313726, a: 1}
-    m_DisabledColor: {r: 1, g: 1, b: 1, a: 0.39215687}
+    m_DisabledColor: {r: 1, g: 1, b: 1, a: 1}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -14334,7 +14353,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2061035936}
   m_Layer: 5
-  m_Name: List View
+  m_Name: Escape Menu Buttons
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

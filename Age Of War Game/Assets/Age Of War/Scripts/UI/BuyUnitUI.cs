@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using FishNet.Broadcast;
 
 public class BuyUnitUI : MonoBehaviour
 {
@@ -17,6 +18,8 @@ public class BuyUnitUI : MonoBehaviour
     private Image UnitSprite;
     [SerializeField]
     private TextMeshProUGUI UnitCost;
+    [SerializeField]
+    private Button UI_Button;
 
     public float BuildTimer { get; set; }
     public float BuildTime { get; set; }
@@ -24,6 +27,7 @@ public class BuyUnitUI : MonoBehaviour
     public float CooldownTime { get; set; }
     public BaseUnitBehaviour BuyUnit { get; private set; }
     public int BuyUnitIndex { get; private set; }
+    public float ClickCooldownTimer { get; set; }
 
     public static List<BuyUnitUI> AllUnitBuyUi = new List<BuyUnitUI>();
 
@@ -61,6 +65,11 @@ public class BuyUnitUI : MonoBehaviour
 
     public void OnClick()
     {
+        if (ClickCooldownTimer > 0)
+        {
+            return;
+        }
+
         if (PlayerUiManager.Instance.CanAffordUnit(BuyUnit))
         {
             if (CooldownTimer > 0 || BuildTimer > 0)
@@ -74,6 +83,8 @@ public class BuyUnitUI : MonoBehaviour
                 return;
             }
 
+            ClickCooldownTimer = 1;
+            UI_Button.interactable = false;
             if (PlayerManager.Instance.CurrentMatchData.PlayMode == PlayModes.CustomGame || PlayerManager.Instance.CurrentMatchData.PlayMode == PlayModes.Quickplay || PlayerManager.Instance.CurrentMatchData.PlayMode == PlayModes.Ranked)
             {
                 // Send of Action to lockstep
@@ -120,9 +131,19 @@ public class BuyUnitUI : MonoBehaviour
             {
                 if (BuyUnit != null)
                 {
-                    if (BaseBuilding.TeamBuildings[1].HoldPopulationSpot.Contains(BuyUnitIndex))
+                    if (PlayerManager.Instance.CurrentMatchData.PlayMode == PlayModes.CustomGame || PlayerManager.Instance.CurrentMatchData.PlayMode == PlayModes.Quickplay || PlayerManager.Instance.CurrentMatchData.PlayMode == PlayModes.Ranked)
                     {
-                        BaseBuilding.TeamBuildings[1].HoldPopulationSpot.Remove(BuyUnitIndex);
+                        if (BaseBuilding.TeamBuildings[PlayerManager.Instance.LocalPlayer.PlayerID].HoldPopulationSpot.Contains(BuyUnitIndex))
+                        {
+                            BaseBuilding.TeamBuildings[PlayerManager.Instance.LocalPlayer.PlayerID].HoldPopulationSpot.Remove(BuyUnitIndex);
+                        }
+                    }
+                    else
+                    {
+                        if (BaseBuilding.TeamBuildings[1].HoldPopulationSpot.Contains(BuyUnitIndex))
+                        {
+                            BaseBuilding.TeamBuildings[1].HoldPopulationSpot.Remove(BuyUnitIndex);
+                        }
                     }
                     PlayerUiManager.Instance.BuyUnit(BuyUnit);
                 }
@@ -159,6 +180,15 @@ public class BuyUnitUI : MonoBehaviour
         {
             UpdateText();
         }
+
+        if (ClickCooldownTimer > 0)
+        {
+            ClickCooldownTimer -= LockstepManager.Instance.StepTime;
+            if (ClickCooldownTimer <= 0)
+            {
+                UI_Button.interactable = true;
+            }
+        }
     }
 
     public void SetUnit(BaseUnitBehaviour Unit, int UnitIndex)
@@ -192,8 +222,8 @@ public class BuildOrder
     {
         Order = BuildOrder;
         BuildTime = TimeToBuild;
-        BaseBuilding.AddBuildOrder(this);
         OwnerID = Owner;
+        BaseBuilding.AddBuildOrder(this);
     }
 }
 
@@ -252,8 +282,17 @@ public class BuyUnitAction : IAction
             BaseUnitBehaviour UnitToSpawn = PlayerManager.Instance.GetUnitByIndex(UnitBuyIndex, OwningPlayer);
             if (UnitToSpawn != null)
             {
-                UnitToSpawn.GetTimeToCreate();
+                float TimeToBuild = UnitToSpawn.GetTimeToCreate();
+                BuildOrder NewBuildOrder = new BuildOrder(UnitToSpawn, TimeToBuild, OwningPlayer);
             }
         }
     }
+}
+
+public struct BuyUnitActionBroadcast : IBroadcast
+{
+    public int TurnNumber;
+    public int NumberOfActions;
+    public ushort SentByPlayer;
+    public int BuyIndex;
 }

@@ -49,6 +49,10 @@ public class NetworkPlayer : NetworkBehaviour
             }
 
             IsLocalPlayer = Owner.IsLocalClient;
+            if (IsLocalPlayer)
+            {
+                PlayerManager.Instance.LocalPlayer = this;
+            }
             if (!IsLocalPlayer)
             {
                 Invoke(nameof(SendPlayerDataDelayed), 0.1f);
@@ -89,6 +93,14 @@ public class NetworkPlayer : NetworkBehaviour
             Invoke(nameof(SendPlayerDataDelayed), 0.1f);
             return;
         }
+
+        if (PlayerManager.Instance.NetworkHelper == null)
+        {
+            PlayerManager.Instance.SpawnFishnetNetworkHelper();
+            Invoke(nameof(SendPlayerDataDelayed), 0.1f);
+            return;
+        }
+
         PlayerManager.Instance.OtherNetworkPlayerConnected(this);
     }
 

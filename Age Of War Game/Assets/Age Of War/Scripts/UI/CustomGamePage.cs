@@ -7,6 +7,9 @@ using Michsky.UI.ModernUIPack;
 using RiptideNetworking;
 using FishNet;
 using FishNet.Transporting;
+using FishNet.Broadcast;
+using FishNet.Connection;
+using FishNet.Object;
 
 public class CustomGamePage : MonoBehaviour
 {
@@ -94,11 +97,14 @@ public class CustomGamePage : MonoBehaviour
     public MultiplayStatus MultiplayerStatus { get; set; }
     public static CustomGamePage Instance = null;
     private string DirectConnectString = "None";
+    private float PingTimer = 0;
 
     private void Awake()
     {
         PlayerButtonWasPressed = false;
         Instance = this;
+        InstanceFinder.NetworkManager.ServerManager.RegisterBroadcast<PreGameDataBroadcast>(BroadCastPlayDataToServer);
+        InstanceFinder.NetworkManager.ClientManager.RegisterBroadcast<PreGameDataBroadcastResponse>(BroadCastPlayDataToClients);
     }
 
     private void OnDisable()
@@ -114,6 +120,27 @@ public class CustomGamePage : MonoBehaviour
         if (PlayerManager.Instance.NetworkType == NetworkingTypes.Riptide)
         {
             PlayButton.interactable = AOW.RiptideNetworking.NetworkManager.Instance.IsHost && !PlayerButtonWasPressed;
+        }
+        else if (PlayerManager.Instance.NetworkType == NetworkingTypes.Fishynet)
+        {
+            if (PlayerManager.Instance.ClientState == LocalConnectionStates.Started && PlayerManager.Instance.LocalPlayer != null)
+            {
+                PlayButton.interactable = PlayerManager.Instance.LocalPlayer.IsHost && !PlayerButtonWasPressed;
+            }
+            else if (PlayButton.interactable)
+            {
+                PlayButton.interactable = false;
+            }
+        }
+
+        if (PlayerManager.Instance.ClientState == LocalConnectionStates.Started)
+        {
+            PingTimer += Time.deltaTime;
+            if (PingTimer > 1)
+            {
+                PingTimer -= 1;
+                LockstepManager.Instance.PingHost();
+            }
         }
     }
 
@@ -365,6 +392,10 @@ public class CustomGamePage : MonoBehaviour
             message.AddBool(PlayerReady);
             AOW.RiptideNetworking.NetworkManager.Instance.Client.Send(message);
         }
+        else if (PlayerManager.Instance.NetworkType == NetworkingTypes.Fishynet)
+        {
+            PlayerManager.Instance.NetworkHelper.SendReady(PlayerManager.Instance.LocalPlayer, PlayerReady);
+        }
     }
 
     #region Ready RPC
@@ -424,6 +455,22 @@ public class CustomGamePage : MonoBehaviour
             Instance.OpponentReadyObject.gameObject.SetActive(Ready);
         }
     }
+    #endregion
+
+    #region Fishnet
+
+    public void LocalPlayerReady(bool Ready)
+    {
+        PlayerReady = Ready;
+        PlayerReadyObject.gameObject.SetActive(Ready);
+    }
+
+    public void OtherPlayerReady(bool Ready)
+    {
+        OpponentReady = Ready;
+        OpponentReadyObject.gameObject.SetActive(Ready);
+    }
+
     #endregion
 
     #endregion
@@ -594,6 +641,11 @@ public class CustomGamePage : MonoBehaviour
         {
             UiObject.SetActive(false);
         }
+
+        if (PlayerManager.Instance.NetworkType == NetworkingTypes.Fishynet)
+        {
+            PlayerManager.Instance.SpawnFishnetNetworkHelper();
+        }
     }
 
     public void FoundCustomGameOpponent(PlayerData Player)
@@ -646,7 +698,7 @@ public class CustomGamePage : MonoBehaviour
     public void SendGameData()
     {
         // RPC Call
-        Debug.Log("Client Sent - Send Game Data - Custom Game");
+        Debug.Log("Client Sent Race / Perk Data");
         if (PlayerManager.Instance.NetworkType == NetworkingTypes.Riptide)
         {
             Message message = Message.Create(MessageSendMode.reliable, AOW.RiptideNetworking.MessageId.SendCustomGameRacePerkData);
@@ -664,6 +716,26 @@ public class CustomGamePage : MonoBehaviour
             }
 
             AOW.RiptideNetworking.NetworkManager.Instance.Client.Send(message);
+        }
+        else if (PlayerManager.Instance.NetworkType == NetworkingTypes.Fishynet)
+        {
+            int SelectedPerk1 = -1;
+            int SelectedPerk2 = -1;
+            if (PlayerSelectedRace != null)
+            {
+                SelectedPerk1 = PlayerSelectedRace.GetPerkIndex(PlayerSelectedPerk1);
+                SelectedPerk2 = PlayerSelectedRace.GetPerkIndex(PlayerSelectedPerk2);
+            }
+
+            PreGameDataBroadcast MyData = new PreGameDataBroadcast()
+            {
+                SendFromPlayer = PlayerManager.Instance.LocalPlayer.PlayerID,
+                SelectedRaceIndex = RaceSelector.Instance.GetRaceIndex(PlayerSelectedRace),
+                SelectedPerk1Index = SelectedPerk1,
+                SelectedPerk2Index = SelectedPerk2,
+            };
+
+            InstanceFinder.ClientManager.Broadcast(MyData);
         }
     }
 
@@ -794,7 +866,99 @@ public class CustomGamePage : MonoBehaviour
 
     #endregion
 
+    #region Fishnet
+
+    public void BroadCastPlayDataToServer(NetworkConnection conn, PreGameDataBroadcast Data)
+    {
+        NetworkObject nob = conn.FirstObject;
+        if (nob == null)
+        {
+            return;
+        }
+
+        PreGameDataBroadcastResponse MyData = new PreGameDataBroadcastResponse()
+        {
+            SendFromPlayer = Data.SendFromPlayer,
+            SelectedRaceIndex = Data.SelectedRaceIndex,
+            SelectedPerk1Index = Data.SelectedPerk1Index,
+            SelectedPerk2Index = Data.SelectedPerk2Index,
+        };
+
+        Debug.Log("Server Sent Race / Perk Data");
+        InstanceFinder.ServerManager.Broadcast(nob, MyData);
+    }
+
+    public void BroadCastPlayDataToClients(PreGameDataBroadcastResponse Data)
+    {
+        Debug.Log($"Recieved Race / Perk Data {Data.SendFromPlayer}");
+        if (Data.SendFromPlayer != PlayerManager.Instance.LocalPlayer.PlayerID)
+        {
+            Debug.Log($"Use Race / Perk Data");
+            RaceDataScriptableObject SelectedRace;
+            Perk SelectedPerk1;
+            Perk SelectedPerk2;
+            if (Data.SelectedRaceIndex == -1 || Data.SelectedRaceIndex >= RaceSelector.Instance.RaceDataList.Count)
+            {
+                SelectedRace = null;
+            }
+            else
+            {
+                SelectedRace = RaceSelector.Instance.RaceDataList[Data.SelectedRaceIndex];
+            }
+
+            if (SelectedRace == null)
+            {
+                SelectedPerk1 = null;
+                SelectedPerk2 = null;
+            }
+            else
+            {
+                if (Data.SelectedPerk1Index == -1 || Data.SelectedPerk1Index >= SelectedRace.PossiblePerks.Count)
+                {
+                    SelectedPerk1 = null;
+                }
+                else
+                {
+                    SelectedPerk1 = SelectedRace.PossiblePerks[Data.SelectedPerk1Index];
+                }
+
+                if (Data.SelectedPerk2Index == -1 || Data.SelectedPerk2Index >= SelectedRace.PossiblePerks.Count)
+                {
+                    SelectedPerk2 = null;
+                }
+                else
+                {
+                    SelectedPerk2 = SelectedRace.PossiblePerks[Data.SelectedPerk2Index];
+                }
+            }
+
+            Instance.LoadOpponentPlayer(SelectedRace, SelectedPerk1, SelectedPerk2);
+        }
+        else
+        {
+            Debug.Log($"Don't Use Race / Perk Data");
+        }
+    }
+
     #endregion
+
+    #endregion
+}
+
+public struct PreGameDataBroadcast : IBroadcast
+{
+    public ushort SendFromPlayer;
+    public int SelectedRaceIndex;
+    public int SelectedPerk1Index;
+    public int SelectedPerk2Index;
+}
+
+public struct PreGameDataBroadcastResponse : IBroadcast
+{
+    public ushort SendFromPlayer;
+    public int SelectedRaceIndex;
+    public int SelectedPerk1Index;
+    public int SelectedPerk2Index;
 }
 
 public enum NetworkingTypes
