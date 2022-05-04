@@ -16,6 +16,7 @@ public class PlayerManager : MonoBehaviour
     public NetworkingTypes NetworkType = NetworkingTypes.Fishynet;
     public AOW.RiptideNetworking.NetworkManager RiptideNetworkManager;
     public FishNet.Managing.NetworkManager FishnetNetworkManager;
+    public AOW.DarkRift2.NetworkManagerDarkRift DarkriftManager;
     public FishnetNetworkHelper NetworkHelperPrefab;
     public FishnetNetworkHelper NetworkHelper { get; set;}
 
@@ -446,6 +447,10 @@ public class PlayerManager : MonoBehaviour
         {
             InstanceFinder.TransportManager.Transport.SetClientAddress(directConnectIp);
             InstanceFinder.ClientManager.StartConnection();
+        }
+        else if (NetworkType == NetworkingTypes.Riptide)
+        {
+            AOW.DarkRift2.NetworkManagerDarkRift.Instance.JoinGame(directConnectIp);
         }
     }
 

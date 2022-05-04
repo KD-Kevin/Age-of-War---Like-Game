@@ -5556,7 +5556,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 598285090}
   m_HandleRect: {fileID: 598285089}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -18625,6 +18625,91 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 606204938}
   m_CullTransparentMesh: 0
+--- !u!1 &607592391
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 607592392}
+  - component: {fileID: 607592394}
+  - component: {fileID: 607592393}
+  m_Layer: 0
+  m_Name: Darkrift 2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &607592392
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 607592391}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1667037154}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &607592393
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 607592391}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f9c23a563e9faa439366c4cd9a1e343, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Client: {fileID: 607592394}
+  KeepAveragePingOverSeconds: 10
+  playerPrefab: {fileID: 6626655243087335873, guid: 49e5212dbf059b843aa7ec833aef210b, type: 3}
+  localPlayerPrefab: {fileID: 3825994902970435639, guid: 275d847c84f101647a775109a6425354, type: 3}
+--- !u!114 &607592394
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 607592391}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d2b44c570cb28644b8762e0b13e7c23, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  host: 127.0.0.1
+  port: 4296
+  noDelay: 0
+  connectOnStart: 0
+  eventsFromDispatcher: 1
+  sniffData: 0
+  objectCacheSettings:
+    maxWriters: 2
+    maxReaders: 2
+    maxMessages: 4
+    maxMessageBuffers: 4
+    maxSocketAsyncEventArgs: 32
+    maxActionDispatcherTasks: 16
+    maxAutoRecyclingArrays: 4
+    extraSmallMemoryBlockSize: 16
+    maxExtraSmallMemoryBlocks: 2
+    smallMemoryBlockSize: 64
+    maxSmallMemoryBlocks: 2
+    mediumMemoryBlockSize: 256
+    maxMediumMemoryBlocks: 2
+    largeMemoryBlockSize: 1024
+    maxLargeMemoryBlocks: 2
+    extraLargeMemoryBlockSize: 4096
+    maxExtraLargeMemoryBlocks: 2
+    maxMessageReceivedEventArgs: 4
 --- !u!1 &609105909
 GameObject:
   m_ObjectHideFlags: 0
@@ -32186,11 +32271,12 @@ GameObject:
   - component: {fileID: 1211305127}
   - component: {fileID: 1211305131}
   - component: {fileID: 1211305130}
-  - component: {fileID: 1211305129}
   - component: {fileID: 1211305132}
   - component: {fileID: 1211305133}
   - component: {fileID: 1211305134}
   - component: {fileID: 1211305135}
+  - component: {fileID: 1211305136}
+  - component: {fileID: 1211305129}
   m_Layer: 0
   m_Name: Fishynet
   m_TagString: Untagged
@@ -32257,15 +32343,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1211305125}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6f48f002b825cbd45a19bd96d90f9edb, type: 3}
+  m_Script: {fileID: 11500000, guid: 4882e1f0baaa18a45836edebb1e6b881, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _unreliableMTU: 1023
-  _attackResponseType: 1
-  _port: 7770
-  _maximumClients: 4095
-  _clientAddress: localhost
-  _timeout: 15
+  settings: {fileID: 11400000, guid: 0551cd6bef78c294a90ac53418a0522b, type: 2}
 --- !u!114 &1211305130
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32278,7 +32359,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 34e4a322dca349547989b14021da4e23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Transport: {fileID: 1211305129}
+  Transport: {fileID: 1211305136}
 --- !u!114 &1211305131
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32356,6 +32437,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _changeFrameRate: 1
   _frameRate: 240
+--- !u!114 &1211305136
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1211305125}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3293827c1150b3b4587ba9a8cdf0a345, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _steamAppID: 480
+  _serverBindAddress: 
+  _port: 7770
+  _maximumClients: 9001
+  _peerToPeer: 1
+  _clientAddress: 
 --- !u!1 &1211547104
 GameObject:
   m_ObjectHideFlags: 0
@@ -45865,6 +45964,7 @@ MonoBehaviour:
   NetworkType: 1
   RiptideNetworkManager: {fileID: 1766968649}
   FishnetNetworkManager: {fileID: 1211305128}
+  DarkriftManager: {fileID: 607592393}
   NetworkHelperPrefab: {fileID: 1193315501137902656, guid: 1fb6451369c797f4f9466c0188b3f548, type: 3}
   ActiveOnlineMode: 0
   LocalPlayerData: {fileID: 11400000, guid: 673fe3e2632e3ed4e94151a696e946fd, type: 2}
@@ -45906,6 +46006,7 @@ Transform:
   m_Children:
   - {fileID: 1766968648}
   - {fileID: 1211305126}
+  - {fileID: 607592392}
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -45923,6 +46024,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TryToResendOnWait: 0
   AttemptGameTurnEvery: 40
+  KeepAveragePingOverSeconds: 10
   ActionTurnHistory:
     AllTurnsCompleted: []
 --- !u!1 &1668818620

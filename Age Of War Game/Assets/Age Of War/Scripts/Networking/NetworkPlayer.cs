@@ -6,6 +6,8 @@ using UnityEngine;
 using AOW.RiptideNetworking;
 using FishNet.Object.Synchronizing;
 using FishNet.Transporting;
+using DarkRift.Client;
+using DarkRift;
 
 public class NetworkPlayer : NetworkBehaviour
 {
@@ -75,7 +77,16 @@ public class NetworkPlayer : NetworkBehaviour
                 PlayerManager.Instance.ConnectedPlayers.Add(PlayerID, this);
             }
         }
-
+        else if (PlayerManager.Instance.NetworkType == NetworkingTypes.Darkrift2)
+        {
+            PlayerManager.Instance.DarkriftManager.DarkRiftClient.MessageReceived += MessageRecieved;
+            if (IsLocalPlayer)
+            {
+                UserName = PlayerManager.Instance.LocalPlayerData.Data.UserName;
+                PlayerManager.Instance.LocalPlayer = this;
+                SendChangeNameMessage();
+            }
+        }
     }
 
     private void OnDisable()
@@ -176,6 +187,76 @@ public class NetworkPlayer : NetworkBehaviour
 
     #endregion
 
+    #region Darkrift
+
+    public void SetPlayerID(ushort NewID)
+    {
+        if (!PlayerManager.Instance.ConnectedPlayers.ContainsKey(NewID))
+        {
+            PlayerManager.Instance.ConnectedPlayers.Add(NewID, this);
+        }
+        else
+        {
+            NetworkPlayer RemovedPlayer = PlayerManager.Instance.ConnectedPlayers[NewID];
+            PlayerManager.Instance.ConnectedPlayers.Remove(NewID);
+            PlayerManager.Instance.ConnectedPlayers.Add(NewID, this);
+
+            Debug.Log($"Player {RemovedPlayer.name}#{RemovedPlayer.GetInstanceID()} replaced with {UserName}#{RemovedPlayer.GetInstanceID()}");
+        }
+    }
+
+    public void SendChangeNameMessage()
+    {
+        using (DarkRiftWriter writer = DarkRiftWriter.Create())
+        {
+            writer.Write(PlayerID);
+            writer.Write(UserName);
+            using (DarkRift.Message message = (DarkRift.Message.Create(DarkRiftTags.UpdatePlayerName, writer)))
+            {
+                PlayerManager.Instance.DarkriftManager.DarkRiftClient.SendMessage(message, SendMode.Reliable);
+            }
+        }
+    }
+
+    public void MessageRecieved(object sender, MessageReceivedEventArgs e)
+    {
+        using (DarkRift.Message message = e.GetMessage() as DarkRift.Message)
+        {
+            //Spawn or despawn the player as necessary.
+            if (message.Tag == DarkRiftTags.UpdatePlayerName)
+            {
+                using (DarkRiftReader reader = message.GetReader())
+                {
+                    RecieveChangeNameMessage(reader);
+                }
+            }
+        }
+    }
+
+    public void RecieveChangeNameMessage(DarkRiftReader reader)
+    {
+        ushort ChangedPlayerID = reader.ReadUInt16();
+        if (ChangedPlayerID == PlayerID)
+        {
+            string UserName = reader.ReadString();
+            if (IsLocalPlayer)
+            {
+                gameObject.name = $"Local Player {PlayerID}: ({UserName})";
+            }
+            else
+            {
+                gameObject.name = $"Connecting Player {PlayerID}: ({UserName})";
+            }
+
+            if (PlayerID == 1)
+            {
+                gameObject.name += " (Host)";
+            }
+        }
+    }
+
+    #endregion
+
     #endregion
 
     #region Spawn RPC
@@ -231,7 +312,7 @@ public class NetworkPlayer : NetworkBehaviour
     {
         if (PlayerManager.Instance.NetworkType == NetworkingTypes.Riptide)
         {
-            Message message = Message.Create(MessageSendMode.reliable, MessageId.SpawnPlayer, shouldAutoRelay: true);
+            RiptideNetworking.Message message = RiptideNetworking.Message.Create(MessageSendMode.reliable, MessageId.SpawnPlayer, shouldAutoRelay: true);
             message.AddUShort(PlayerID);
             message.AddString(UserName);
             message.AddVector3(transform.position);
@@ -243,7 +324,7 @@ public class NetworkPlayer : NetworkBehaviour
     {
         if (PlayerManager.Instance.NetworkType == NetworkingTypes.Riptide)
         {
-            Message message = Message.Create(MessageSendMode.reliable, MessageId.SpawnPlayer);
+            RiptideNetworking.Message message = RiptideNetworking.Message.Create(MessageSendMode.reliable, MessageId.SpawnPlayer);
             message.AddUShort(newPlayerId);
             message.AddUShort(PlayerID);
             message.AddString(UserName);
@@ -255,10 +336,10 @@ public class NetworkPlayer : NetworkBehaviour
     #region Riptide
 
     [MessageHandler((ushort)MessageId.SpawnPlayer)]
-    private static void SpawnPlayer(ushort fromClientId, Message message)
+    private static void SpawnPlayer(ushort fromClientId, RiptideNetworking.Message message)
     {
         ushort newPlayerId = message.GetUShort();
-        Message messageToSend = Message.Create(MessageSendMode.reliable, MessageId.SpawnPlayer);
+        RiptideNetworking.Message messageToSend = RiptideNetworking.Message.Create(MessageSendMode.reliable, MessageId.SpawnPlayer);
         messageToSend.AddUShort(message.GetUShort());
         messageToSend.AddString(message.GetString());
         messageToSend.AddVector3(message.GetVector3());
@@ -266,7 +347,7 @@ public class NetworkPlayer : NetworkBehaviour
     }
 
     [MessageHandler((ushort)MessageId.SpawnPlayer)]
-    private static void SpawnPlayer(Message message)
+    private static void SpawnPlayer(RiptideNetworking.Message message)
     {
         Spawn(message.GetUShort(), message.GetString(), message.GetVector3());
     }

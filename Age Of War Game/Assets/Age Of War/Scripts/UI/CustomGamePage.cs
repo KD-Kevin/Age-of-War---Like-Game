@@ -10,6 +10,8 @@ using FishNet.Transporting;
 using FishNet.Broadcast;
 using FishNet.Connection;
 using FishNet.Object;
+using DarkRift;
+using DarkRift.Client;
 
 public class CustomGamePage : MonoBehaviour
 {
@@ -103,8 +105,15 @@ public class CustomGamePage : MonoBehaviour
     {
         PlayerButtonWasPressed = false;
         Instance = this;
-        InstanceFinder.NetworkManager.ServerManager.RegisterBroadcast<PreGameDataBroadcast>(BroadCastPlayDataToServer);
-        InstanceFinder.NetworkManager.ClientManager.RegisterBroadcast<PreGameDataBroadcastResponse>(BroadCastPlayDataToClients);
+        if (PlayerManager.Instance.NetworkType == NetworkingTypes.Fishynet)
+        {
+            InstanceFinder.NetworkManager.ServerManager.RegisterBroadcast<PreGameDataBroadcast>(BroadCastPlayDataToServer);
+            InstanceFinder.NetworkManager.ClientManager.RegisterBroadcast<PreGameDataBroadcastResponse>(BroadCastPlayDataToClients);
+        }
+        else if (PlayerManager.Instance.NetworkType == NetworkingTypes.Darkrift2)
+        {
+            PlayerManager.Instance.DarkriftManager.DarkRiftClient.MessageReceived += Client_MessageReceived;
+        }
     }
 
     private void OnDisable()
@@ -387,7 +396,7 @@ public class CustomGamePage : MonoBehaviour
         Debug.Log("Client Sent - Ready To Go - Custom Game");
         if (PlayerManager.Instance.NetworkType == NetworkingTypes.Riptide)
         {
-            Message message = Message.Create(MessageSendMode.reliable, AOW.RiptideNetworking.MessageId.ReadyButtonPressed);
+            RiptideNetworking.Message message = RiptideNetworking.Message.Create(MessageSendMode.reliable, AOW.RiptideNetworking.MessageId.ReadyButtonPressed);
             message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
             message.AddBool(PlayerReady);
             AOW.RiptideNetworking.NetworkManager.Instance.Client.Send(message);
@@ -396,6 +405,41 @@ public class CustomGamePage : MonoBehaviour
         {
             PlayerManager.Instance.NetworkHelper.SendReady(PlayerManager.Instance.LocalPlayer, PlayerReady);
         }
+        else if (PlayerManager.Instance.NetworkType == NetworkingTypes.Darkrift2)
+        {
+            using (DarkRiftWriter writer = DarkRiftWriter.Create())
+            {
+                writer.Write(PlayerManager.Instance.LocalPlayer.PlayerID);
+                writer.Write(PlayerReady);
+
+                using (DarkRift.Message message = DarkRift.Message.Create(DarkRiftTags.PlayerReady, writer))
+                {
+                    PlayerManager.Instance.DarkriftManager.DarkRiftClient.SendMessage(message, SendMode.Reliable);
+                }
+            }
+        }
+    }
+
+    void Client_MessageReceived(object sender, MessageReceivedEventArgs e)
+    {
+        using (DarkRift.Message message = e.GetMessage() as DarkRift.Message)
+        {
+            //Spawn or despawn the player as necessary.
+            if (message.Tag == DarkRiftTags.PlayerReady)
+            {
+                using (DarkRiftReader reader = message.GetReader())
+                {
+                    PlayerReadyMessage(reader);
+                }
+            }
+            else if (message.Tag == DarkRiftTags.SendCustomGamePagePlayerData)
+            {
+                using (DarkRiftReader reader = message.GetReader())
+                {
+                    RecievePlayerData(reader);
+                }
+            }
+        }
     }
 
     #region Ready RPC
@@ -403,11 +447,11 @@ public class CustomGamePage : MonoBehaviour
     #region Riptide
 
     [MessageHandler((ushort)AOW.RiptideNetworking.MessageId.ReadyButtonPressed)]
-    private static void ReadyButtonPressed(ushort fromClientId, Message message)
+    private static void ReadyButtonPressed(ushort fromClientId, RiptideNetworking.Message message)
     {
         Debug.Log("Server Recieved - Ready To Go - Custom Game");
         ushort newPlayerId = message.GetUShort();
-        Message messageToSend = Message.Create(MessageSendMode.reliable, AOW.RiptideNetworking.MessageId.ReadyButtonPressed);
+        RiptideNetworking.Message messageToSend = RiptideNetworking.Message.Create(MessageSendMode.reliable, AOW.RiptideNetworking.MessageId.ReadyButtonPressed);
         bool Ready = message.GetBool();
         messageToSend.AddUShort(newPlayerId);
         messageToSend.AddBool(Ready);
@@ -433,7 +477,7 @@ public class CustomGamePage : MonoBehaviour
     }
 
     [MessageHandler((ushort)AOW.RiptideNetworking.MessageId.ReadyButtonPressed)]
-    private static void SendConfirmation(Message message)
+    private static void SendConfirmation(RiptideNetworking.Message message)
     {
         if (AOW.RiptideNetworking.NetworkManager.Instance.IsHost)
         {
@@ -469,6 +513,26 @@ public class CustomGamePage : MonoBehaviour
     {
         OpponentReady = Ready;
         OpponentReadyObject.gameObject.SetActive(Ready);
+    }
+
+    #endregion
+
+    #region Darkrift
+
+    void PlayerReadyMessage(DarkRiftReader reader)
+    {
+        int confirmedPlayer = reader.ReadUInt16();
+        bool Ready = reader.ReadBoolean();
+        if (confirmedPlayer == PlayerManager.Instance.LocalPlayer.PlayerID)
+        {
+            Instance.PlayerReady = Ready;
+            Instance.PlayerReadyObject.gameObject.SetActive(Ready);
+        }
+        else
+        {
+            Instance.OpponentReady = Ready;
+            Instance.OpponentReadyObject.gameObject.SetActive(Ready);
+        }
     }
 
     #endregion
@@ -559,6 +623,10 @@ public class CustomGamePage : MonoBehaviour
             InstanceFinder.ClientManager.StartConnection();
             PlayerManager.Instance.SpawnFishnetNetworkHelper();
         }
+        else if (PlayerManager.Instance.NetworkType == NetworkingTypes.Darkrift2)
+        {
+            PlayerManager.Instance.DarkriftManager.StartHost();
+        }
         PlayerManager.Instance.RequestOpponentCustomGame(FoundCustomGameOpponent, CancelSearch);
     }
 
@@ -598,6 +666,10 @@ public class CustomGamePage : MonoBehaviour
             {
                 InstanceFinder.ServerManager.StopConnection(true);
             }
+        }
+        else if (PlayerManager.Instance.NetworkType == NetworkingTypes.Darkrift2)
+        {
+            AOW.DarkRift2.NetworkManagerDarkRift.Instance.LeaveGame();
         }
     }
 
@@ -693,7 +765,6 @@ public class CustomGamePage : MonoBehaviour
         }
     }
 
-
     #region Game Data RPC
     public void SendGameData()
     {
@@ -701,7 +772,7 @@ public class CustomGamePage : MonoBehaviour
         Debug.Log("Client Sent Race / Perk Data");
         if (PlayerManager.Instance.NetworkType == NetworkingTypes.Riptide)
         {
-            Message message = Message.Create(MessageSendMode.reliable, AOW.RiptideNetworking.MessageId.SendCustomGameRacePerkData);
+            RiptideNetworking.Message message = RiptideNetworking.Message.Create(MessageSendMode.reliable, AOW.RiptideNetworking.MessageId.SendCustomGameRacePerkData);
             message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
             message.AddInt(RaceSelector.Instance.GetRaceIndex(PlayerSelectedRace));
             if (PlayerSelectedRace != null)
@@ -737,16 +808,38 @@ public class CustomGamePage : MonoBehaviour
 
             InstanceFinder.ClientManager.Broadcast(MyData);
         }
+        else if (PlayerManager.Instance.NetworkType == NetworkingTypes.Darkrift2)
+        {
+            using (DarkRiftWriter writer = DarkRiftWriter.Create())
+            {
+                writer.Write(PlayerManager.Instance.LocalPlayer.PlayerID);
+                writer.Write(RaceSelector.Instance.GetRaceIndex(PlayerSelectedRace));
+                if (PlayerSelectedRace != null)
+                {
+                    writer.Write(PlayerSelectedRace.GetPerkIndex(PlayerSelectedPerk1));
+                    writer.Write(PlayerSelectedRace.GetPerkIndex(PlayerSelectedPerk2));
+                }
+                else
+                {
+                    writer.Write(-1);
+                    writer.Write(-1);
+                }
+                using (DarkRift.Message message = (DarkRift.Message.Create(DarkRiftTags.SendCustomGamePagePlayerData, writer)))
+                {
+                    PlayerManager.Instance.DarkriftManager.DarkRiftClient.SendMessage(message, SendMode.Reliable);
+                }
+            }
+        }
     }
 
     #region Riptide
 
     [MessageHandler((ushort)AOW.RiptideNetworking.MessageId.SendCustomGameRacePerkData)]
-    private static void SendGameData(ushort fromClientId, Message message)
+    private static void SendGameData(ushort fromClientId, RiptideNetworking.Message message)
     {
         Debug.Log("Server Recieved - Send Game Data - Custom Game");
         ushort newPlayerId = message.GetUShort();
-        Message messageToSend = Message.Create(MessageSendMode.reliable, AOW.RiptideNetworking.MessageId.SendCustomGameRacePerkData);
+        RiptideNetworking.Message messageToSend = RiptideNetworking.Message.Create(MessageSendMode.reliable, AOW.RiptideNetworking.MessageId.SendCustomGameRacePerkData);
         int RaceIndex = message.GetInt();
         int Perk1Index = message.GetInt();
         int Perk2Index = message.GetInt();
@@ -811,7 +904,7 @@ public class CustomGamePage : MonoBehaviour
     }
 
     [MessageHandler((ushort)AOW.RiptideNetworking.MessageId.SendCustomGameRacePerkData)]
-    private static void SendGameData(Message message)
+    private static void SendGameData(RiptideNetworking.Message message)
     {
         Debug.Log("Client Recieved - Send Game Data - Custom Game");
         if (AOW.RiptideNetworking.NetworkManager.Instance.IsHost)
@@ -890,10 +983,10 @@ public class CustomGamePage : MonoBehaviour
 
     public void BroadCastPlayDataToClients(PreGameDataBroadcastResponse Data)
     {
-        Debug.Log($"Recieved Race / Perk Data {Data.SendFromPlayer}");
+        //Debug.Log($"Recieved Race / Perk Data {Data.SendFromPlayer}");
         if (Data.SendFromPlayer != PlayerManager.Instance.LocalPlayer.PlayerID)
         {
-            Debug.Log($"Use Race / Perk Data");
+            //Debug.Log($"Use Race / Perk Data");
             RaceDataScriptableObject SelectedRace;
             Perk SelectedPerk1;
             Perk SelectedPerk2;
@@ -934,10 +1027,67 @@ public class CustomGamePage : MonoBehaviour
 
             Instance.LoadOpponentPlayer(SelectedRace, SelectedPerk1, SelectedPerk2);
         }
+        //else
+        //{
+        //    Debug.Log($"Don't Use Race / Perk Data");
+        //}
+    }
+
+    #endregion
+
+    #region Darkrift
+
+    public void RecievePlayerData(DarkRiftReader reader)
+    {
+        ushort PlayerID = reader.ReadUInt16();
+        if (PlayerID == PlayerManager.Instance.LocalPlayer.PlayerID)
+        {
+            return;
+        }
+
+        int RaceIndex = reader.ReadInt32();
+        int Perk1Index = reader.ReadInt32();
+        int Perk2Index = reader.ReadInt32();
+
+        RaceDataScriptableObject SelectedRace;
+        Perk SelectedPerk1;
+        Perk SelectedPerk2;
+        if (RaceIndex == -1 || RaceIndex >= RaceSelector.Instance.RaceDataList.Count)
+        {
+            SelectedRace = null;
+        }
         else
         {
-            Debug.Log($"Don't Use Race / Perk Data");
+            SelectedRace = RaceSelector.Instance.RaceDataList[RaceIndex];
         }
+
+        if (SelectedRace == null)
+        {
+            SelectedPerk1 = null;
+            SelectedPerk2 = null;
+        }
+        else
+        {
+            if (Perk1Index == -1 || Perk1Index >= SelectedRace.PossiblePerks.Count)
+            {
+                SelectedPerk1 = null;
+            }
+            else
+            {
+                SelectedPerk1 = SelectedRace.PossiblePerks[Perk1Index];
+            }
+
+            if (Perk2Index == -1 || Perk2Index >= SelectedRace.PossiblePerks.Count)
+            {
+                SelectedPerk2 = null;
+            }
+            else
+            {
+                SelectedPerk2 = SelectedRace.PossiblePerks[Perk2Index];
+            }
+        }
+
+        Instance.LoadOpponentPlayer(SelectedRace, SelectedPerk1, SelectedPerk2);
     }
 
     #endregion
