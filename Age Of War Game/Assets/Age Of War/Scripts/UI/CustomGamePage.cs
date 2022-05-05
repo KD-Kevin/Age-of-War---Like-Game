@@ -12,6 +12,7 @@ using FishNet.Connection;
 using FishNet.Object;
 using DarkRift;
 using DarkRift.Client;
+using HeathenEngineering.SteamworksIntegration;
 
 public class CustomGamePage : MonoBehaviour
 {
@@ -82,6 +83,8 @@ public class CustomGamePage : MonoBehaviour
     private Button HostButton;
     [SerializeField]
     private Button CancelHostButton;
+    [SerializeField]
+    private TextMeshProUGUI SteamLobbyRoomID;
 
     public RaceDataScriptableObject PlayerSelectedRace { get; set; }
     public Perk PlayerSelectedPerk1 { get; set; }
@@ -100,6 +103,7 @@ public class CustomGamePage : MonoBehaviour
     public static CustomGamePage Instance = null;
     private string DirectConnectString = "None";
     private float PingTimer = 0;
+    public Lobby CurrentLobby;
 
     private void Awake()
     {
@@ -169,6 +173,7 @@ public class CustomGamePage : MonoBehaviour
         OpponentSelectedRace = null;
         OpponentSelectedPerk1 = null;
         OpponentSelectedPerk2 = null;
+        SteamLobbyRoomID.text = $"Room ID: No Room";
 
         if (MultiplayerStatus == MultiplayStatus.Searching)
         {
@@ -554,7 +559,19 @@ public class CustomGamePage : MonoBehaviour
             {
                 AOW.RiptideNetworking.NetworkManager.Instance.LeaveGame();
             }
+            else if (PlayerManager.Instance.NetworkType == NetworkingTypes.Fishynet)
+            {
+                if (PlayerManager.Instance.ClientState != LocalConnectionStates.Stopped)
+                {
+                    InstanceFinder.ClientManager.StopConnection();
+                }
+                if (PlayerManager.Instance.ServerState != LocalConnectionStates.Stopped)
+                {
+                    InstanceFinder.ServerManager.StopConnection(true);
+                }
+            }
             gameObject.SetActive(false);
+            PlayerManager.Instance.SteamLobbyManager.Leave();
             return;
         }
 
@@ -622,12 +639,31 @@ public class CustomGamePage : MonoBehaviour
             InstanceFinder.ServerManager.StartConnection();
             InstanceFinder.ClientManager.StartConnection();
             PlayerManager.Instance.SpawnFishnetNetworkHelper();
+            PlayerManager.Instance.SteamLobbyManager.Create();
         }
         else if (PlayerManager.Instance.NetworkType == NetworkingTypes.Darkrift2)
         {
             PlayerManager.Instance.DarkriftManager.StartHost();
         }
         PlayerManager.Instance.RequestOpponentCustomGame(FoundCustomGameOpponent, CancelSearch);
+    }
+
+    public void OnRoomCreated(Lobby RoomCreated)
+    {
+        SteamLobbyRoomID.text = $"Room ID: {RoomCreated.id}";
+        CurrentLobby = RoomCreated;
+    }
+
+    public void OnRoomNotCreated()
+    {
+        SteamLobbyRoomID.text = $"Room ID: No Room";
+    }
+
+    public void OnRoomJoined(Lobby RoomCreated)
+    {
+        Debug.Log($"Joined Room {RoomCreated.id}");
+        SteamLobbyRoomID.text = $"Room ID: {RoomCreated.id}";
+        CurrentLobby = RoomCreated;
     }
 
     public void CancelButtonPressed()

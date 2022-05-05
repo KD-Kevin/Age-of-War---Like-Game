@@ -1,15 +1,11 @@
 using BitStrap;
 using RiptideNetworking;
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using FishNet.Object;
 using FishNet;
 using FishNet.Transporting;
+using HeathenEngineering.SteamworksIntegration;
 
 public class PlayerManager : MonoBehaviour
 {
@@ -17,6 +13,7 @@ public class PlayerManager : MonoBehaviour
     public AOW.RiptideNetworking.NetworkManager RiptideNetworkManager;
     public FishNet.Managing.NetworkManager FishnetNetworkManager;
     public AOW.DarkRift2.NetworkManagerDarkRift DarkriftManager;
+    public LobbyManager SteamLobbyManager;
     public FishnetNetworkHelper NetworkHelperPrefab;
     public FishnetNetworkHelper NetworkHelper { get; set;}
 
@@ -89,15 +86,17 @@ public class PlayerManager : MonoBehaviour
         if (NetworkType == NetworkingTypes.Riptide)
         {
             FishnetNetworkManager.gameObject.SetActive(false);
+            DarkriftManager.gameObject.SetActive(false);
         }
         else if (NetworkType == NetworkingTypes.Fishynet)
         {
             RiptideNetworkManager.gameObject.SetActive(false);
+            DarkriftManager.gameObject.SetActive(false);
             InstanceFinder.ServerManager.OnServerConnectionState += OnServerStateChange;
             InstanceFinder.ClientManager.OnClientConnectionState += OnClientConnectionStateChange;
             SceneLoadManager.Instance.InitializeBroadcasts();
         }
-        else if (NetworkType == NetworkingTypes.Riptide)
+        else if (NetworkType == NetworkingTypes.Darkrift2)
         {
             RiptideNetworkManager.gameObject.SetActive(false);
             FishnetNetworkManager.gameObject.SetActive(false);
@@ -406,6 +405,31 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
+    // Steam
+    public void OnRoomCreated(Lobby RoomCreated)
+    {
+        if (ActiveOnlineMode == PlayModes.CustomGame)
+        {
+            CustomGamePage.Instance.OnRoomCreated(RoomCreated);
+        }
+    }
+
+    public void OnRoomJoined(Lobby Room)
+    {
+        if (ActiveOnlineMode == PlayModes.CustomGame)
+        {
+            CustomGamePage.Instance.OnRoomJoined(Room);
+        }
+    }
+
+    public void OnRoomNotCreated()
+    {
+        if (ActiveOnlineMode == PlayModes.CustomGame)
+        {
+            CustomGamePage.Instance.OnRoomNotCreated();
+        }
+    }
+
     // Quickplay
     public void RequestOpponentQuickplay(System.Action<PlayerData> FindPlayer, System.Action CannotFindPlayer)
     {
@@ -445,8 +469,9 @@ public class PlayerManager : MonoBehaviour
         }
         else if (NetworkType == NetworkingTypes.Fishynet)
         {
-            InstanceFinder.TransportManager.Transport.SetClientAddress(directConnectIp);
-            InstanceFinder.ClientManager.StartConnection();
+            //InstanceFinder.TransportManager.Transport.SetClientAddress(directConnectIp);
+            //InstanceFinder.ClientManager.StartConnection();
+            SteamLobbyManager.Join(directConnectIp);
         }
         else if (NetworkType == NetworkingTypes.Riptide)
         {

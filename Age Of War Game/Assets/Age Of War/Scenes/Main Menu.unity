@@ -2739,7 +2739,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Enter IP
+  m_text: Room ID
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4bd810f1cbcb0f446a8f5a31453e243f, type: 2}
   m_sharedMaterial: {fileID: 21539420542967178, guid: 4bd810f1cbcb0f446a8f5a31453e243f, type: 2}
@@ -5556,7 +5556,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 598285090}
   m_HandleRect: {fileID: 598285089}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -15416,7 +15416,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &517816660
 RectTransform:
   m_ObjectHideFlags: 0
@@ -15451,6 +15451,7 @@ RectTransform:
   - {fileID: 278229485}
   - {fileID: 759031288}
   - {fileID: 1886022467}
+  - {fileID: 688752901}
   m_Father: {fileID: 391967150}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -15549,6 +15550,7 @@ MonoBehaviour:
   OpponentReadyObject: {fileID: 1710593164}
   HostButton: {fileID: 759031290}
   CancelHostButton: {fileID: 1886022469}
+  SteamLobbyRoomID: {fileID: 688752902}
 --- !u!1 &519130190
 GameObject:
   m_ObjectHideFlags: 0
@@ -19804,6 +19806,140 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 686525066}
+  m_CullTransparentMesh: 1
+--- !u!1 &688752900
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 688752901}
+  - component: {fileID: 688752903}
+  - component: {fileID: 688752902}
+  m_Layer: 5
+  m_Name: Room ID
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &688752901
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 688752900}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 517816660}
+  m_RootOrder: 23
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 0, y: 0.5}
+  m_AnchoredPosition: {x: 948, y: 484.5}
+  m_SizeDelta: {x: 500, y: 50}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &688752902
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 688752900}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_text: 'Room ID: 23ddf'
+  m_isRightToLeft: 0
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontSharedMaterials: []
+  m_fontMaterial: {fileID: 0}
+  m_fontMaterials: []
+  m_fontColor32:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+  m_enableVertexGradient: 0
+  m_colorMode: 3
+  m_fontColorGradient:
+    topLeft: {r: 1, g: 1, b: 1, a: 1}
+    topRight: {r: 1, g: 1, b: 1, a: 1}
+    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
+    bottomRight: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColorGradientPreset: {fileID: 0}
+  m_spriteAsset: {fileID: 0}
+  m_tintAllSprites: 0
+  m_StyleSheet: {fileID: 0}
+  m_TextStyleHashCode: -1183493901
+  m_overrideHtmlColors: 0
+  m_faceColor:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontSize: 36
+  m_fontSizeBase: 36
+  m_fontWeight: 400
+  m_enableAutoSizing: 0
+  m_fontSizeMin: 18
+  m_fontSizeMax: 72
+  m_fontStyle: 0
+  m_HorizontalAlignment: 1
+  m_VerticalAlignment: 256
+  m_textAlignment: 65535
+  m_characterSpacing: 0
+  m_wordSpacing: 0
+  m_lineSpacing: 0
+  m_lineSpacingMax: 0
+  m_paragraphSpacing: 0
+  m_charWidthMaxAdj: 0
+  m_enableWordWrapping: 1
+  m_wordWrappingRatios: 0.4
+  m_overflowMode: 0
+  m_linkedTextComponent: {fileID: 0}
+  parentLinkedComponent: {fileID: 0}
+  m_enableKerning: 1
+  m_enableExtraPadding: 0
+  checkPaddingRequired: 0
+  m_isRichText: 1
+  m_parseCtrlCharacters: 1
+  m_isOrthographic: 1
+  m_isCullingEnabled: 0
+  m_horizontalMapping: 0
+  m_verticalMapping: 0
+  m_uvLineOffset: 0
+  m_geometrySortingOrder: 0
+  m_IsTextObjectScaleStatic: 0
+  m_VertexBufferAutoSizeReduction: 0
+  m_useMaxVisibleDescender: 1
+  m_pageToDisplay: 1
+  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_isUsingLegacyAnimationComponent: 0
+  m_isVolumetricText: 0
+  m_hasFontAssetChanged: 0
+  m_baseMaterial: {fileID: 0}
+  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!222 &688752903
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 688752900}
   m_CullTransparentMesh: 1
 --- !u!1 &697433822
 GameObject:
@@ -28072,7 +28208,7 @@ GameObject:
   - component: {fileID: 1002981832}
   - component: {fileID: 1002981831}
   m_Layer: 5
-  m_Name: Enter Ip
+  m_Name: Enter Ip / Room ID
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -32277,6 +32413,7 @@ GameObject:
   - component: {fileID: 1211305135}
   - component: {fileID: 1211305136}
   - component: {fileID: 1211305129}
+  - component: {fileID: 1211305137}
   m_Layer: 0
   m_Name: Fishynet
   m_TagString: Untagged
@@ -32452,9 +32589,106 @@ MonoBehaviour:
   _steamAppID: 480
   _serverBindAddress: 
   _port: 7770
-  _maximumClients: 9001
+  _maximumClients: 10
   _peerToPeer: 1
   _clientAddress: 
+--- !u!114 &1211305137
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1211305125}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f314bc6f3466b54da82e29cdd36fe44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  searchArguments:
+    slots: -1
+    distance: 3
+    nearValues: []
+    numericFilters: []
+    stringFilters: []
+  createArguments:
+    name: Direct Connect
+    slots: 2
+    type: 2
+    metadata:
+    - key: Version
+      value: 0.0.0.1
+  evtFound:
+    m_PersistentCalls:
+      m_Calls: []
+  evtEnterSuccess:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1667037153}
+        m_TargetAssemblyTypeName: PlayerManager, Assembly-CSharp
+        m_MethodName: OnRoomJoined
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  evtEnterFailed:
+    m_PersistentCalls:
+      m_Calls: []
+  evtCreated:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1667037153}
+        m_TargetAssemblyTypeName: PlayerManager, Assembly-CSharp
+        m_MethodName: OnRoomCreated
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  evtCreateFailed:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1667037153}
+        m_TargetAssemblyTypeName: PlayerManager, Assembly-CSharp
+        m_MethodName: OnRoomNotCreated
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  evtQuickMatchFailed:
+    m_PersistentCalls:
+      m_Calls: []
+  evtDataUpdated:
+    m_PersistentCalls:
+      m_Calls: []
+  evtLeave:
+    m_PersistentCalls:
+      m_Calls: []
+  evtAskedToLeave:
+    m_PersistentCalls:
+      m_Calls: []
+  evtGameCreated:
+    m_PersistentCalls:
+      m_Calls: []
+  evtUserJoined:
+    m_PersistentCalls:
+      m_Calls: []
+  evtUserLeft:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1211547104
 GameObject:
   m_ObjectHideFlags: 0
@@ -45965,6 +46199,7 @@ MonoBehaviour:
   RiptideNetworkManager: {fileID: 1766968649}
   FishnetNetworkManager: {fileID: 1211305128}
   DarkriftManager: {fileID: 607592393}
+  SteamLobbyManager: {fileID: 1211305137}
   NetworkHelperPrefab: {fileID: 1193315501137902656, guid: 1fb6451369c797f4f9466c0188b3f548, type: 3}
   ActiveOnlineMode: 0
   LocalPlayerData: {fileID: 11400000, guid: 673fe3e2632e3ed4e94151a696e946fd, type: 2}
