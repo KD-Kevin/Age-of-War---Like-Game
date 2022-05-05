@@ -10,6 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 8443018017619345154}
   - component: {fileID: 3825994902970435639}
+  - component: {fileID: 7513064928938257945}
+  - component: {fileID: 7070176357915511477}
   m_Layer: 0
   m_Name: Network Local Player
   m_TagString: Untagged
@@ -43,8 +45,53 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af868201c53ae5b45b873213d69cd90f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _componentIndexCache: 0
+  _addedNetworkObject: {fileID: 7513064928938257945}
+  _networkObjectCache: {fileID: 7513064928938257945}
   PlayerID: 0
   IsLocalPlayer: 0
-  ReadyForNextTurn: 0
   ReadyToStart: 0
   UserName: Guest
+--- !u!114 &7513064928938257945
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 106270055460443094}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26b716c41e9b56b4baafaf13a523ba2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  NetworkObserver: {fileID: 0}
+  _prefabId: -1
+  _scenePathHash: 0
+  _sceneId: 0
+  _sceneNetworkObjects: []
+  _networkBehaviours:
+  - {fileID: 3825994902970435639}
+  - {fileID: 7070176357915511477}
+  SceneTransformProperties:
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0, w: 1}
+    LocalScale: {x: 1, y: 1, z: 1}
+  _isNetworked: 1
+  ChildNetworkObjects: []
+--- !u!114 &7070176357915511477
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 106270055460443094}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c71fd7f855ec523429999fc4e14a1928, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _componentIndexCache: 1
+  _addedNetworkObject: {fileID: 7513064928938257945}
+  _networkObjectCache: {fileID: 7513064928938257945}
+  _overrideType: 3
+  _observerConditions: []
