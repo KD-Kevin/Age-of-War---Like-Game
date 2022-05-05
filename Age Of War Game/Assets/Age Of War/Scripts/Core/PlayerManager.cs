@@ -79,6 +79,23 @@ public class PlayerManager : MonoBehaviour
                 LocalPlayerData.Data = LoadedData;
             }
         }
+
+        // Check Steam Info
+        try
+        {
+            string SteamUsername = UserData.Me.Nickname;
+            if (SavedUserName != SteamUsername)
+            {
+                PlayerPrefs.SetString("SaveName", SteamUsername);
+                LocalPlayerData.Data.UserName = SteamUsername;
+                LocalPlayerData.Data.SaveLocal(SteamUsername);
+            }
+            Debug.Log($"Loaded Steam Username {SteamUsername}");
+        }
+        catch
+        {
+            Debug.Log("Could not Get Steam Username");
+        }
     }
 
     private void Start()

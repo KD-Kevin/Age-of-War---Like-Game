@@ -15416,7 +15416,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &517816660
 RectTransform:
   m_ObjectHideFlags: 0
@@ -15551,6 +15551,9 @@ MonoBehaviour:
   HostButton: {fileID: 759031290}
   CancelHostButton: {fileID: 1886022469}
   SteamLobbyRoomID: {fileID: 688752902}
+  CurrentLobby:
+    id:
+      m_SteamID: 0
 --- !u!1 &519130190
 GameObject:
   m_ObjectHideFlags: 0
