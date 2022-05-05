@@ -651,6 +651,7 @@ public class CustomGamePage : MonoBehaviour
     public void OnRoomCreated(Lobby RoomCreated)
     {
         SteamLobbyRoomID.text = $"Room ID: {RoomCreated.id}";
+      
         CurrentLobby = RoomCreated;
     }
 
@@ -664,6 +665,11 @@ public class CustomGamePage : MonoBehaviour
         Debug.Log($"Joined Room {RoomCreated.id}");
         SteamLobbyRoomID.text = $"Room ID: {RoomCreated.id}";
         CurrentLobby = RoomCreated;
+    }
+
+    public void CopyRoomIDToClipboard()
+    {
+        GUIUtility.systemCopyBuffer = $"{CurrentLobby.id}";
     }
 
     public void CancelButtonPressed()
