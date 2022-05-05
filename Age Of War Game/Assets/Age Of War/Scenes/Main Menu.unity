@@ -32946,7 +32946,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _steamAppID: 480
   _serverBindAddress: 
-  _port: 7770
+  _port: 12345
   _maximumClients: 10
   _peerToPeer: 1
   _clientAddress: 
