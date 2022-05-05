@@ -438,7 +438,7 @@ public class PlayerManager : MonoBehaviour
             CustomGamePage.Instance.OnRoomJoined(Room);
         }
 
-        FishnetNetworkManager.ClientManager.StartConnection(Room.GameServer.IpAddress);
+        FishnetNetworkManager.ClientManager.StartConnection(Room.Owner.user.cSteamId.m_SteamID.ToString());
     }
 
     public void OnRoomNotCreated()

@@ -16,7 +16,7 @@ MonoBehaviour:
     m_AppId: 480
   isDebugging: 1
   server:
-    autoInitalize: 0
+    autoInitalize: 1
     autoLogon: 0
     ip: 0
     queryPort: 27016
@@ -29,7 +29,7 @@ MonoBehaviour:
     enableHeartbeats: 1
     supportSpectators: 0
     spectatorServerName: Usually GameDescription + Spectator
-    anonymousServerLogin: 0
+    anonymousServerLogin: 1
     gameServerToken: See https://steamcommunity.com/dev/managegameservers
     isPasswordProtected: 0
     serverName: My Server Name
