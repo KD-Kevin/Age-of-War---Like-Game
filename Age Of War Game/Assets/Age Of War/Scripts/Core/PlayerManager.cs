@@ -84,10 +84,10 @@ public class PlayerManager : MonoBehaviour
         try
         {
             string SteamUsername = UserData.Me.Nickname;
+            LocalPlayerData.Data.UserName = SteamUsername;
             if (SavedUserName != SteamUsername)
             {
                 PlayerPrefs.SetString("SaveName", SteamUsername);
-                LocalPlayerData.Data.UserName = SteamUsername;
                 LocalPlayerData.Data.SaveLocal(SteamUsername);
             }
             Debug.Log($"Loaded Steam Username {SteamUsername}");
