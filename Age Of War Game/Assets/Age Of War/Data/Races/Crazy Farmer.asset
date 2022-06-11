@@ -18,15 +18,16 @@ MonoBehaviour:
     amount of turkeys in a wide range of battle assets.
   CampainSceneName: CrazyFarmerCampaign
   DisplaySprite: {fileID: 21300000, guid: b7414fdd0411d364ab74c963a05b62d3, type: 3}
+  RaceType: 0
   RaceSpecificUiPrefab: {fileID: 0}
   BaseBlueprint: {fileID: 0}
   Ultimates: []
   PossiblePerks: []
   StartingUnitsBlueprints:
-  - {fileID: 6349147188241674974, guid: 069babf77dd68c14fbc9c99c81d035fe, type: 3}
-  - {fileID: 6349147188241674974, guid: 069babf77dd68c14fbc9c99c81d035fe, type: 3}
-  - {fileID: 6349147188241674974, guid: 069babf77dd68c14fbc9c99c81d035fe, type: 3}
-  - {fileID: 6349147188241674974, guid: 069babf77dd68c14fbc9c99c81d035fe, type: 3}
+  - {fileID: 7650381709119104208, guid: 069babf77dd68c14fbc9c99c81d035fe, type: 3}
+  - {fileID: 7650381709119104208, guid: 069babf77dd68c14fbc9c99c81d035fe, type: 3}
+  - {fileID: 7650381709119104208, guid: 069babf77dd68c14fbc9c99c81d035fe, type: 3}
+  - {fileID: 7650381709119104208, guid: 069babf77dd68c14fbc9c99c81d035fe, type: 3}
   StartingTowerWeaponBlueprints: []
   UnlockableTowerWeaponBlueprints: []
   StartingFloorWeaponBlueprints: []
