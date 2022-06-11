@@ -150,7 +150,7 @@ namespace AOW.RiptideNetworking
         private void DidConnect(object sender, EventArgs e)
         {
             PingHost(true);
-            NetworkPlayer.Spawn(Client.Id, PlayerManager.Instance.LocalPlayerData.Data.UserName, Vector3.zero, true);
+            //NetworkPlayer.Spawn(Client.Id, PlayerManager.Instance.LocalPlayerData.Data.UserName, Vector3.zero, true);
         }
 
         private void FailedToConnect(object sender, EventArgs e)
@@ -160,7 +160,7 @@ namespace AOW.RiptideNetworking
 
         private void PlayerJoined(object sender, ClientConnectedEventArgs e)
         {
-            PlayerManager.Instance.ConnectedPlayers[Client.Id].SendSpawn(e.Id);
+            //PlayerManager.Instance.ConnectedPlayers[Client.Id].SendSpawn(e.Id);
         }
 
         private void PlayerLeft(object sender, ClientDisconnectedEventArgs e)

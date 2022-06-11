@@ -109,15 +109,8 @@ public class CustomGamePage : MonoBehaviour
     {
         PlayerButtonWasPressed = false;
         Instance = this;
-        if (PlayerManager.Instance.NetworkType == NetworkingTypes.Fishynet)
-        {
-            InstanceFinder.NetworkManager.ServerManager.RegisterBroadcast<PreGameDataBroadcast>(BroadCastPlayDataToServer);
-            InstanceFinder.NetworkManager.ClientManager.RegisterBroadcast<PreGameDataBroadcastResponse>(BroadCastPlayDataToClients);
-        }
-        else if (PlayerManager.Instance.NetworkType == NetworkingTypes.Darkrift2)
-        {
-            PlayerManager.Instance.DarkriftManager.DarkRiftClient.MessageReceived += Client_MessageReceived;
-        }
+        InstanceFinder.NetworkManager.ServerManager.RegisterBroadcast<PreGameDataBroadcast>(BroadCastPlayDataToServer);
+        InstanceFinder.NetworkManager.ClientManager.RegisterBroadcast<PreGameDataBroadcastResponse>(BroadCastPlayDataToClients);
     }
 
     private void OnDisable()
@@ -130,20 +123,13 @@ public class CustomGamePage : MonoBehaviour
 
     private void Update()
     {
-        if (PlayerManager.Instance.NetworkType == NetworkingTypes.Riptide)
+        if (PlayerManager.Instance.ClientState == LocalConnectionStates.Started && PlayerManager.Instance.LocalPlayer != null)
         {
-            PlayButton.interactable = AOW.RiptideNetworking.NetworkManager.Instance.IsHost && !PlayerButtonWasPressed;
+            PlayButton.interactable = PlayerManager.Instance.LocalPlayer.IsHost && !PlayerButtonWasPressed;
         }
-        else if (PlayerManager.Instance.NetworkType == NetworkingTypes.Fishynet)
+        else if (PlayButton.interactable)
         {
-            if (PlayerManager.Instance.ClientState == LocalConnectionStates.Started && PlayerManager.Instance.LocalPlayer != null)
-            {
-                PlayButton.interactable = PlayerManager.Instance.LocalPlayer.IsHost && !PlayerButtonWasPressed;
-            }
-            else if (PlayButton.interactable)
-            {
-                PlayButton.interactable = false;
-            }
+            PlayButton.interactable = false;
         }
 
         if (PlayerManager.Instance.ClientState == LocalConnectionStates.Started)
@@ -399,112 +385,11 @@ public class CustomGamePage : MonoBehaviour
 
         // RPC Call
         Debug.Log("Client Sent - Ready To Go - Custom Game");
-        if (PlayerManager.Instance.NetworkType == NetworkingTypes.Riptide)
-        {
-            RiptideNetworking.Message message = RiptideNetworking.Message.Create(MessageSendMode.reliable, AOW.RiptideNetworking.MessageId.ReadyButtonPressed);
-            message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
-            message.AddBool(PlayerReady);
-            AOW.RiptideNetworking.NetworkManager.Instance.Client.Send(message);
-        }
-        else if (PlayerManager.Instance.NetworkType == NetworkingTypes.Fishynet)
-        {
-            PlayerManager.Instance.NetworkHelper.SendReady(PlayerManager.Instance.LocalPlayer, PlayerReady);
-        }
-        else if (PlayerManager.Instance.NetworkType == NetworkingTypes.Darkrift2)
-        {
-            using (DarkRiftWriter writer = DarkRiftWriter.Create())
-            {
-                writer.Write(PlayerManager.Instance.LocalPlayer.PlayerID);
-                writer.Write(PlayerReady);
-
-                using (DarkRift.Message message = DarkRift.Message.Create(DarkRiftTags.PlayerReady, writer))
-                {
-                    PlayerManager.Instance.DarkriftManager.DarkRiftClient.SendMessage(message, SendMode.Reliable);
-                }
-            }
-        }
+        PlayerManager.Instance.NetworkHelper.SendReady(PlayerManager.Instance.LocalPlayer, PlayerReady);
     }
 
-    void Client_MessageReceived(object sender, MessageReceivedEventArgs e)
-    {
-        using (DarkRift.Message message = e.GetMessage() as DarkRift.Message)
-        {
-            //Spawn or despawn the player as necessary.
-            if (message.Tag == DarkRiftTags.PlayerReady)
-            {
-                using (DarkRiftReader reader = message.GetReader())
-                {
-                    PlayerReadyMessage(reader);
-                }
-            }
-            else if (message.Tag == DarkRiftTags.SendCustomGamePagePlayerData)
-            {
-                using (DarkRiftReader reader = message.GetReader())
-                {
-                    RecievePlayerData(reader);
-                }
-            }
-        }
-    }
 
     #region Ready RPC
-
-    #region Riptide
-
-    [MessageHandler((ushort)AOW.RiptideNetworking.MessageId.ReadyButtonPressed)]
-    private static void ReadyButtonPressed(ushort fromClientId, RiptideNetworking.Message message)
-    {
-        Debug.Log("Server Recieved - Ready To Go - Custom Game");
-        ushort newPlayerId = message.GetUShort();
-        RiptideNetworking.Message messageToSend = RiptideNetworking.Message.Create(MessageSendMode.reliable, AOW.RiptideNetworking.MessageId.ReadyButtonPressed);
-        bool Ready = message.GetBool();
-        messageToSend.AddUShort(newPlayerId);
-        messageToSend.AddBool(Ready);
-        foreach (NetworkPlayer player in PlayerManager.Instance.ConnectedPlayers.Values)
-        {
-            if (player == PlayerManager.Instance.LocalPlayer)
-            {
-                continue;
-            }
-            AOW.RiptideNetworking.NetworkManager.Instance.Server.Send(messageToSend, player.PlayerID);
-        }
-
-        if (newPlayerId == PlayerManager.Instance.LocalPlayer.PlayerID)
-        {
-            Instance.PlayerReady = Ready;
-            Instance.PlayerReadyObject.gameObject.SetActive(Ready);
-        }
-        else
-        {
-            Instance.OpponentReady = Ready;
-            Instance.OpponentReadyObject.gameObject.SetActive(Ready);
-        }
-    }
-
-    [MessageHandler((ushort)AOW.RiptideNetworking.MessageId.ReadyButtonPressed)]
-    private static void SendConfirmation(RiptideNetworking.Message message)
-    {
-        if (AOW.RiptideNetworking.NetworkManager.Instance.IsHost)
-        {
-            return;
-        }
-        ushort confirmedPlayer = message.GetUShort();
-        
-        bool Ready = message.GetBool();
-        Debug.Log("Client Recieved - Ready To Go - Custom Game");
-
-        if (confirmedPlayer == PlayerManager.Instance.LocalPlayer.PlayerID)
-        {
-            Instance.PlayerReady = Ready;
-            Instance.PlayerReadyObject.gameObject.SetActive(Ready);
-        }
-        else
-        {
-            Instance.OpponentReady = Ready;
-            Instance.OpponentReadyObject.gameObject.SetActive(Ready);
-        }
-    }
-    #endregion
 
     #region Fishnet
 
@@ -522,26 +407,6 @@ public class CustomGamePage : MonoBehaviour
 
     #endregion
 
-    #region Darkrift
-
-    void PlayerReadyMessage(DarkRiftReader reader)
-    {
-        int confirmedPlayer = reader.ReadUInt16();
-        bool Ready = reader.ReadBoolean();
-        if (confirmedPlayer == PlayerManager.Instance.LocalPlayer.PlayerID)
-        {
-            Instance.PlayerReady = Ready;
-            Instance.PlayerReadyObject.gameObject.SetActive(Ready);
-        }
-        else
-        {
-            Instance.OpponentReady = Ready;
-            Instance.OpponentReadyObject.gameObject.SetActive(Ready);
-        }
-    }
-
-    #endregion
-
     #endregion
 
     public void BackButtonPressed()
@@ -555,20 +420,13 @@ public class CustomGamePage : MonoBehaviour
         {
             // Forfiet match?
             MultiplayerStatus = MultiplayStatus.NoSearching;
-            if (PlayerManager.Instance.NetworkType == NetworkingTypes.Riptide)
+            if (PlayerManager.Instance.ClientState != LocalConnectionStates.Stopped)
             {
-                AOW.RiptideNetworking.NetworkManager.Instance.LeaveGame();
+                InstanceFinder.ClientManager.StopConnection();
             }
-            else if (PlayerManager.Instance.NetworkType == NetworkingTypes.Fishynet)
+            if (PlayerManager.Instance.ServerState != LocalConnectionStates.Stopped)
             {
-                if (PlayerManager.Instance.ClientState != LocalConnectionStates.Stopped)
-                {
-                    InstanceFinder.ClientManager.StopConnection();
-                }
-                if (PlayerManager.Instance.ServerState != LocalConnectionStates.Stopped)
-                {
-                    InstanceFinder.ServerManager.StopConnection(true);
-                }
+                InstanceFinder.ServerManager.StopConnection(true);
             }
             gameObject.SetActive(false);
             PlayerManager.Instance.SteamLobbyManager.Leave();
@@ -576,12 +434,9 @@ public class CustomGamePage : MonoBehaviour
         }
 
         MultiplayerStatus = MultiplayStatus.NoSearching;
-        if (PlayerManager.Instance.NetworkType == NetworkingTypes.Riptide)
+        if (AOW.RiptideNetworking.NetworkManager.Instance.Server.IsRunning)
         {
-            if (AOW.RiptideNetworking.NetworkManager.Instance.Server.IsRunning)
-            {
-                AOW.RiptideNetworking.NetworkManager.Instance.LeaveGame();
-            }
+            AOW.RiptideNetworking.NetworkManager.Instance.LeaveGame();
         }
 
         gameObject.SetActive(false);
@@ -630,21 +485,10 @@ public class CustomGamePage : MonoBehaviour
             UiObject.SetActive(false);
         }
 
-        if (PlayerManager.Instance.NetworkType == NetworkingTypes.Riptide)
-        {
-            AOW.RiptideNetworking.NetworkManager.Instance.StartHost();
-        }
-        else if (PlayerManager.Instance.NetworkType == NetworkingTypes.Fishynet)
-        {
-            InstanceFinder.ServerManager.StartConnection();
-            InstanceFinder.ClientManager.StartConnection();
-            PlayerManager.Instance.SpawnFishnetNetworkHelper();
-            PlayerManager.Instance.SteamLobbyManager.Create();
-        }
-        else if (PlayerManager.Instance.NetworkType == NetworkingTypes.Darkrift2)
-        {
-            PlayerManager.Instance.DarkriftManager.StartHost();
-        }
+        InstanceFinder.ServerManager.StartConnection();
+        InstanceFinder.ClientManager.StartConnection();
+        PlayerManager.Instance.SpawnFishnetNetworkHelper();
+        PlayerManager.Instance.SteamLobbyManager.Create();
         PlayerManager.Instance.RequestOpponentCustomGame(FoundCustomGameOpponent, CancelSearch);
     }
 
@@ -694,24 +538,14 @@ public class CustomGamePage : MonoBehaviour
             UiObject.SetActive(false);
         }
 
-        if (PlayerManager.Instance.NetworkType == NetworkingTypes.Riptide)
+
+        if (PlayerManager.Instance.ClientState != LocalConnectionStates.Stopped)
         {
-            AOW.RiptideNetworking.NetworkManager.Instance.LeaveGame();
+            InstanceFinder.ClientManager.StopConnection();
         }
-        else if (PlayerManager.Instance.NetworkType == NetworkingTypes.Fishynet)
+        if (PlayerManager.Instance.ServerState != LocalConnectionStates.Stopped)
         {
-            if (PlayerManager.Instance.ClientState != LocalConnectionStates.Stopped)
-            {
-                InstanceFinder.ClientManager.StopConnection();
-            }
-            if (PlayerManager.Instance.ServerState != LocalConnectionStates.Stopped)
-            {
-                InstanceFinder.ServerManager.StopConnection(true);
-            }
-        }
-        else if (PlayerManager.Instance.NetworkType == NetworkingTypes.Darkrift2)
-        {
-            AOW.DarkRift2.NetworkManagerDarkRift.Instance.LeaveGame();
+            InstanceFinder.ServerManager.StopConnection(true);
         }
     }
 
@@ -756,10 +590,7 @@ public class CustomGamePage : MonoBehaviour
             UiObject.SetActive(false);
         }
 
-        if (PlayerManager.Instance.NetworkType == NetworkingTypes.Fishynet)
-        {
-            PlayerManager.Instance.SpawnFishnetNetworkHelper();
-        }
+        PlayerManager.Instance.SpawnFishnetNetworkHelper();
     }
 
     public void FoundCustomGameOpponent(PlayerData Player)
@@ -812,194 +643,25 @@ public class CustomGamePage : MonoBehaviour
     {
         // RPC Call
         Debug.Log("Client Sent Race / Perk Data");
-        if (PlayerManager.Instance.NetworkType == NetworkingTypes.Riptide)
-        {
-            RiptideNetworking.Message message = RiptideNetworking.Message.Create(MessageSendMode.reliable, AOW.RiptideNetworking.MessageId.SendCustomGameRacePerkData);
-            message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
-            message.AddInt(RaceSelector.Instance.GetRaceIndex(PlayerSelectedRace));
-            if (PlayerSelectedRace != null)
-            {
-                message.AddInt(PlayerSelectedRace.GetPerkIndex(PlayerSelectedPerk1));
-                message.AddInt(PlayerSelectedRace.GetPerkIndex(PlayerSelectedPerk2));
-            }
-            else
-            {
-                message.AddInt(-1);
-                message.AddInt(-1);
-            }
 
-            AOW.RiptideNetworking.NetworkManager.Instance.Client.Send(message);
-        }
-        else if (PlayerManager.Instance.NetworkType == NetworkingTypes.Fishynet)
+        int SelectedPerk1 = -1;
+        int SelectedPerk2 = -1;
+        if (PlayerSelectedRace != null)
         {
-            int SelectedPerk1 = -1;
-            int SelectedPerk2 = -1;
-            if (PlayerSelectedRace != null)
-            {
-                SelectedPerk1 = PlayerSelectedRace.GetPerkIndex(PlayerSelectedPerk1);
-                SelectedPerk2 = PlayerSelectedRace.GetPerkIndex(PlayerSelectedPerk2);
-            }
-
-            PreGameDataBroadcast MyData = new PreGameDataBroadcast()
-            {
-                SendFromPlayer = PlayerManager.Instance.LocalPlayer.PlayerID,
-                SelectedRaceIndex = RaceSelector.Instance.GetRaceIndex(PlayerSelectedRace),
-                SelectedPerk1Index = SelectedPerk1,
-                SelectedPerk2Index = SelectedPerk2,
-            };
-
-            InstanceFinder.ClientManager.Broadcast(MyData);
+            SelectedPerk1 = PlayerSelectedRace.GetPerkIndex(PlayerSelectedPerk1);
+            SelectedPerk2 = PlayerSelectedRace.GetPerkIndex(PlayerSelectedPerk2);
         }
-        else if (PlayerManager.Instance.NetworkType == NetworkingTypes.Darkrift2)
+
+        PreGameDataBroadcast MyData = new PreGameDataBroadcast()
         {
-            using (DarkRiftWriter writer = DarkRiftWriter.Create())
-            {
-                writer.Write(PlayerManager.Instance.LocalPlayer.PlayerID);
-                writer.Write(RaceSelector.Instance.GetRaceIndex(PlayerSelectedRace));
-                if (PlayerSelectedRace != null)
-                {
-                    writer.Write(PlayerSelectedRace.GetPerkIndex(PlayerSelectedPerk1));
-                    writer.Write(PlayerSelectedRace.GetPerkIndex(PlayerSelectedPerk2));
-                }
-                else
-                {
-                    writer.Write(-1);
-                    writer.Write(-1);
-                }
-                using (DarkRift.Message message = (DarkRift.Message.Create(DarkRiftTags.SendCustomGamePagePlayerData, writer)))
-                {
-                    PlayerManager.Instance.DarkriftManager.DarkRiftClient.SendMessage(message, SendMode.Reliable);
-                }
-            }
-        }
+            SendFromPlayer = PlayerManager.Instance.LocalPlayer.PlayerID,
+            SelectedRaceIndex = RaceSelector.Instance.GetRaceIndex(PlayerSelectedRace),
+            SelectedPerk1Index = SelectedPerk1,
+            SelectedPerk2Index = SelectedPerk2,
+        };
+
+        InstanceFinder.ClientManager.Broadcast(MyData);
     }
-
-    #region Riptide
-
-    [MessageHandler((ushort)AOW.RiptideNetworking.MessageId.SendCustomGameRacePerkData)]
-    private static void SendGameData(ushort fromClientId, RiptideNetworking.Message message)
-    {
-        Debug.Log("Server Recieved - Send Game Data - Custom Game");
-        ushort newPlayerId = message.GetUShort();
-        RiptideNetworking.Message messageToSend = RiptideNetworking.Message.Create(MessageSendMode.reliable, AOW.RiptideNetworking.MessageId.SendCustomGameRacePerkData);
-        int RaceIndex = message.GetInt();
-        int Perk1Index = message.GetInt();
-        int Perk2Index = message.GetInt();
-        messageToSend.AddUShort(newPlayerId);
-        messageToSend.AddInt(RaceIndex);
-        messageToSend.AddInt(Perk1Index);
-        messageToSend.AddInt(Perk2Index);
-        foreach (NetworkPlayer player in PlayerManager.Instance.ConnectedPlayers.Values)
-        {
-            if (player.PlayerID == fromClientId)
-            {
-                continue;
-            }
-            AOW.RiptideNetworking.NetworkManager.Instance.Server.Send(messageToSend, player.PlayerID);
-        }
-
-
-        if (fromClientId == PlayerManager.Instance.LocalPlayer.PlayerID)
-        {
-            return;
-        }
-
-        RaceDataScriptableObject SelectedRace;
-        Perk SelectedPerk1;
-        Perk SelectedPerk2;
-        if (RaceIndex == -1 || RaceIndex >= RaceSelector.Instance.RaceDataList.Count)
-        {
-            SelectedRace = null;
-        }
-        else
-        {
-            SelectedRace = RaceSelector.Instance.RaceDataList[RaceIndex];
-        }
-
-        if (SelectedRace == null)
-        {
-            SelectedPerk1 = null;
-            SelectedPerk2 = null;
-        }
-        else
-        {
-            if (Perk1Index == -1 || Perk1Index >= SelectedRace.PossiblePerks.Count)
-            {
-                SelectedPerk1 = null;
-            }
-            else
-            {
-                SelectedPerk1 = SelectedRace.PossiblePerks[Perk1Index];
-            }
-
-            if (Perk2Index == -1 || Perk2Index >= SelectedRace.PossiblePerks.Count)
-            {
-                SelectedPerk2 = null;
-            }
-            else
-            {
-                SelectedPerk2 = SelectedRace.PossiblePerks[Perk2Index];
-            }
-        }
-
-        Instance.LoadOpponentPlayer(SelectedRace, SelectedPerk1, SelectedPerk2);
-    }
-
-    [MessageHandler((ushort)AOW.RiptideNetworking.MessageId.SendCustomGameRacePerkData)]
-    private static void SendGameData(RiptideNetworking.Message message)
-    {
-        Debug.Log("Client Recieved - Send Game Data - Custom Game");
-        if (AOW.RiptideNetworking.NetworkManager.Instance.IsHost)
-        {
-            return;
-        }
-        ushort newPlayerId = message.GetUShort();
-        int RaceIndex = message.GetInt();
-        int Perk1Index = message.GetInt();
-        int Perk2Index = message.GetInt();
-
-        RaceDataScriptableObject SelectedRace;
-        Perk SelectedPerk1;
-        Perk SelectedPerk2;
-        if (RaceIndex == -1 || RaceIndex >= RaceSelector.Instance.RaceDataList.Count)
-        {
-            SelectedRace = null;
-        }
-        else
-        {
-            SelectedRace = RaceSelector.Instance.RaceDataList[RaceIndex];
-        }
-
-        if (SelectedRace == null)
-        {
-            SelectedPerk1 = null;
-            SelectedPerk2 = null;
-        }
-        else
-        {
-            if (Perk1Index == -1 || Perk1Index >= SelectedRace.PossiblePerks.Count)
-            {
-                SelectedPerk1 = null;
-            }
-            else
-            {
-                SelectedPerk1 = SelectedRace.PossiblePerks[Perk1Index];
-            }
-
-            if (Perk2Index == -1 || Perk2Index >= SelectedRace.PossiblePerks.Count)
-            {
-                SelectedPerk2 = null;
-            }
-            else
-            {
-                SelectedPerk2 = SelectedRace.PossiblePerks[Perk2Index];
-            }
-        }
-
-        Instance.LoadOpponentPlayer(SelectedRace, SelectedPerk1, SelectedPerk2);
-    }
-
-    #endregion
 
     #region Fishnet
 

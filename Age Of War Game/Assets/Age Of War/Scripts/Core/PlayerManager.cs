@@ -9,7 +9,6 @@ using HeathenEngineering.SteamworksIntegration;
 
 public class PlayerManager : MonoBehaviour
 {
-    public NetworkingTypes NetworkType = NetworkingTypes.Fishynet;
     public AOW.RiptideNetworking.NetworkManager RiptideNetworkManager;
     public FishNet.Managing.NetworkManager FishnetNetworkManager;
     public AOW.DarkRift2.NetworkManagerDarkRift DarkriftManager;
@@ -100,24 +99,11 @@ public class PlayerManager : MonoBehaviour
 
     private void Start()
     {
-        if (NetworkType == NetworkingTypes.Riptide)
-        {
-            FishnetNetworkManager.gameObject.SetActive(false);
-            DarkriftManager.gameObject.SetActive(false);
-        }
-        else if (NetworkType == NetworkingTypes.Fishynet)
-        {
-            RiptideNetworkManager.gameObject.SetActive(false);
-            DarkriftManager.gameObject.SetActive(false);
-            InstanceFinder.ServerManager.OnServerConnectionState += OnServerStateChange;
-            InstanceFinder.ClientManager.OnClientConnectionState += OnClientConnectionStateChange;
-            SceneLoadManager.Instance.InitializeBroadcasts();
-        }
-        else if (NetworkType == NetworkingTypes.Darkrift2)
-        {
-            RiptideNetworkManager.gameObject.SetActive(false);
-            FishnetNetworkManager.gameObject.SetActive(false);
-        }
+        RiptideNetworkManager.gameObject.SetActive(false);
+        DarkriftManager.gameObject.SetActive(false);
+        InstanceFinder.ServerManager.OnServerConnectionState += OnServerStateChange;
+        InstanceFinder.ClientManager.OnClientConnectionState += OnClientConnectionStateChange;
+        SceneLoadManager.Instance.InitializeBroadcasts();
     }
 
     private void OnDestroy()
@@ -128,18 +114,8 @@ public class PlayerManager : MonoBehaviour
             LocalPlayerData.Data.SaveLocal(LocalPlayerData.Data.UserName);
         }
 
-        if (NetworkType == NetworkingTypes.Riptide)
-        {
-        }
-        else if (NetworkType == NetworkingTypes.Fishynet)
-        {
-
-            InstanceFinder.ServerManager.OnServerConnectionState -= OnServerStateChange;
-            InstanceFinder.ClientManager.OnClientConnectionState -= OnClientConnectionStateChange;
-        }
-        else if (NetworkType == NetworkingTypes.Darkrift2)
-        {
-        }
+        InstanceFinder.ServerManager.OnServerConnectionState -= OnServerStateChange;
+        InstanceFinder.ClientManager.OnClientConnectionState -= OnClientConnectionStateChange;
     }
 
     // Online
@@ -166,60 +142,8 @@ public class PlayerManager : MonoBehaviour
     #region Ready To Start RPC
     public void SendReadyToStart()
     {
-        //Debug.Log("Client Sent - Send Ready Confirmation");
-        if (NetworkType == NetworkingTypes.Riptide)
-        {
-            Message message = Message.Create(MessageSendMode.reliable, AOW.RiptideNetworking.MessageId.SendPlayerReadyForSimulation);
-            message.AddUShort(Instance.LocalPlayer.PlayerID);
-            message.AddBool(true);
-            AOW.RiptideNetworking.NetworkManager.Instance.Client.Send(message);
-        }
-        else if (NetworkType == NetworkingTypes.Fishynet)
-        {
-            NetworkHelper.SendReady(LocalPlayer);
-        }
+        NetworkHelper.SendReady(LocalPlayer);
     }
-
-    #region Riptide
-    [MessageHandler((ushort)AOW.RiptideNetworking.MessageId.SendPlayerReadyForSimulation)]
-    private static void SendReadyToStart(ushort fromClientId, Message message)
-    {
-        //Debug.Log("Server Recieved - Send Ready Confirmation");
-        ushort newPlayerId = message.GetUShort();
-        Message messageToSend = Message.Create(MessageSendMode.reliable, AOW.RiptideNetworking.MessageId.SendPlayerReadyForSimulation);
-        bool Confirmed = message.GetBool();
-        messageToSend.AddUShort(newPlayerId);
-        messageToSend.AddBool(Confirmed);
-        foreach (NetworkPlayer player in PlayerManager.Instance.ConnectedPlayers.Values)
-        {
-            AOW.RiptideNetworking.NetworkManager.Instance.Server.Send(messageToSend, player.PlayerID);
-        }
-
-        foreach (NetworkPlayer player in Instance.ConnectedPlayers.Values)
-        {
-            if (player.PlayerID == fromClientId)
-            {
-                player.ReadyToStart = Confirmed;
-            }
-        }
-    }
-
-    [MessageHandler((ushort)AOW.RiptideNetworking.MessageId.SendPlayerReadyForSimulation)]
-    private static void SendReadyToStart(Message message)
-    {
-        //Debug.Log("Client Recieved - Send Ready Confirmation");
-        ushort confirmedPlayer = message.GetUShort();
-        bool Confirmed = message.GetBool();
-
-        foreach (NetworkPlayer player in Instance.ConnectedPlayers.Values)
-        {
-            if (player.PlayerID == confirmedPlayer)
-            {
-                player.ReadyToStart = Confirmed;
-            }
-        }
-    }
-    #endregion
 
     #endregion
 
@@ -245,18 +169,13 @@ public class PlayerManager : MonoBehaviour
 
     public void OtherPlayerJoined()
     {
-        Debug.Log("Other Player Joined");
         if (ActiveOnlineMode == PlayModes.Ranked || ActiveOnlineMode == PlayModes.Quickplay || ActiveOnlineMode == PlayModes.CustomGame)
         {
-            SendPlayerData();
+            Debug.Log("Other Player Joined");
         }
         else
         {
             Debug.LogWarning("Non online mode - should not be able to connect to other players");
-            if (NetworkType == NetworkingTypes.Riptide)
-            {
-                AOW.RiptideNetworking.NetworkManager.Instance.LeaveGame();
-            }
         }
     }
 
@@ -272,11 +191,8 @@ public class PlayerManager : MonoBehaviour
 
     public void OtherNetworkPlayerConnected(NetworkPlayer Player)
     {
-        if (NetworkType == NetworkingTypes.Fishynet)
-        {
-            //Debug.Log(NetworkHelper == null ? "Network Helper Null": LocalPlayerData == null ? "Local Player Data Null" : LocalPlayerData.Data == null ? " Local Player Save Data Null" : LocalPlayerData.Data.SerializeToJSON() == null ? "JSON Save Data is Null" : "Send Player Data");
-            NetworkHelper.SendDataToNetworkPlayer(Player, LocalPlayerData.Data.SerializeToJSON());
-        }
+        //Debug.Log(NetworkHelper == null ? "Network Helper Null": LocalPlayerData == null ? "Local Player Data Null" : LocalPlayerData.Data == null ? " Local Player Save Data Null" : LocalPlayerData.Data.SerializeToJSON() == null ? "JSON Save Data is Null" : "Send Player Data");
+        NetworkHelper.SendDataToNetworkPlayer(Player, LocalPlayerData.Data.SerializeToJSON());
     }
 
     public void RecievePlayerData(PlayerData OtherPlayersData)
@@ -298,102 +214,6 @@ public class PlayerManager : MonoBehaviour
 
     #endregion
 
-    #region Send Player Data RPC
-    public void SendPlayerData()
-    {
-        Debug.Log("Client Sent - Send Player Data");
-        if (NetworkType == NetworkingTypes.Riptide)
-        {
-            Message message = Message.Create(MessageSendMode.reliable, AOW.RiptideNetworking.MessageId.SendPlayerData);
-            message.AddUShort(Instance.LocalPlayer.PlayerID);
-            //byte[] PlayerDataByteArr = LocalPlayerData.Data.SerializeToByteArray();
-            //message.AddBytes(PlayerDataByteArr, true, true);
-            message.AddString(LocalPlayerData.Data.SerializeToJSON());
-
-            AOW.RiptideNetworking.NetworkManager.Instance.Client.Send(message);
-        }
-    }
-
-    #region Riptide
-
-    [MessageHandler((ushort)AOW.RiptideNetworking.MessageId.SendPlayerData)]
-    private static void SendPlayerData(ushort fromClientId, Message message)
-    {
-        ushort newPlayerId = message.GetUShort();
-        Message messageToSend = Message.Create(MessageSendMode.reliable, AOW.RiptideNetworking.MessageId.SendPlayerData);
-        //byte[] PlayerDataArr = message.GetBytes();
-        string PlayerDataJSON = message.GetString();
-        messageToSend.AddUShort(newPlayerId);
-        //messageToSend.AddBytes(PlayerDataArr, true ,true);
-        messageToSend.AddString(PlayerDataJSON);
-        foreach (NetworkPlayer player in PlayerManager.Instance.ConnectedPlayers.Values)
-        {
-            if (player.PlayerID == fromClientId)
-            {
-                continue;
-            }
-            AOW.RiptideNetworking.NetworkManager.Instance.Server.Send(messageToSend, player.PlayerID);
-        }
-
-        if (newPlayerId == PlayerManager.Instance.LocalPlayer.PlayerID)
-        {
-            return;
-        }
-
-        Debug.Log("Server Recieved - Send Player Data");
-        //PlayerData SentPlayersData = PlayerData.Deserialize(PlayerDataArr);
-        PlayerData SentPlayersData = PlayerData.Deserialize(PlayerDataJSON);
-
-        if (Instance.ActiveOnlineMode == PlayModes.Ranked)
-        {
-            Instance.ConfirmationRankedOpponentCallback(SentPlayersData);
-        }
-        else if (Instance.ActiveOnlineMode == PlayModes.Quickplay)
-        {
-            Instance.ConfirmationQuickplayOpponentCallback(SentPlayersData);
-        }
-        else if (Instance.ActiveOnlineMode == PlayModes.CustomGame)
-        {
-            Instance.ConfirmationCustomGameOpponentCallback(SentPlayersData);
-        }
-    }
-
-    [MessageHandler((ushort)AOW.RiptideNetworking.MessageId.SendPlayerData)]
-    private static void SendPlayerData(Message message)
-    {
-        if (AOW.RiptideNetworking.NetworkManager.Instance.IsHost)
-        {
-            return;
-        }
-
-        ushort newPlayerId = message.GetUShort();
-        if (newPlayerId == Instance.LocalPlayer.PlayerID)
-        {
-            return;
-        }
-        Debug.Log("Client Recieved - Send Player Data");
-        //byte[] PlayerDataArr = message.GetBytes();
-        string PlayerDataJSON = message.GetString();
-
-        //PlayerData SentPlayersData = PlayerData.Deserialize(PlayerDataArr);
-        PlayerData SentPlayersData = PlayerData.Deserialize(PlayerDataJSON);
-
-        if (Instance.ActiveOnlineMode == PlayModes.Ranked)
-        {
-            Instance.ConfirmationRankedOpponentCallback(SentPlayersData);
-        }
-        else if (Instance.ActiveOnlineMode == PlayModes.Quickplay)
-        {
-            Instance.ConfirmationQuickplayOpponentCallback(SentPlayersData);
-        }
-        else if (Instance.ActiveOnlineMode == PlayModes.CustomGame)
-        {
-            Instance.ConfirmationCustomGameOpponentCallback(SentPlayersData);
-        }
-    }
-    #endregion
-
-    #endregion
 
     public BaseUnitBehaviour GetUnitByIndex(int unitBuyIndex, ushort owningPlayer)
     {
@@ -482,20 +302,8 @@ public class PlayerManager : MonoBehaviour
         ActiveOnlineMode = PlayModes.CustomGame;
         ConfirmationCustomGameOpponentCallback = FindPlayer;
         CancellationCustomGameOpponentCallback = CannotFindPlayer;
-        if (NetworkType == NetworkingTypes.Riptide)
-        {
-            AOW.RiptideNetworking.NetworkManager.Instance.JoinGame(directConnectIp);
-        }
-        else if (NetworkType == NetworkingTypes.Fishynet)
-        {
-            //InstanceFinder.TransportManager.Transport.SetClientAddress(directConnectIp);
-            //InstanceFinder.ClientManager.StartConnection();
-            SteamLobbyManager.Join(directConnectIp);
-        }
-        else if (NetworkType == NetworkingTypes.Riptide)
-        {
-            AOW.DarkRift2.NetworkManagerDarkRift.Instance.JoinGame(directConnectIp);
-        }
+
+        SteamLobbyManager.Join(directConnectIp);
     }
 
     public void FoundCustomGameOpponent(PlayerData Player)

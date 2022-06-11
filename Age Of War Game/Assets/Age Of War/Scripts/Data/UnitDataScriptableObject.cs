@@ -55,7 +55,7 @@ public class StatChanges
     /// <summary>
     /// How much this unit type gains on a kill (Base XP x ExperienceGainMultipler = Actual XP)
     /// </summary>
-    public float ExperienceGainMultipler = 1f;
+    public float ExperienceGainMultiplier = 1f;
 
     public int MaxHealthChange = 0;
     public bool HealEquivalentHealth = true;
@@ -63,4 +63,6 @@ public class StatChanges
     public bool HealEquivalentArmor = true;
 
     public float MovementSpeedChange = 0;
+
+    public float AttackRateMultiplier = 1;
 }

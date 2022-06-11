@@ -153,7 +153,7 @@ namespace AOW.DarkRift2
 
                 id++; // Make sure all network types are on the same player ID for the rest of the game code
                 Player.IsLocalPlayer = true;
-                Player.SetPlayerID(id);
+                //Player.SetPlayerID(id);
             }
             //If it's for another player then spawn a network player and and to the manager. 
             else
@@ -165,7 +165,7 @@ namespace AOW.DarkRift2
                 );
 
                 id++;
-                Player.SetPlayerID(id);
+                //Player.SetPlayerID(id);
             }
         }
 

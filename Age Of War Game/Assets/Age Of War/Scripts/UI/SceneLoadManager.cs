@@ -60,23 +60,13 @@ public class SceneLoadManager : MonoBehaviour
             if (SendNetworkCall)
             {
                 //Debug.Log("Change Scene");
-                if (PlayerManager.Instance.NetworkType == NetworkingTypes.Riptide)
+                LoadSceneBroadcast SceneLoadBroadcast = new LoadSceneBroadcast()
                 {
-                    Message message = Message.Create(MessageSendMode.reliable, AOW.RiptideNetworking.MessageId.ChangeScene);
-                    message.AddUShort(PlayerManager.Instance.LocalPlayer.PlayerID);
-                    message.AddString(name);
-                    AOW.RiptideNetworking.NetworkManager.Instance.Client.Send(message);
-                }
-                else if (PlayerManager.Instance.NetworkType == NetworkingTypes.Fishynet)
-                {
-                    LoadSceneBroadcast SceneLoadBroadcast = new LoadSceneBroadcast()
-                    {
-                        SentFromPlayer = PlayerManager.Instance.LocalPlayer.PlayerID,
-                        SceneName = name,
-                    };
+                    SentFromPlayer = PlayerManager.Instance.LocalPlayer.PlayerID,
+                    SceneName = name,
+                };
 
-                    InstanceFinder.ClientManager.Broadcast(SceneLoadBroadcast);
-                }
+                InstanceFinder.ClientManager.Broadcast(SceneLoadBroadcast);
             }
         }
     }

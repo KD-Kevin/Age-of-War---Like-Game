@@ -4,18 +4,23 @@ using UnityEngine;
 
 public class BaseUnitBehaviour : MonoBehaviour, IHealth, ITeam
 {
+    [Header("Parameters")]
     [SerializeField]
-    private string UnitDisplayName;
+    protected string UnitDisplayName;
     [SerializeField]
-    private Sprite UnitDisplaySprite;
+    protected Sprite UnitDisplaySprite;
+
+    #region Default Values
+
+    [Header("Default Values")]
     [SerializeField]
-    private float BuildTime = 3;
+    protected float BuildTime = 3;
     [SerializeField]
-    private float BuildCooldown = 3;
+    protected float BuildCooldown = 3;
     [SerializeField]
-    private int BuildCost = 100;
+    protected int BuildCost = 100;
     [SerializeField]
-    private int ExperienceGiven = 15;
+    protected int ExperienceGiven = 15;
     [SerializeField]
     protected int StartHealth = 100;
     [SerializeField]
@@ -35,13 +40,27 @@ public class BaseUnitBehaviour : MonoBehaviour, IHealth, ITeam
     [SerializeField]
     protected float AlliedUnitStopDistance = 1f;
     [SerializeField]
-    private float MovementSpeed = 4;
+    protected float MovementSpeed = 4;
+    [SerializeField]
+    protected float AttackRate = 1;
+    [SerializeField]
+    protected int PhysicalDamage = 5;
+    [SerializeField]
+    protected int MagicalDamage = 0;
+    [SerializeField]
+    protected int TrueDamage = 0;
+
+    #endregion
+
+    [Header("Enviroment")]
     [SerializeField]
     protected LayerMask RaycastLayers;
     [SerializeField]
-    private Transform LookTransform;
+    protected Transform LookTransform;
     [SerializeField]
-    private UnitDataScriptableObject UnitDataScriptableObject;
+    protected Transform HealthBarPositionTransform;
+    [SerializeField]
+    protected UnitDataScriptableObject UnitDataScriptableObject;
 
     public string DisplayName { get => UnitDisplayName; set => UnitDisplayName = value; }
     public Sprite DisplaySprite { get => UnitDisplaySprite; set => UnitDisplaySprite = value; }
@@ -60,11 +79,17 @@ public class BaseUnitBehaviour : MonoBehaviour, IHealth, ITeam
     public int AutoRestore { get => AutoRestoreAmount; set => AutoRestoreAmount = value; }
     public int PrefabID { get => PrefabSpawnID; set => PrefabSpawnID = value; }
     public int Team { get => TeamID; set => SetTeam(value); }
+    public float RateOfFire { get { return AttackRate; } }
+    public float AttackPeriod { get; protected set; }
+    public int DefaultPhyscialDamage { get { return PhysicalDamage; } }
+    public int DefaultMagicalDamage { get { return MagicalDamage; } }
+    public int DefaultTrueDamage { get { return TrueDamage; } }
+    public Transform HealthBarTransform { get { return HealthBarPositionTransform; } }
 
     public UnitData UnitData { get; set; }
     public List<EquipmentChangeScriptableObject> CurrentListOfPossibleChanges { get; set; }
     public bool Moving { get; set; }
-    public bool Attack { get; set; }
+    public bool Attacking { get; set; }
 
     protected int TeamID = -1;
     protected int PrefabSpawnID = -1;
@@ -79,6 +104,7 @@ public class BaseUnitBehaviour : MonoBehaviour, IHealth, ITeam
     protected IHealth HealthTarget = null;
     protected float LongestRaycastDistance;
     protected float RepairHealRestoreTimer = 0;
+    protected float AttackRateTimer = 0;
 
     public static List<BaseUnitBehaviour> FighterPrefabList = new List<BaseUnitBehaviour>();
     public static Dictionary<int, List<BaseUnitBehaviour>> FighterPools = new Dictionary<int, List<BaseUnitBehaviour>>();
@@ -183,6 +209,11 @@ public class BaseUnitBehaviour : MonoBehaviour, IHealth, ITeam
 
     public virtual void Heal(int HealAmount)
     {
+        if (CurrentHealth <= 0 || HealAmount == 0)
+        {
+            return;
+        }
+
         // Modifiers Here
 
         if (CurrentHealth <= 0)
@@ -199,12 +230,12 @@ public class BaseUnitBehaviour : MonoBehaviour, IHealth, ITeam
 
     public virtual void HealAndRepair(int RepairAmount)
     {
-        // Modifiers Here
-
-        if (CurrentHealth <= 0)
+        if (CurrentHealth <= 0 || RepairAmount == 0)
         {
             return;
-        }
+        } 
+        // Modifiers Here
+
 
         CurrentHealth += RepairAmount;
         int Remainder = 0;
@@ -226,12 +257,13 @@ public class BaseUnitBehaviour : MonoBehaviour, IHealth, ITeam
 
     public virtual void HealAndRestore(int RestoreAmount)
     {
-        // Modifiers Here
-
-        if (CurrentHealth <= 0)
+        if (CurrentHealth <= 0 || RestoreAmount == 0)
         {
             return;
         }
+
+        // Modifiers Here
+
 
         CurrentHealth += RestoreAmount;
         int Remainder = 0;
@@ -253,6 +285,11 @@ public class BaseUnitBehaviour : MonoBehaviour, IHealth, ITeam
 
     public virtual void RepairAndRestore(int RepairAmount)
     {
+        if (CurrentHealth <= 0 || RepairAmount == 0)
+        {
+            return;
+        }
+
         // Modifiers Here
 
         CurrentArmor += RepairAmount;
@@ -275,6 +312,11 @@ public class BaseUnitBehaviour : MonoBehaviour, IHealth, ITeam
 
     public virtual void RestoreAndRepair(int RestoreAmount)
     {
+        if (CurrentHealth <= 0 || RestoreAmount == 0)
+        {
+            return;
+        }
+
         // Modifiers Here
 
         CurrentMagicArmor += RestoreAmount;
@@ -297,7 +339,7 @@ public class BaseUnitBehaviour : MonoBehaviour, IHealth, ITeam
 
     public virtual void HealRepairAndRestore(int Amount)
     {
-        if (CurrentHealth <= 0)
+        if (CurrentHealth <= 0 || Amount == 0)
         {
             return;
         }
@@ -341,7 +383,7 @@ public class BaseUnitBehaviour : MonoBehaviour, IHealth, ITeam
 
     public virtual void HealRestoreAndRepair(int Amount)
     {
-        if (CurrentHealth <= 0)
+        if (CurrentHealth <= 0 || Amount == 0)
         {
             return;
         }
@@ -402,6 +444,8 @@ public class BaseUnitBehaviour : MonoBehaviour, IHealth, ITeam
 
         UnitData = UnitDataScriptableObject.Data.Clone();
         CurrentListOfPossibleChanges = UnitData.PossibleEquipmentChanges;
+        AttackPeriod = 1 / AttackRate;
+        UnitHealthBarManager.Instance.GetHealthBar(this);
     }
 
     public virtual void Repair(int RepairAmount)
@@ -460,17 +504,34 @@ public class BaseUnitBehaviour : MonoBehaviour, IHealth, ITeam
 
     public virtual int GetAttackDamage()
     {
-        return 0;
+        int Damage = DefaultPhyscialDamage;
+
+        // Multipliers Here
+
+        return Damage;
     }
 
     public virtual int GetMagicAttackDamage()
     {
-        return 0;
+        int Damage = DefaultMagicalDamage;
+
+        // Multipliers Here
+
+        return Damage;
     }
 
     public virtual int GetTrueAttackDamage()
     {
-        return 0;
+        int Damage = DefaultTrueDamage;
+
+        // Multipliers Here
+
+        return Damage;
+    }
+
+    public virtual int GetOverallDamage()
+    {
+        return GetAttackDamage() + GetMagicAttackDamage() + GetTrueAttackDamage();
     }
 
     public virtual int GetExperienceDropped()
@@ -549,7 +610,8 @@ public class BaseUnitBehaviour : MonoBehaviour, IHealth, ITeam
         }
     }
 
-    protected void UpdateUnit()
+    protected IHealth PotentialTarget;
+    protected virtual void UpdateUnit()
     {
         RayHits = Physics2D.RaycastAll(LookTransform.position, LookTransform.forward, LongestRaycastDistance, RaycastLayers);
 
@@ -565,11 +627,11 @@ public class BaseUnitBehaviour : MonoBehaviour, IHealth, ITeam
             foreach (RaycastHit2D hit in RayHits)
             {
                 //Debug.Log($"Object In Front {hit.collider.gameObject.name}");
-                IHealth TempHit = hit.collider.gameObject.GetComponent<IHealth>();
-                if (TempHit is BaseBuilding)
+                PotentialTarget = hit.collider.gameObject.GetComponent<IHealth>();
+                if (PotentialTarget is BaseBuilding)
                 {
                     //Debug.Log("Found base");
-                    BaseBuilding unit = TempHit as BaseBuilding;
+                    BaseBuilding unit = PotentialTarget as BaseBuilding;
                     if (unit.Team == TeamID)
                     {
                         NewMovingValue = true;
@@ -583,9 +645,9 @@ public class BaseUnitBehaviour : MonoBehaviour, IHealth, ITeam
                     }
                 }
 
-                if (TempHit is BaseUnitBehaviour)
+                if (PotentialTarget is BaseUnitBehaviour)
                 {
-                    BaseUnitBehaviour unit = TempHit as BaseUnitBehaviour;
+                    BaseUnitBehaviour unit = PotentialTarget as BaseUnitBehaviour;
                     if (ClosestUnitHit == null)
                     {
                         ClosestUnitHit = unit;
@@ -640,7 +702,7 @@ public class BaseUnitBehaviour : MonoBehaviour, IHealth, ITeam
         {
             if (FrameCounter == 5)
             {
-                Attack = false;
+                Attacking = false;
                 if (RayHits.Length == 0)
                 {
                     return;
@@ -650,23 +712,23 @@ public class BaseUnitBehaviour : MonoBehaviour, IHealth, ITeam
                 {
                     foreach (RaycastHit2D hit in RayHits)
                     {
-                        IHealth TempHit = hit.collider.gameObject.GetComponent<IHealth>();
-                        if (TempHit is BaseUnitBehaviour)
+                        PotentialTarget = hit.collider.gameObject.GetComponent<IHealth>();
+                        if (PotentialTarget is BaseUnitBehaviour)
                         {
-                            BaseUnitBehaviour unit = TempHit as BaseUnitBehaviour;
+                            BaseUnitBehaviour unit = PotentialTarget as BaseUnitBehaviour;
                             if (unit.Team != TeamID && unit.Team != 0)
                             {
-                                HealthTarget = TempHit;
+                                HealthTarget = PotentialTarget;
                             }
                             break;
                         }
 
-                        if (TempHit is BaseBuilding)
+                        if (PotentialTarget is BaseBuilding)
                         {
-                            BaseBuilding baseBuilding = TempHit as BaseBuilding;
+                            BaseBuilding baseBuilding = PotentialTarget as BaseBuilding;
                             if (baseBuilding.Team != TeamID && baseBuilding.Team != 0)
                             {
-                                HealthTarget = TempHit;
+                                HealthTarget = PotentialTarget;
                             }
                             break;
                         }
@@ -676,11 +738,16 @@ public class BaseUnitBehaviour : MonoBehaviour, IHealth, ITeam
                 if (HealthTarget != null)
                 {
                     // Attack
-                    Attack = true;
+                    Attacking = true;
                 }
+                else
+                {
+                    Attacking = false;
+                }
+
             }
 
-            if (Attack)
+            if (Attacking)
             {
                 AttackUpdate();
             }
@@ -690,10 +757,10 @@ public class BaseUnitBehaviour : MonoBehaviour, IHealth, ITeam
         {
             if (CurrentHealth < MaxHealth || CurrentArmor < MaxArmor || CurrentMagicArmor < MaxMagicArmor)
             {
-                RepairHealRestoreTimer += Time.deltaTime;
-                if (RepairHealRestoreTimer > 1f)
+                RepairHealRestoreTimer += LockstepManager.Instance.HalfStepTime;
+                if (RepairHealRestoreTimer >= 1f)
                 {
-                    RepairHealRestoreTimer = 0;
+                    RepairHealRestoreTimer -= 1;
                     Heal(AutoHeal);
                     Repair(AutoRepair);
                     Restore(AutoRestore);
@@ -704,7 +771,35 @@ public class BaseUnitBehaviour : MonoBehaviour, IHealth, ITeam
 
     protected virtual void AttackUpdate()
     {
+        AttackRateTimer += LockstepManager.Instance.HalfStepTime;
+        if (AttackRateTimer >= AttackPeriod)
+        {
+            AttackRateTimer -= AttackPeriod;
 
+            Attack();
+        }
+    }
+
+    // Melee Combat by default, change this to launch a projectile for ranged combat or mixed combat or non combat abilities
+    public virtual void Attack()
+    {
+        if (HealthTarget != null && HealthTarget.CurrentHealth > 0)
+        {
+            HealthTarget.Damage(GetTrueAttackDamage(), $"Attacked From {DisplayName}", DamageTypes.True);
+            HealthTarget.Damage(GetMagicAttackDamage(), $"Attacked From {DisplayName}", DamageTypes.Magical);
+            HealthTarget.Damage(GetAttackDamage(), $"Attacked From {DisplayName}", DamageTypes.Physical);
+
+            if (HealthTarget.CurrentHealth <= 0)
+            {
+                HealthTarget = null;
+                Attacking = false;
+            }
+        }
+        else
+        {
+            HealthTarget = null;
+            Attacking = false;
+        }
     }
 
     protected virtual void StoppedMoving()
