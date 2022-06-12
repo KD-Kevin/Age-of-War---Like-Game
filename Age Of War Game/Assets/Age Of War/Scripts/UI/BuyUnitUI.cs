@@ -85,13 +85,18 @@ public class BuyUnitUI : MonoBehaviour
 
             ClickCooldownTimer = 1;
             UI_Button.interactable = false;
-            if (PlayerManager.Instance.CurrentMatchData.PlayMode == PlayModes.CustomGame || PlayerManager.Instance.CurrentMatchData.PlayMode == PlayModes.Quickplay || PlayerManager.Instance.CurrentMatchData.PlayMode == PlayModes.Ranked)
-            {
-                // Send of Action to lockstep
-                BuyUnitAction NewAction = new BuyUnitAction(BuyUnitIndex);
-                LockstepManager.Instance.LocalPlayersCurrentTurn.AddAction(NewAction);
-                return;
-            }
+
+
+            //if (PlayerManager.Instance.CurrentMatchData.PlayMode == PlayModes.CustomGame || PlayerManager.Instance.CurrentMatchData.PlayMode == PlayModes.Quickplay || PlayerManager.Instance.CurrentMatchData.PlayMode == PlayModes.Ranked)
+            //{
+            // Send of Action to lockstep
+            BuyUnitAction NewAction = new BuyUnitAction(BuyUnitIndex);
+            NewAction.OwningPlayer = 1;
+            LockstepManager.Instance.AddAction(NewAction);
+            return;
+            //}
+
+
             PlayerUiManager.Instance.CurrentCurrencyAmount -= BuyUnit.GetBuildCost();
             if (!BaseBuilding.TeamBuildings[1].HoldPopulationSpot.Contains(BuyUnitIndex))
             {
@@ -237,53 +242,105 @@ public class BuyUnitAction : IAction
     public BuyUnitAction(int BuyIndex = -1)
     {
         ActionType = (int)ActionTypes.BuyUnit;
-        OwningPlayer = PlayerManager.Instance.LocalPlayer.PlayerID;
+        if (PlayerManager.Instance.ActiveOnlineMode == PlayModes.CustomGame || PlayerManager.Instance.ActiveOnlineMode == PlayModes.Ranked || PlayerManager.Instance.ActiveOnlineMode == PlayModes.Quickplay)
+        {
+            OwningPlayer = PlayerManager.Instance.LocalPlayer.PlayerID;
+        }
+        else
+        {
+            OwningPlayer = 0;
+        }
         UnitBuyIndex = BuyIndex;
     }
 
     public void ProcessAction()
     {
-        if (OwningPlayer == PlayerManager.Instance.LocalPlayer.PlayerID)
+        // Online
+        if (PlayerManager.Instance.ActiveOnlineMode == PlayModes.CustomGame || PlayerManager.Instance.ActiveOnlineMode == PlayModes.Ranked || PlayerManager.Instance.ActiveOnlineMode == PlayModes.Quickplay)
         {
-            BaseUnitBehaviour UnitToBuy = PlayerUiManager.Instance.GetUnitByIndex(UnitBuyIndex);
-            int CostToReduce;
-            if (UnitToBuy != null)
+            if (OwningPlayer == PlayerManager.Instance.LocalPlayer.PlayerID)
             {
-                CostToReduce = UnitToBuy.GetBuildCost();
+                BaseUnitBehaviour UnitToBuy = PlayerUiManager.Instance.GetUnitByIndex(UnitBuyIndex);
+                int CostToReduce;
+                if (UnitToBuy != null)
+                {
+                    CostToReduce = UnitToBuy.GetBuildCost();
+                }
+                else
+                {
+                    return;
+                }
+                if (!BaseBuilding.TeamBuildings[OwningPlayer].HoldPopulationSpot.Contains(UnitBuyIndex))
+                {
+                    BaseBuilding.TeamBuildings[OwningPlayer].HoldPopulationSpot.Add(UnitBuyIndex);
+                }
+
+                PlayerUiManager.Instance.CurrentCurrencyAmount -= CostToReduce;
+                PlayerUiManager.Instance.UpdateCurrencyText();
+                PlayerUiManager.Instance.UpdatePopulationText();
+                BuyUnitUI UI = PlayerUiManager.Instance.GetBuyUnitUiByIndex(UnitBuyIndex);
+
+                if (UI == null)
+                {
+                    return;
+                }
+                UI.CooldownTime = UnitToBuy.GetCooldown();
+                UI.CooldownTimer = UI.CooldownTime;
+                UI.BuildTimer = UnitToBuy.GetTimeToCreate();
+                UI.BuildTime = UI.BuildTimer;
             }
             else
             {
-                return;
+                BaseUnitBehaviour UnitToSpawn = PlayerManager.Instance.GetUnitByIndex(UnitBuyIndex, OwningPlayer);
+                if (UnitToSpawn != null)
+                {
+                    float TimeToBuild = UnitToSpawn.GetTimeToCreate();
+                    BuildOrder NewBuildOrder = new BuildOrder(UnitToSpawn, TimeToBuild, OwningPlayer);
+                }
             }
-            if (!BaseBuilding.TeamBuildings[OwningPlayer].HoldPopulationSpot.Contains(UnitBuyIndex))
-            {
-                BaseBuilding.TeamBuildings[OwningPlayer].HoldPopulationSpot.Add(UnitBuyIndex);
-            }
-            if (OwningPlayer != PlayerManager.Instance.LocalPlayer.PlayerID)
-            {
-                return;
-            }
-            PlayerUiManager.Instance.CurrentCurrencyAmount -= CostToReduce;
-            PlayerUiManager.Instance.UpdateCurrencyText();
-            PlayerUiManager.Instance.UpdatePopulationText();
-            BuyUnitUI UI = PlayerUiManager.Instance.GetBuyUnitUiByIndex(UnitBuyIndex);
-
-            if (UI == null)
-            {
-                return;
-            }
-            UI.CooldownTime = UnitToBuy.GetCooldown();
-            UI.CooldownTimer = UI.CooldownTime;
-            UI.BuildTimer = UnitToBuy.GetTimeToCreate();
-            UI.BuildTime = UI.BuildTimer;
         }
+        // Offline
         else
         {
-            BaseUnitBehaviour UnitToSpawn = PlayerManager.Instance.GetUnitByIndex(UnitBuyIndex, OwningPlayer);
-            if (UnitToSpawn != null)
+            if (OwningPlayer == 1)
             {
-                float TimeToBuild = UnitToSpawn.GetTimeToCreate();
-                BuildOrder NewBuildOrder = new BuildOrder(UnitToSpawn, TimeToBuild, OwningPlayer);
+                BaseUnitBehaviour UnitToBuy = PlayerUiManager.Instance.GetUnitByIndex(UnitBuyIndex);
+                int CostToReduce;
+                if (UnitToBuy != null)
+                {
+                    CostToReduce = UnitToBuy.GetBuildCost();
+                }
+                else
+                {
+                    return;
+                }
+                if (!BaseBuilding.TeamBuildings[OwningPlayer].HoldPopulationSpot.Contains(UnitBuyIndex))
+                {
+                    BaseBuilding.TeamBuildings[OwningPlayer].HoldPopulationSpot.Add(UnitBuyIndex);
+                }
+
+                PlayerUiManager.Instance.CurrentCurrencyAmount -= CostToReduce;
+                PlayerUiManager.Instance.UpdateCurrencyText();
+                PlayerUiManager.Instance.UpdatePopulationText();
+                BuyUnitUI UI = PlayerUiManager.Instance.GetBuyUnitUiByIndex(UnitBuyIndex);
+
+                if (UI == null)
+                {
+                    return;
+                }
+                UI.CooldownTime = UnitToBuy.GetCooldown();
+                UI.CooldownTimer = UI.CooldownTime;
+                UI.BuildTimer = UnitToBuy.GetTimeToCreate();
+                UI.BuildTime = UI.BuildTimer;
+            }
+            else
+            {
+                BaseUnitBehaviour UnitToSpawn = PlayerManager.Instance.GetUnitByIndex(UnitBuyIndex, OwningPlayer);
+                if (UnitToSpawn != null)
+                {
+                    float TimeToBuild = UnitToSpawn.GetTimeToCreate();
+                    BuildOrder NewBuildOrder = new BuildOrder(UnitToSpawn, TimeToBuild, OwningPlayer);
+                }
             }
         }
     }

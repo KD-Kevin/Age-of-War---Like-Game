@@ -36,6 +36,9 @@ public class PlayerManager : MonoBehaviour
     public NetworkPlayer LocalPlayer { get; set; }
     public Dictionary<ushort, NetworkPlayer> ConnectedPlayers = new Dictionary<ushort, NetworkPlayer>();
 
+    // Offline
+    public bool OfflineGameStarted { get; set; }
+
     // Custom Game
     private System.Action<PlayerData> ConfirmationCustomGameOpponentCallback = null;
     private System.Action CancellationCustomGameOpponentCallback = null;
@@ -140,9 +143,17 @@ public class PlayerManager : MonoBehaviour
     }
 
     #region Ready To Start RPC
+
     public void SendReadyToStart()
     {
-        NetworkHelper.SendReady(LocalPlayer);
+        if (ActiveOnlineMode == PlayModes.CustomGame || ActiveOnlineMode == PlayModes.Quickplay || ActiveOnlineMode == PlayModes.Ranked)
+        {
+            NetworkHelper.SendReady(LocalPlayer);
+        }
+        else
+        {
+            OfflineGameStarted = true;
+        }
     }
 
     #endregion

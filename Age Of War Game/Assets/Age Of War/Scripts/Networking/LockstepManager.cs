@@ -50,6 +50,8 @@ public class LockstepManager : MonoBehaviour
     public bool WaitingOnPlayer { get; set; }
     public PlayerActions PreviousLocalPlayersCurrentTurn { get; set; }
     public PlayerActions LocalPlayersCurrentTurn { get; set; }
+    public PlayerActions AiPreviousTurn { get; set; }
+    public PlayerActions AiCurrentTurn { get; set; }
     public List<PlayerActions> ActionPendingList { get; set; }
     private int LastAskForResentSec = -1;
     private float GameTurnHalfTime = 0;
@@ -178,10 +180,9 @@ public class LockstepManager : MonoBehaviour
         }
         else if (!SimulationStarted)
         {
-            if (PlayerManager.Instance.EveryoneIsReadyForStart())
+            if (PlayerManager.Instance.EveryoneIsReadyForStart() || PlayerManager.Instance.OfflineGameStarted)
             {
                 CountDown = true;
-                ReconnectOnSecond = System.DateTime.Now.Ticks + 6 * 10000000 - LastPing / 2; // seconds to 100 nano seconds ~ 10*7
                 //if (NetworkManager.Instance.IsHost)
                 //{
                 //    SendCountdown(ReconnectOnSecond);
@@ -190,13 +191,24 @@ public class LockstepManager : MonoBehaviour
 
                 SimulationStarted = true;
 
-                LocalPlayersCurrentTurn = new PlayerActions(PlayerManager.Instance.LocalPlayer.PlayerID, true);
+                if (PlayerManager.Instance.ActiveOnlineMode == PlayModes.None || PlayerManager.Instance.ActiveOnlineMode == PlayModes.VsComputer)
+                {
+                    ReconnectOnSecond = System.DateTime.Now.Ticks + 6 * 10000000;
+                    AiCurrentTurn = new PlayerActions(2, false);
+                    LocalPlayersCurrentTurn = new PlayerActions(1, true);
+                    PlayerManager.Instance.OfflineGameStarted = false;
+                }
+                else
+                {
+                    ReconnectOnSecond = System.DateTime.Now.Ticks + 6 * 10000000 - LastPing / 2; // seconds to 100 nano seconds ~ 10*7
+                    LocalPlayersCurrentTurn = new PlayerActions(PlayerManager.Instance.LocalPlayer.PlayerID, true);
+                }
             }
         }
 
         if (CountDown)
         {
-            if (SecondsTillReconnect == -1)
+            if (SecondsTillReconnect <= -1)
             {
                 CountDown = false;
                 SecondsTillReconnect = 0;
@@ -283,6 +295,7 @@ public class LockstepManager : MonoBehaviour
     public void AsyncGameTurn()
     {
         BaseUnitBehaviour.UpdateUnits();
+
         PingHost();
         //Debug.Log($"Async Update {System.DateTime.Now.Hour} hr / {System.DateTime.Now.Minute} min / {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
     }
@@ -417,15 +430,59 @@ public class LockstepManager : MonoBehaviour
         LocalPlayersCurrentTurn.AddAction(ActionDone);
     }
 
+    public void AddAction(IAction ActionToAdd)
+    {
+        LocalPlayersCurrentTurn.AddAction(ActionToAdd);
+    }
+
+    public void AddAiAction(IAction ActionToAdd)
+    {
+        AiCurrentTurn.AddAction(ActionToAdd);
+    }
+
     public void SendOffLocalActions()
     {
-        // Send off actions for current turn
-        // Send it off - RPC call
-        SendTurnActions();
+        if (PlayerManager.Instance.ActiveOnlineMode == PlayModes.Ranked || PlayerManager.Instance.ActiveOnlineMode == PlayModes.Ranked || PlayerManager.Instance.ActiveOnlineMode == PlayModes.Ranked)
+        {
+            // Send off actions for current turn
+            // Send it off - RPC call
+            SendTurnActions();
 
-        // Set New Current Actions
-        PreviousLocalPlayersCurrentTurn = LocalPlayersCurrentTurn;
-        LocalPlayersCurrentTurn = new PlayerActions(PlayerManager.Instance.LocalPlayer.PlayerID, true);
+            // Set New Current Actions
+            PreviousLocalPlayersCurrentTurn = LocalPlayersCurrentTurn;
+            LocalPlayersCurrentTurn = new PlayerActions(PlayerManager.Instance.LocalPlayer.PlayerID, true);
+        }
+        else
+        {
+            // Offline MODE
+            OfflineRecievePlayerAction(LocalPlayersCurrentTurn, AiCurrentTurn);
+
+            // Set New Current Actions
+            AiPreviousTurn = AiCurrentTurn;
+            AiCurrentTurn = new PlayerActions(2, false);
+
+            PreviousLocalPlayersCurrentTurn = LocalPlayersCurrentTurn;
+            LocalPlayersCurrentTurn = new PlayerActions(1, true);
+        }
+    }
+
+    public void OfflineRecievePlayerAction(PlayerActions PlayerAction, PlayerActions AiAction)
+    {
+        if (CurrentTurn != null && CurrentTurn.LockStepTurnNumber == PlayerAction.TurnNumber)
+        {
+            CurrentTurn.AddActionSet(PlayerAction);
+            CurrentTurn.AddActionSet(AiAction);
+        }
+        else if (PendingTurn != null && PendingTurn.LockStepTurnNumber == PlayerAction.TurnNumber)
+        {
+            CurrentTurn.AddActionSet(PlayerAction);
+            CurrentTurn.AddActionSet(AiAction);
+        }
+        else if (ConfirmedTurn != null && ConfirmedTurn.LockStepTurnNumber == PlayerAction.TurnNumber)
+        {
+            CurrentTurn.AddActionSet(PlayerAction);
+            CurrentTurn.AddActionSet(AiAction);
+        }
     }
 
     public void RecievePlayerAction(PlayerActions PendingActionToTrack)
@@ -934,15 +991,18 @@ public class LockstepManager : MonoBehaviour
     private float TickRateTimer = 0;
     public void PingHost(bool ReliableSend = false)
     {
-        PingStartTime_ns = System.DateTime.Now.Ticks;
-        PingBroadcast Ping = new PingBroadcast()
+        if (PlayerManager.Instance.ActiveOnlineMode == PlayModes.CustomGame || PlayerManager.Instance.ActiveOnlineMode == PlayModes.Ranked || PlayerManager.Instance.ActiveOnlineMode == PlayModes.Quickplay)
         {
-            Reliable = ReliableSend,
-            SentByPlayer = PlayerManager.Instance.LocalPlayer.PlayerID,
-            ServerTimeNow = 0,
-        };
+            PingStartTime_ns = System.DateTime.Now.Ticks;
+            PingBroadcast Ping = new PingBroadcast()
+            {
+                Reliable = ReliableSend,
+                SentByPlayer = PlayerManager.Instance.LocalPlayer.PlayerID,
+                ServerTimeNow = 0,
+            };
 
-        InstanceFinder.ClientManager.Broadcast(Ping);
+            InstanceFinder.ClientManager.Broadcast(Ping);
+        }
     }
 
     public void PingHost_ToServer(NetworkConnection conn, PingBroadcast broadcast)
@@ -1049,6 +1109,11 @@ public class ActionTurn
 
     public bool ReadyForNextTurn()
     {
+        if (PlayerManager.Instance.ActiveOnlineMode == PlayModes.None || PlayerManager.Instance.ActiveOnlineMode == PlayModes.VsComputer)
+        {
+            return true;
+        }
+
         if (CurrentState == ActionStates.New)
         {
             return true;
@@ -1259,7 +1324,9 @@ public class PlayerActions
 
         if (AddNoAction)
         {
-            AddAction(new NoAction());
+            NoAction NewNoAction = new NoAction();
+            NewNoAction.OwningPlayer = playerID;
+            AddAction(NewNoAction);
         }
     }
 }
@@ -1289,7 +1356,15 @@ public class NoAction : IAction
     public NoAction()
     {
         ActionType = (int)ActionTypes.NoAction;
-        OwningPlayer = PlayerManager.Instance.LocalPlayer.PlayerID;
+
+        if (PlayerManager.Instance.ActiveOnlineMode == PlayModes.CustomGame || PlayerManager.Instance.ActiveOnlineMode == PlayModes.Ranked || PlayerManager.Instance.ActiveOnlineMode == PlayModes.Quickplay)
+        {
+            OwningPlayer = PlayerManager.Instance.LocalPlayer.PlayerID;
+        }
+        else
+        {
+            OwningPlayer = 0;
+        }
     }
 
     public void ProcessAction()
@@ -1314,7 +1389,15 @@ public class CorruptAction : IAction
     public CorruptAction()
     {
         ActionType = (int)ActionTypes.Corrupt;
-        OwningPlayer = PlayerManager.Instance.LocalPlayer.PlayerID;
+
+        if (PlayerManager.Instance.ActiveOnlineMode == PlayModes.CustomGame || PlayerManager.Instance.ActiveOnlineMode == PlayModes.Ranked || PlayerManager.Instance.ActiveOnlineMode == PlayModes.Quickplay)
+        {
+            OwningPlayer = PlayerManager.Instance.LocalPlayer.PlayerID;
+        }
+        else
+        {
+            OwningPlayer = 0;
+        }
     }
 
     public void ProcessAction()
