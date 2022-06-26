@@ -46534,6 +46534,7 @@ GameObject:
   - component: {fileID: 1667037154}
   - component: {fileID: 1667037153}
   - component: {fileID: 1667037156}
+  - component: {fileID: 1667037155}
   m_Layer: 0
   m_Name: PlayerManager
   m_TagString: Untagged
@@ -46553,7 +46554,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 846e71cf5c6844b46b60c55db5c23341, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  NetworkType: 1
   RiptideNetworkManager: {fileID: 1766968649}
   FishnetNetworkManager: {fileID: 1211305128}
   DarkriftManager: {fileID: 607592393}
@@ -46586,6 +46586,13 @@ MonoBehaviour:
     OpponentSelectedPerk1: {fileID: 0}
     OpponentSelectedPerk2: {fileID: 0}
   PreviousMatchData: []
+  OpponentAiController: {fileID: 1667037155}
+  DefaultVeryEasyAi: {fileID: 11400000, guid: 20e00232fc00b3e42aa99706d0006fde, type: 2}
+  DefaultEasyAi: {fileID: 11400000, guid: 2054bac2764703d48b379bb7e6bfd9d9, type: 2}
+  DefaultNormalAi: {fileID: 11400000, guid: c375268ed53511d4a81b959fc3ae0a07, type: 2}
+  DefaultHardAi: {fileID: 11400000, guid: d3eb7e69d2971fa49bfee48ad73524bc, type: 2}
+  DefaultInsaneAi: {fileID: 11400000, guid: f3a882a7776a09046a6a3c01165e5c62, type: 2}
+  DefaultYouWontAi: {fileID: 11400000, guid: 7bad86ffafb07b547872e2da9593b835, type: 2}
 --- !u!4 &1667037154
 Transform:
   m_ObjectHideFlags: 0
@@ -46603,6 +46610,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1667037155
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1667037152}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 619106c90be6a08478f612fda11e774f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1667037156
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -43,6 +43,15 @@ public class RaceDataScriptableObject : ScriptableObject
     [Header("Passive")]
     public RacePassive Passive;
 
+    // Ai Difficulties - If these are not set, it will grab from the PlayerManager
+    [Header("Ai")]
+    public GameAiScriptableObject VeryEasyAi;
+    public GameAiScriptableObject EasyAi;
+    public GameAiScriptableObject NormalAi;
+    public GameAiScriptableObject HardAi;
+    public GameAiScriptableObject InsaneAi;
+    public GameAiScriptableObject YouWontAi;
+
     public int GetPerkIndex(Perk WantedPerkInfo)
     {
         if (WantedPerkInfo == null)

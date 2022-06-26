@@ -295,6 +295,7 @@ public class LockstepManager : MonoBehaviour
     public void AsyncGameTurn()
     {
         BaseUnitBehaviour.UpdateUnits();
+        AiController.UpdateAiControllers();
 
         PingHost();
         //Debug.Log($"Async Update {System.DateTime.Now.Hour} hr / {System.DateTime.Now.Minute} min / {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
@@ -319,6 +320,9 @@ public class LockstepManager : MonoBehaviour
         BaseBuilding.UpdateBases();
         BaseUnitBehaviour.UpdateUnits();
         BuyUnitUI.UpdateAllBuyUi();
+
+        // Update your ai last so it gets the upto date info of the game state
+        GameAi.AskAllAiForDecision();
         //Debug.Log($"Game Update -> {System.DateTime.Now.Second} sec / {System.DateTime.Now.Millisecond} ms");
     }
 

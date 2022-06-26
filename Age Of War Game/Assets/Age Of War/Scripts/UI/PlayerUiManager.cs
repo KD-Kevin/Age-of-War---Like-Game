@@ -6,6 +6,7 @@ using TMPro;
 using UnityEngine.UI;
 using UnityEditor;
 using UnityEngine.SceneManagement;
+using System;
 
 public class PlayerUiManager : MonoBehaviour
 {
@@ -124,6 +125,11 @@ public class PlayerUiManager : MonoBehaviour
             BuySpeedUnitUI.SetUnit(TestUnit, 2);
             BuyTankUnitUI.SetUnit(TestUnit, 3);
             BuyExtraUnitUI.SetUnit(TestUnit, 4);
+        }
+
+        if (PlayerManager.Instance.ActiveOnlineMode == PlayModes.None || PlayerManager.Instance.ActiveOnlineMode == PlayModes.VsComputer)
+        {
+            PlayerManager.Instance.AddAi(2);
         }
     }
 

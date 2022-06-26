@@ -29,6 +29,15 @@ public class PlayerManager : MonoBehaviour
     public List<(PlayerData, PlayModes)> PreviousPlayerData = new List<(PlayerData, PlayModes)>(); // Keeps track of your previous players you played against and in which modes
     public List<MatchData> PreviousMatchData = new List<MatchData>();
 
+    public AiController OpponentAiController;
+    // Ai Difficulties - Defaults if race does ot have Ai Data
+    public GameAiScriptableObject DefaultVeryEasyAi;
+    public GameAiScriptableObject DefaultEasyAi;
+    public GameAiScriptableObject DefaultNormalAi;
+    public GameAiScriptableObject DefaultHardAi;
+    public GameAiScriptableObject DefaultInsaneAi;
+    public GameAiScriptableObject DefaultYouWontAi;
+
     // Campaign
     public CampaignSaveData CurrentCampaignSaveData { get; set; }
 
@@ -121,6 +130,7 @@ public class PlayerManager : MonoBehaviour
         InstanceFinder.ClientManager.OnClientConnectionState -= OnClientConnectionStateChange;
     }
 
+    #region Online
     // Online
     public bool WaitingOnSpawn { get; set; }
     public void SpawnFishnetNetworkHelper()
@@ -153,6 +163,76 @@ public class PlayerManager : MonoBehaviour
         else
         {
             OfflineGameStarted = true;
+            GameAiScriptableObject AiData;
+            if (CurrentMatchData.AiDifficulty == CampaignDifficulty.Normal)
+            {
+                if (CurrentMatchData.OpponentSelectedRace.NormalAi == null)
+                {
+                    AiData = DefaultNormalAi;
+                }
+                else
+                {
+                    AiData = CurrentMatchData.OpponentSelectedRace.NormalAi;
+                }
+            }
+            else if (CurrentMatchData.AiDifficulty == CampaignDifficulty.Hard)
+            {
+                if (CurrentMatchData.OpponentSelectedRace.HardAi == null)
+                {
+                    AiData = DefaultHardAi;
+                }
+                else
+                {
+                    AiData = CurrentMatchData.OpponentSelectedRace.HardAi;
+                }
+            }
+            else if (CurrentMatchData.AiDifficulty == CampaignDifficulty.Easy)
+            {
+                if (CurrentMatchData.OpponentSelectedRace.EasyAi == null)
+                {
+                    AiData = DefaultVeryEasyAi;
+                }
+                else
+                {
+                    AiData = CurrentMatchData.OpponentSelectedRace.EasyAi;
+                }
+            }
+            else if (CurrentMatchData.AiDifficulty == CampaignDifficulty.Insane)
+            {
+                if (CurrentMatchData.OpponentSelectedRace.InsaneAi == null)
+                {
+                    AiData = DefaultInsaneAi;
+                }
+                else
+                {
+                    AiData = CurrentMatchData.OpponentSelectedRace.InsaneAi;
+                }
+            }
+            else if (CurrentMatchData.AiDifficulty == CampaignDifficulty.YouWont)
+            {
+                if (CurrentMatchData.OpponentSelectedRace.YouWontAi == null)
+                {
+                    AiData = DefaultYouWontAi;
+                }
+                else
+                {
+                    AiData = CurrentMatchData.OpponentSelectedRace.YouWontAi;
+                }
+            }
+            else 
+            {
+                if (CurrentMatchData.OpponentSelectedRace.VeryEasyAi == null)
+                {
+                    AiData = DefaultVeryEasyAi;
+                }
+                else
+                {
+                    AiData = CurrentMatchData.OpponentSelectedRace.VeryEasyAi;
+                }
+            }
+
+            // Load the opponent Ai
+            OpponentAiController.LoadController(CurrentMatchData.OpponentSelectedRace, AiData, 2);
         }
     }
 
@@ -368,6 +448,10 @@ public class PlayerManager : MonoBehaviour
         CancellationRankedCallback.Invoke();
     }
 
+    #endregion
+
+    #region Offline
+
     // Load Page Data
     public void LoadPageData(VersusAiPage page)
     {
@@ -428,6 +512,13 @@ public class PlayerManager : MonoBehaviour
         LocalPlayerData.Data.UserName = "No Name";
         PlayerPrefs.SetString("SaveName", "No Name");
     }
+
+    public void AddAi(int TeamID)
+    {
+
+    }
+
+    #endregion
 }
 
 [System.Serializable]

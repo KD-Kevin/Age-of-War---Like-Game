@@ -429,6 +429,7 @@ public class BaseUnitBehaviour : MonoBehaviour, IHealth, ITeam
     {
         CurrentArmor = StartArmor;
         CurrentHealth = StartHealth;
+        CurrentMagicArmor = StartMagicArmor;
 
         LongestRaycastDistance = StopDistance > AlliedUnitStopDistance ? StopDistance : AlliedUnitStopDistance;
 

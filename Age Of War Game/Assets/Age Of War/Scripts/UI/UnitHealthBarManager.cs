@@ -8,14 +8,14 @@ public class UnitHealthBarManager : MonoBehaviour
     public static UnitHealthBarManager Instance;
 
     [SerializeField]
-    private UnitHealthBar HealthBarPrefab;
+    private UnitHealBarBase HealthBarPrefab;
     [SerializeField]
     private Transform HealthBarPrefabSpawn;
 
-    private List<UnitHealthBar> Active = new List<UnitHealthBar>();
-    private List<UnitHealthBar> Pool = new List<UnitHealthBar>();
-    private List<UnitHealthBar> ReturnList = new List<UnitHealthBar>();
-    private List<UnitHealthBar> AddList = new List<UnitHealthBar>();
+    private List<UnitHealBarBase> Active = new List<UnitHealBarBase>();
+    private List<UnitHealBarBase> Pool = new List<UnitHealBarBase>();
+    private List<UnitHealBarBase> ReturnList = new List<UnitHealBarBase>();
+    private List<UnitHealBarBase> AddList = new List<UnitHealBarBase>();
 
     private void Awake()
     {
@@ -44,7 +44,7 @@ public class UnitHealthBarManager : MonoBehaviour
         ReturnList.Clear();
     }
 
-    public void ReturnUi(UnitHealthBar unitHealthBar)
+    public void ReturnUi(UnitHealBarBase unitHealthBar)
     {
         unitHealthBar.gameObject.SetActive(false);
         ReturnList.Add(unitHealthBar);
@@ -52,7 +52,7 @@ public class UnitHealthBarManager : MonoBehaviour
 
     public void GetHealthBar(BaseUnitBehaviour ForUnit)
     {
-        UnitHealthBar NewBar;
+        UnitHealBarBase NewBar;
         if (Pool.Count > 0)
         {
             NewBar = Pool[0];

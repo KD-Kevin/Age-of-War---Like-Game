@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UnitHealthBar : MonoBehaviour
+public class UnitHealthBar : UnitHealBarBase
 {
     [SerializeField]
     private Image HealthFillImage;
@@ -14,18 +14,16 @@ public class UnitHealthBar : MonoBehaviour
     [SerializeField]
     private Image MagicalArmorFillImage;
 
-    public BaseUnitBehaviour Unit { get; private set; }
-
-    public void SetUnit(BaseUnitBehaviour newUnit)
+    public override void SetUnit(IHealth newUnit)
     {
-        Unit = newUnit;
+        base.SetUnit(newUnit);
 
-        if (Unit.MaxMagicArmor > 0)
+        if (HealthComponent.MaxMagicArmor > 0)
         {
             MagicArmorUiObject.SetActive(true);
         }
 
-        if (Unit.MaxArmor > 0)
+        if (HealthComponent.MaxArmor > 0)
         {
             ArmorUiObject.SetActive(true);
         }
@@ -33,26 +31,26 @@ public class UnitHealthBar : MonoBehaviour
         UpdateUi();
     }
 
-    public void UpdateUi()
+    public override void UpdateUi()
     {
         // Set Position
-        transform.position = Unit.HealthBarTransform.position;
+        base.UpdateUi();
 
         // Set Values
-        HealthFillImage.fillAmount = (float)Unit.CurrentHealth / Unit.MaxHealth;
+        HealthFillImage.fillAmount = (float)HealthComponent.CurrentHealth / HealthComponent.MaxHealth;
 
-        if (Unit.MaxArmor > 0)
+        if (HealthComponent.MaxArmor > 0)
         {
-            ArmorFillImage.fillAmount = (float)Unit.CurrentArmor / Unit.MaxArmor;
+            ArmorFillImage.fillAmount = (float)HealthComponent.CurrentArmor / HealthComponent.MaxArmor;
         }
         else if (ArmorUiObject.activeInHierarchy)
         {
             ArmorUiObject.SetActive(false);
         }
 
-        if (Unit.MaxMagicArmor > 0)
+        if (HealthComponent.MaxMagicArmor > 0)
         {
-            MagicalArmorFillImage.fillAmount = (float)Unit.CurrentMagicArmor / Unit.MaxMagicArmor;
+            MagicalArmorFillImage.fillAmount = (float)HealthComponent.CurrentMagicArmor / HealthComponent.MaxMagicArmor;
         }
         else if (MagicArmorUiObject.activeInHierarchy)
         {
@@ -61,7 +59,7 @@ public class UnitHealthBar : MonoBehaviour
 
         if (HealthFillImage.fillAmount <= 0)
         {
-            UnitHealthBarManager.Instance.ReturnUi(this);
+            UnitHealthBarManager.Instance?.ReturnUi(this);
         }
     }
 
