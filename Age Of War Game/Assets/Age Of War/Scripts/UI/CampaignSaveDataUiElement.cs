@@ -1,33 +1,34 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-using UnityEngine.UI;
 
-public class CampaignSaveDataUiElement : MonoBehaviour
+namespace AgeOfWar.UI
 {
-    [SerializeField]
-    private TextMeshProUGUI CampaignText;
-    private CampaignSaveData SaveData;
-    public CampaignSaveData CurrentSaveData { 
-        get
+    public class CampaignSaveDataUiElement : MonoBehaviour
+    {
+        [SerializeField]
+        private TextMeshProUGUI CampaignText;
+        private CampaignSaveData SaveData;
+        public CampaignSaveData CurrentSaveData
         {
-            return SaveData;
+            get
+            {
+                return SaveData;
+            }
+            set
+            {
+                SaveData = value;
+                UpdateUi();
+            }
         }
-        set 
-        { 
-            SaveData = value;
-            UpdateUi();
-        } 
-    }
 
-    private void UpdateUi()
-    {
-        CampaignText.text = SaveData.SaveDataTitle;
-    }
+        private void UpdateUi()
+        {
+            CampaignText.text = SaveData.SaveDataTitle;
+        }
 
-    public void OnClick()
-    {
-        CampaignPage.Instance.LoadSaveData(SaveData);
+        public void OnClick()
+        {
+            CampaignPage.Instance.LoadSaveData(SaveData);
+        }
     }
 }

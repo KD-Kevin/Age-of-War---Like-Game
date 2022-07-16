@@ -5,24 +5,27 @@ using Michsky.UI.ModernUIPack;
 using TMPro;
 using BitStrap;
 
-public class UpdateWindowManagerUi : MonoBehaviour
+namespace AgeOfWar.UI
 {
-    [SerializeField]
-    private WindowManager Manager;
-
-    [Button]
-    public void UpdateValues()
+    public class UpdateWindowManagerUi : MonoBehaviour
     {
-        foreach(WindowManager.WindowItem item in Manager.windows)
+        [SerializeField]
+        private WindowManager Manager;
+
+        [Button]
+        public void UpdateValues()
         {
-            item.windowObject.gameObject.name = item.windowName + " Window";
-            item.buttonObject.gameObject.name = item.windowName + " Button";
-
-            TextMeshProUGUI[] Texts = item.buttonObject.GetComponentsInChildren<TextMeshProUGUI>();
-
-            foreach(TextMeshProUGUI Text in Texts)
+            foreach (WindowManager.WindowItem item in Manager.windows)
             {
-                Text.text = item.windowName;
+                item.windowObject.gameObject.name = item.windowName + " Window";
+                item.buttonObject.gameObject.name = item.windowName + " Button";
+
+                TextMeshProUGUI[] Texts = item.buttonObject.GetComponentsInChildren<TextMeshProUGUI>();
+
+                foreach (TextMeshProUGUI Text in Texts)
+                {
+                    Text.text = item.windowName;
+                }
             }
         }
     }

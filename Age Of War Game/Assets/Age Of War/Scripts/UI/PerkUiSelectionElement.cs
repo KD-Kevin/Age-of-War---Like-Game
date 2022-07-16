@@ -1,43 +1,45 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using AgeOfWar.Core;
 
-public class PerkUiSelectionElement : MonoBehaviour
+namespace AgeOfWar.UI
 {
-    [SerializeField]
-    private Color SelectedColor;
-    [SerializeField]
-    private Color IdleColor;
-    [SerializeField]
-    private Image PerkSpriteImage;
-    [SerializeField]
-    private TextMeshProUGUI PerkNameText;
-
-    public Perk CorrespondingPerk { get; set; }
-    public PerkSelectorCatagory CorrespondingCatagory { get; set; }
-
-    public void SetUi(Perk PerkData)
+    public class PerkUiSelectionElement : MonoBehaviour
     {
-        CorrespondingPerk = PerkData;
-        PerkNameText.text = PerkData.DisplayName;
-        PerkSpriteImage.sprite = PerkData.DisplaySprite;
-    }
+        [SerializeField]
+        private Color SelectedColor;
+        [SerializeField]
+        private Color IdleColor;
+        [SerializeField]
+        private Image PerkSpriteImage;
+        [SerializeField]
+        private TextMeshProUGUI PerkNameText;
 
-    public void OnSelect()
-    {
-        PerkSpriteImage.color = SelectedColor;
-        CorrespondingCatagory.OnSelect(this);
-    }
+        public Perk CorrespondingPerk { get; set; }
+        public PerkSelectorCatagory CorrespondingCatagory { get; set; }
 
-    public void ResetUi()
-    {
-        PerkSpriteImage.color = IdleColor;
-    }
+        public void SetUi(Perk PerkData)
+        {
+            CorrespondingPerk = PerkData;
+            PerkNameText.text = PerkData.DisplayName;
+            PerkSpriteImage.sprite = PerkData.DisplaySprite;
+        }
 
-    public void SetSelectionColor()
-    {
-        PerkSpriteImage.color = SelectedColor;
+        public void OnSelect()
+        {
+            PerkSpriteImage.color = SelectedColor;
+            CorrespondingCatagory.OnSelect(this);
+        }
+
+        public void ResetUi()
+        {
+            PerkSpriteImage.color = IdleColor;
+        }
+
+        public void SetSelectionColor()
+        {
+            PerkSpriteImage.color = SelectedColor;
+        }
     }
 }

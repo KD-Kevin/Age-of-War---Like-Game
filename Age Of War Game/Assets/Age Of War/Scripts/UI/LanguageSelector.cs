@@ -1,54 +1,55 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
+using AgeOfWar.Data;
 
-
-public class LanguageSelector : MonoBehaviour
+namespace AgeOfWar.UI
 {
-    [SerializeField] private TMPro.TMP_Dropdown _dropdown;
-
-    public static Localization CurrentLocalization = Localization.English;
-
-    private void Start()
+    public class LanguageSelector : MonoBehaviour
     {
-        _dropdown.options.Clear();
+        [SerializeField] private TMPro.TMP_Dropdown _dropdown;
 
-        List<string> options = new List<string>();
+        public static Localization CurrentLocalization = Localization.English;
 
-        for(int i = 0; i < (int)Localization.Number; i++)
+        private void Start()
         {
-            options.Add(((Localization)i).ToString());
+            _dropdown.options.Clear();
+
+            List<string> options = new List<string>();
+
+            for (int i = 0; i < (int)Localization.Number; i++)
+            {
+                options.Add(((Localization)i).ToString());
+            }
+
+            _dropdown.AddOptions(options);
+
+            GetDropDown();
+            CurrentLocalization = (Localization)_dropdown.value;
         }
 
-        _dropdown.AddOptions(options);
-
-        GetDropDown();
-        CurrentLocalization = (Localization)_dropdown.value;
-    }
-
-    private void GetDropDown()
-    {
-        if (PlayerPrefs.GetInt("Language", 0) == 0)
+        private void GetDropDown()
         {
-            _dropdown.value = 0;
+            if (PlayerPrefs.GetInt("Language", 0) == 0)
+            {
+                _dropdown.value = 0;
+            }
+            else
+            {
+                _dropdown.value = 1;
+            }
         }
-        else
+
+        public void ChangeLanguage(int selected)
         {
-            _dropdown.value = 1;
+            PlayerPrefs.SetInt("Language", selected);
+            CurrentLocalization = (Localization)selected;
+
+            //LocalizationField[] allLoadedLocalizationFields = FindObjectsOfType<LocalizationField>();
+            //for (int l = 0; l < allLoadedLocalizationFields.Length; ++l)
+            //{
+            //    allLoadedLocalizationFields[l].ChangeLocalization();
+            //}
         }
-    }
-
-    public void ChangeLanguage(int selected)
-    {
-        PlayerPrefs.SetInt("Language", selected);
-        CurrentLocalization = (Localization)selected;
-
-        //LocalizationField[] allLoadedLocalizationFields = FindObjectsOfType<LocalizationField>();
-        //for (int l = 0; l < allLoadedLocalizationFields.Length; ++l)
-        //{
-        //    allLoadedLocalizationFields[l].ChangeLocalization();
-        //}
     }
 }
 

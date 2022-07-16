@@ -2,38 +2,41 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// TBD
-/// 
-/// ----------------------------------- Decision Tree ----------------------------------------------------
-/// 1. TBD
-/// ------------------------------------------------------------------------------------------------------
-/// 
-/// </summary>
-public class GenericNormalAi : GameAi
+namespace AgeOfWar.AI
 {
-    [SerializeField]
-    protected int MakeDecisionEveryXTurns = 3;
-
-    protected int DecisionCounter = 0;
-
-    public override AiDecisionTypes MakeDecision()
+    /// <summary>
+    /// TBD
+    /// 
+    /// ----------------------------------- Decision Tree ----------------------------------------------------
+    /// 1. TBD
+    /// ------------------------------------------------------------------------------------------------------
+    /// 
+    /// </summary>
+    public class GenericNormalAi : GameAi
     {
-        AiDecisionTypes Decision = AiDecisionTypes.NoDecision;
+        [SerializeField]
+        protected int MakeDecisionEveryXTurns = 3;
 
-        DecisionCounter++;
-        if (DecisionCounter == MakeDecisionEveryXTurns)
+        protected int DecisionCounter = 0;
+
+        public override AiDecisionTypes MakeDecision()
         {
-            DecisionCounter = 0;
-            // Go down decision tree
+            AiDecisionTypes Decision = AiDecisionTypes.NoDecision;
 
-        }
-        else
-        {
-            Decision = AiDecisionTypes.Idle;
-        }
+            DecisionCounter++;
+            if (DecisionCounter == MakeDecisionEveryXTurns)
+            {
+                DecisionCounter = 0;
+                // Go down decision tree
 
-        lastDecisionType = Decision;
-        return Decision;
+            }
+            else
+            {
+                Decision = AiDecisionTypes.Idle;
+            }
+
+            lastDecisionType = Decision;
+            return Decision;
+        }
     }
 }

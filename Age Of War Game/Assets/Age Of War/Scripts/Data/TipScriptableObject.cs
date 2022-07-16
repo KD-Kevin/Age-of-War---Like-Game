@@ -1,17 +1,19 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Tips", menuName = "AgeOfWar/Tips/LoadingTips")]
-public class TipScriptableObject : ScriptableObject
+namespace AgeOfWar.Data
 {
-    public Localization TestLocalization;
-    public List<string> Tips = new List<string>();
-
-    public string GetRandomTip()
+    [CreateAssetMenu(fileName = "Tips", menuName = "AgeOfWar/Tips/LoadingTips")]
+    public class TipScriptableObject : ScriptableObject
     {
-        int RandomIndex = Random.Range(0, Tips.Count);
+        public Localization TestLocalization;
+        public List<string> Tips = new List<string>();
 
-        return Tips[RandomIndex];
+        public string GetRandomTip()
+        {
+            int RandomIndex = Random.Range(0, Tips.Count);
+
+            return Tips[RandomIndex];
+        }
     }
 }

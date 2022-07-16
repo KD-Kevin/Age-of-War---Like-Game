@@ -1,28 +1,31 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using AgeOfWar.Core;
+using AgeOfWar.Core.Units;
 
-public class UnitHealBarBase : MonoBehaviour
+namespace AgeOfWar.UI
 {
-    public IHealth HealthComponent { get; private set; }
-
-    public virtual void ResetUi()
+    public class UnitHealBarBase : MonoBehaviour
     {
-        SetUnit(HealthComponent);
-    }
+        public IHealth HealthComponent { get; private set; }
 
-    public virtual void SetUnit(IHealth newUnit)
-    {
-        HealthComponent = newUnit;
-    }
-
-    public virtual void UpdateUi()
-    {
-        // Set Position
-        if (HealthComponent is BaseUnitBehaviour)
+        public virtual void ResetUi()
         {
-            BaseUnitBehaviour Unit = HealthComponent as BaseUnitBehaviour;
-            transform.position = Unit.HealthBarTransform.position;
+            SetUnit(HealthComponent);
+        }
+
+        public virtual void SetUnit(IHealth newUnit)
+        {
+            HealthComponent = newUnit;
+        }
+
+        public virtual void UpdateUi()
+        {
+            // Set Position
+            if (HealthComponent is BaseUnitBehaviour)
+            {
+                BaseUnitBehaviour Unit = HealthComponent as BaseUnitBehaviour;
+                transform.position = Unit.HealthBarTransform.position;
+            }
         }
     }
 }

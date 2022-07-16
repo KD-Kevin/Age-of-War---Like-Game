@@ -1,29 +1,31 @@
-using System.Collections;
-using System.Collections.Generic;
+using AgeOfWar.Core;
 using UnityEngine;
 
-public class EnterUsernamePage : MonoBehaviour
+namespace AgeOfWar.UI
 {
-    private string SetUserName = "No Name";
-
-    public void OpenPage()
+    public class EnterUsernamePage : MonoBehaviour
     {
-        gameObject.SetActive(true);
-    }
+        private string SetUserName = "No Name";
 
-    public void SubmitButtopnPressed()
-    {
-        if (SetUserName == "No Name" || string.IsNullOrEmpty(SetUserName))
+        public void OpenPage()
         {
-            return;
+            gameObject.SetActive(true);
         }
 
-        PlayerManager.Instance.LocalPlayerData.Data.UserName = SetUserName;
-        gameObject.SetActive(false);
-    }
+        public void SubmitButtopnPressed()
+        {
+            if (SetUserName == "No Name" || string.IsNullOrEmpty(SetUserName))
+            {
+                return;
+            }
 
-    public void SetName(string Username)
-    {
-        SetUserName = Username;
+            PlayerManager.Instance.LocalPlayerData.Data.UserName = SetUserName;
+            gameObject.SetActive(false);
+        }
+
+        public void SetName(string Username)
+        {
+            SetUserName = Username;
+        }
     }
 }

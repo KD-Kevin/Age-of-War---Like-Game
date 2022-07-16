@@ -4,52 +4,57 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Michsky.UI.ModernUIPack;
+using AgeOfWar.Data;
+using AgeOfWar.Core.Units;
 
-public class RaceSelectionUiElement : MonoBehaviour
+namespace AgeOfWar.UI
 {
-    [SerializeField]
-    private Color SelectionColor;
-    [SerializeField]
-    private Color IdleColor;
-    [SerializeField]
-    private Image RaceSpriteImage;
-    [SerializeField]
-    private TextMeshProUGUI RaceNameText;
-    [SerializeField]
-    private ButtonManagerBasic RaceNameButton;
-    [SerializeField]
-    private RaceSelectionUnitUiElement UnitUiPrefab;
-    [SerializeField]
-    private Transform PrefabSpawn;
-    
-    public RaceDataScriptableObject CorrespondingData { get; set; }
-
-    private List<RaceSelectionUnitUiElement> UnitUiElements = new List<RaceSelectionUnitUiElement>();
-
-    public void SetUi(RaceDataScriptableObject Data)
+    public class RaceSelectionUiElement : MonoBehaviour
     {
-        CorrespondingData = Data;
-        RaceNameButton.buttonText = Data.DisplayName;
-        RaceNameText.text = Data.DisplayName;
-        RaceSpriteImage.sprite = Data.DisplaySprite;
+        [SerializeField]
+        private Color SelectionColor;
+        [SerializeField]
+        private Color IdleColor;
+        [SerializeField]
+        private Image RaceSpriteImage;
+        [SerializeField]
+        private TextMeshProUGUI RaceNameText;
+        [SerializeField]
+        private ButtonManagerBasic RaceNameButton;
+        [SerializeField]
+        private RaceSelectionUnitUiElement UnitUiPrefab;
+        [SerializeField]
+        private Transform PrefabSpawn;
 
-        foreach(BaseUnitBehaviour RaceUnit in Data.StartingUnitsBlueprints)
+        public RaceDataScriptableObject CorrespondingData { get; set; }
+
+        private List<RaceSelectionUnitUiElement> UnitUiElements = new List<RaceSelectionUnitUiElement>();
+
+        public void SetUi(RaceDataScriptableObject Data)
         {
-            RaceSelectionUnitUiElement NewElement = Instantiate(UnitUiPrefab, PrefabSpawn);
-            NewElement.SetUi(RaceUnit);
+            CorrespondingData = Data;
+            RaceNameButton.buttonText = Data.DisplayName;
+            RaceNameText.text = Data.DisplayName;
+            RaceSpriteImage.sprite = Data.DisplaySprite;
 
-            UnitUiElements.Add(NewElement);
+            foreach (BaseUnitBehaviour RaceUnit in Data.StartingUnitsBlueprints)
+            {
+                RaceSelectionUnitUiElement NewElement = Instantiate(UnitUiPrefab, PrefabSpawn);
+                NewElement.SetUi(RaceUnit);
+
+                UnitUiElements.Add(NewElement);
+            }
         }
-    }
 
-    public void ResetUi()
-    {
-        RaceNameButton.buttonVar.targetGraphic.color = IdleColor;
-    }
+        public void ResetUi()
+        {
+            RaceNameButton.buttonVar.targetGraphic.color = IdleColor;
+        }
 
-    public void OnSelect()
-    {
-        RaceNameButton.buttonVar.targetGraphic.color = SelectionColor;
-        RaceSelector.Instance.SelectData(this);
+        public void OnSelect()
+        {
+            RaceNameButton.buttonVar.targetGraphic.color = SelectionColor;
+            RaceSelector.Instance.SelectData(this);
+        }
     }
 }

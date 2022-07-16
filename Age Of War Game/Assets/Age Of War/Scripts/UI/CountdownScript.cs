@@ -1,20 +1,22 @@
-using System.Collections;
-using System.Collections.Generic;
+using AgeOfWar.Networking;
 using UnityEngine;
 
-public class CountdownScript : MonoBehaviour
+namespace AgeOfWar.UI
 {
-    [SerializeField]
-    private TMPro.TextMeshProUGUI CountdownText;
-
-    // Update is called once per frame
-    void Update()
+    public class CountdownScript : MonoBehaviour
     {
-        if (LockstepManager.Instance.SecondsTillReconnect <= -1)
-        {
-            gameObject.SetActive(false);
-        }
+        [SerializeField]
+        private TMPro.TextMeshProUGUI CountdownText;
 
-        CountdownText.text = $"{LockstepManager.Instance.SecondsTillReconnect}";
+        // Update is called once per frame
+        void Update()
+        {
+            if (LockstepManager.Instance.SecondsTillReconnect <= -1)
+            {
+                gameObject.SetActive(false);
+            }
+
+            CountdownText.text = $"{LockstepManager.Instance.SecondsTillReconnect}";
+        }
     }
 }

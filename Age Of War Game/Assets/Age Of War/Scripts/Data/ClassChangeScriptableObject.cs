@@ -1,10 +1,12 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using AgeOfWar.Core.Units;
 
-[CreateAssetMenu(fileName = "Tips", menuName = "AgeOfWar/Upgrades/ClassChange")]
-public class ClassChangeScriptableObject : ScriptableObject
+namespace AgeOfWar.Data
 {
-    public string ClassChangeDisplayName = "Enter Upgrade Name";
-    public BaseUnitBehaviour NewUnitType;
+    [CreateAssetMenu(fileName = "Tips", menuName = "AgeOfWar/Upgrades/ClassChange")]
+    public class ClassChangeScriptableObject : ScriptableObject
+    {
+        public string ClassChangeDisplayName = "Enter Upgrade Name";
+        public BaseUnitBehaviour NewUnitType;
+    }
 }

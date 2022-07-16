@@ -1,19 +1,21 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using AgeOfWar.Core.Units;
 
-public class RaceSelectionUnitUiElement : MonoBehaviour
+namespace AgeOfWar.UI
 {
-    [SerializeField]
-    private Image UnitSpriteImage;
-    [SerializeField]
-    private TextMeshProUGUI UnitNameText;
-
-    public void SetUi(BaseUnitBehaviour PrefabData)
+    public class RaceSelectionUnitUiElement : MonoBehaviour
     {
-        UnitNameText.text = PrefabData.DisplayName;
-        UnitSpriteImage.sprite = PrefabData.DisplaySprite;
+        [SerializeField]
+        private Image UnitSpriteImage;
+        [SerializeField]
+        private TextMeshProUGUI UnitNameText;
+
+        public void SetUi(BaseUnitBehaviour PrefabData)
+        {
+            UnitNameText.text = PrefabData.DisplayName;
+            UnitSpriteImage.sprite = PrefabData.DisplaySprite;
+        }
     }
 }
