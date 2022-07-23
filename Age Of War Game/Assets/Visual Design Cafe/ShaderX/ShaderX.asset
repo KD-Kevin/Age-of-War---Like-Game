@@ -16,8 +16,8 @@ MonoBehaviour:
   _description: 
   _version:
     _bundleIdentifier: com.vdc.shaderx.embedded
-    _versionNumber: 0.7.2
-    _buildNumber: 42
+    _versionNumber: 0.7.3
+    _buildNumber: 43
   _downloadInBackground: 1
   _priority: 0
   _documentationUrl: 

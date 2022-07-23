@@ -106,14 +106,6 @@ Shader "{{name_prefix}}Nature Shaders/{{shader.name}}"
             _TrunkBendFactor("Trunk Bending", Vector) = (1, 0, 0, 0)
         {% endif %}
 
-        // Interaction
-        {% if interaction %}
-            _Interaction("Interaction", Float) = 0
-            _InteractionDuration("Interaction Duration", Range(0, 5)) = 1.5
-            _InteractionStrength("Interaction Strength", Range(0, 1)) = 1
-            _InteractionPushDown("Interaction PushDown", Range(0,1)) = 1
-        {% endif %}
-
         // Translucency
         {% if translucent %}
             [ToggleOff]_Translucency("Translucency", Float) = 0
@@ -252,7 +244,7 @@ Shader "{{name_prefix}}Nature Shaders/{{shader.name}}"
             #pragma {{shader_feature_local}} _BAKED_MESH_DATA
 
             {% if wind %}
-                #pragma {{shader_feature_local}}_vertex _WIND_OFF _WIND
+                #pragma {{shader_feature_local}} _WIND_OFF _WIND
                 #if defined(_WIND)
                     #define _WIND_ON
                 #endif
@@ -278,18 +270,6 @@ Shader "{{name_prefix}}Nature Shaders/{{shader.name}}"
             {% if emission %}
                 // Already defined in Lit template.
                 //#pragma {{shader_feature_local}} _EMISSION
-            {% endif %}
-
-            {% if config.global.interaction.supported and interaction %}
-                // Uses a global keyword to enable/disable interaction in project quality settings.
-                #pragma multi_compile_vertex _INTERACTION_OFF _INTERACTION
-                #if defined(_INTERACTION)
-                    #define _INTERACTION_ON
-                #endif
-            {% else %}
-                #ifndef _INTERACTION_OFF
-                    #define _INTERACTION_OFF
-                #endif
             {% endif %}
 
             {% if config.global.overlay.supported and overlay %}
@@ -324,21 +304,23 @@ Shader "{{name_prefix}}Nature Shaders/{{shader.name}}"
                 #pragma multi_compile_instancing
                 #pragma instancing_options procedural:setupGPUI
             {% else %}
-                // Nature Renderer integration
-                #pragma multi_compile_instancing
-                #pragma instancing_options procedural:SetupNatureRenderer nolightmap forwardadd renderinglayer
+                {% if config.global.nature_renderer.version >= 2020 %}
+                    // Nature Renderer integration
+                    #pragma multi_compile_instancing
+                    #pragma instancing_options procedural:SetupNatureRenderer nolightmap forwardadd renderinglayer
 
-                // BUG: 
-                // This define needs to be put BEFORE embedding the Lit.Config file below, 
-                // even though this define is not used there. If it is put after then the
-                // camera-relative rendering is broken in HDRP when using procedural instancing.
+                    // BUG: 
+                    // This define needs to be put BEFORE embedding the Lit.Config file below, 
+                    // even though this define is not used there. If it is put after then the
+                    // camera-relative rendering is broken in HDRP when using procedural instancing.
 
-                // Nature Renderer calculates values that are the same for all vertices once
-                // for each object. This is a nice optimization that reduces per-vertex calculations.
-                // This only works if Procedural Instancing is enabled.
-                #if defined(UNITY_PROCEDURAL_INSTANCING_ENABLED)
-                    #define PER_OBJECT_VALUES_CALCULATED
-                #endif
+                    // Nature Renderer calculates values that are the same for all vertices once
+                    // for each object. This is a nice optimization that reduces per-vertex calculations.
+                    // This only works if Procedural Instancing is enabled.
+                    #if defined(UNITY_PROCEDURAL_INSTANCING_ENABLED)
+                        #define PER_OBJECT_VALUES_CALCULATED
+                    #endif
+                {% endif %}
             {% endif %}
 
             // Include the default cginc files and configurations 
@@ -456,14 +438,6 @@ Shader "{{name_prefix}}Nature Shaders/{{shader.name}}"
                 {% endif %}
                 {% if fade %}
                     float2 _WindFade;
-                {% endif %}
-
-                // Interaction
-                {% if config.global.interaction.supported %}
-                    float _Interaction;
-                    float _InteractionDuration;
-                    float _InteractionStrength;
-                    float _InteractionPushDown;
                 {% endif %}
 
                 // Translucency
@@ -604,9 +578,7 @@ Shader "{{name_prefix}}Nature Shaders/{{shader.name}}"
             {% endif %}
 
             {% if config.global.interaction.supported and interaction %}
-                #ifdef _INTERACTION
-                    {% embed "../Common/Interaction" %}
-                #endif
+                {% embed "../Common/Interaction" %}
             {% endif %}
 
             {% if config.global.overlay.supported and overlay %}
@@ -630,7 +602,17 @@ Shader "{{name_prefix}}Nature Shaders/{{shader.name}}"
             {% elseif config.local.rendering_engine == "GPU Instancer" %}
                 {% embed "../Integrations/GPU Instancer" %}
             {% else %}
-                {% embed "../Integrations/Nature Renderer" %}
+                {% if config.global.nature_renderer.version >= 2021 %}
+                    {% standard %}
+                        #if SHADERPASS == SHADERPASS_MOTION_VECTORS
+                            float4x4 unity_MatrixPreviousM;
+                            float4x4 unity_MatrixPreviousMI;
+                        #endif
+                    {% endstandard %}
+                    {% embed "../Integrations/Nature Renderer 2021" %}
+                {% elif config.global.nature_renderer.version == 2020 %}
+                    {% embed "../Integrations/Nature Renderer 2020" %}
+                {% endif %}
             {% endif %}
 
             // Called with raw vertex data before doing any kind of calculations or transformations.

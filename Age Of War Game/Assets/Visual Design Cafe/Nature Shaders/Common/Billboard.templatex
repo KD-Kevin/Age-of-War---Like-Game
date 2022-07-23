@@ -33,7 +33,7 @@ void BillboardVert(
     float3 worldPos = vertex.xyz + GetObjectPivot();
 
     #ifdef BILLBOARD_FACE_CAMERA_POS
-        float3 eyeVec = normalize(unity_BillboardCameraPosition - worldPos);
+        float3 eyeVec = TransformWorldToObjectDir(normalize(unity_BillboardCameraPosition - worldPos));
         float3 billboardTangent = normalize(float3(-eyeVec.z, 0, eyeVec.x));
         float3 billboardNormal = float3(billboardTangent.z, 0, -billboardTangent.x);
         float angle = atan2(billboardNormal.z, billboardNormal.x);

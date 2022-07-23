@@ -22,10 +22,10 @@
 #pragma multi_compile _ LOD_FADE_CROSSFADE
 
 #pragma {{shader_feature_local}} _SURFACE_MAP_OFF _SURFACE_MAP_PACKED _SURFACE_MAP_METALLIC_GLOSS
-#pragma {{shader_feature_local}} _ALPHATEST
-#pragma {{shader_feature_local}} _NORMALMAP
-#pragma {{shader_feature_local}} _SPECULARHIGHLIGHTS_OFF
-#pragma {{shader_feature_local}} _EMISSION
+#pragma {{shader_feature_local}} _ _ALPHATEST
+#pragma {{shader_feature_local}} _ _NORMALMAP
+#pragma {{shader_feature_local}} _ _SPECULARHIGHLIGHTS_OFF
+#pragma {{shader_feature_local}} _ _EMISSION
 
 #pragma multi_compile_instancing
 

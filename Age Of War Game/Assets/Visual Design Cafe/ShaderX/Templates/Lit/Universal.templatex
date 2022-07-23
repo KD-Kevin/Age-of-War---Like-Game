@@ -243,7 +243,7 @@
                             exp2(10 * surface.Smoothness + 1), 
                             surface.Emission, 
                             surface.Alpha
-                            {% if unity.version.major > 2021 or unity.version.string == "2021.2" %}
+                            {% if unity.version.major > 2021 or unity.version.string == "2021.2" or unity.version.string == "2021.3" %}
                                 , surface.Normal 
                             {% endif %}
                             );

@@ -17,8 +17,8 @@ MonoBehaviour:
     your vegetation.
   _version:
     _bundleIdentifier: com.vdc.nature-shaders.embedded
-    _versionNumber: 1.0.11
-    _buildNumber: 69
+    _versionNumber: 1.0.13
+    _buildNumber: 72
   _downloadInBackground: 1
   _priority: 0
   _documentationUrl: 
