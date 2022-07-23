@@ -5,6 +5,7 @@ namespace AgeOfWar.Core
     public class CameraController : MonoBehaviour
     {
         public float MovementSpeed = 2;
+        public Vector2 Bounds = new Vector2(-20,20);
 
         // Update is called once per frame
         void Update()
@@ -19,6 +20,12 @@ namespace AgeOfWar.Core
             {
                 transform.position += Vector3.right * MovementSpeed * Time.deltaTime;
             }
+
+            transform.position = new Vector3(
+                Mathf.Clamp(transform.position.x, Bounds.x, Bounds.y),
+                transform.position.y,
+                transform.position.z
+                );
         }
     }
 }

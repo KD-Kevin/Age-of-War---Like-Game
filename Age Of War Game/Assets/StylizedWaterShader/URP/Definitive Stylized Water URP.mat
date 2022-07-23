@@ -37,20 +37,20 @@ Material:
     - _Float1: 2
     - _FresnelExp: 5
     - _FresnelExp1: 10
-    - _GradientPosition1: 1.1693549
+    - _GradientPosition1: 4.318144
     - _GradientPosition2: 2.3790324
     - _GradientPosition3: 0.93
     - _LightColorIntensity: 0.68
-    - _MainFoamIntensity: 3.44
-    - _MainFoamOpacity: 0.95
-    - _MainFoamScale: 3.5
+    - _MainFoamIntensity: 41.89
+    - _MainFoamOpacity: 0.881
+    - _MainFoamScale: 8.38
     - _MainFoamSpeed: 0.1
     - _Opacity: 0.263
     - _OpacityDepth: 2
     - _RealTimeReflection: 0
     - _ReflectionsIntensity: 1
     - _RefractionIntensity: 2.11
-    - _Roughness: 2.41
+    - _Roughness: 0.881
     - _Roughness1: 0.79
     - _SecondaryFoamAlwaysVisible: 0
     - _SecondaryFoamIntensity: 1.12
@@ -58,21 +58,21 @@ Material:
     - _SecondaryFoamScale: 3.5
     - _SpecularIntensity: 0
     - _TurbulenceDistortionIntesity: 0.47
-    - _TurbulenceScale: 0.44
+    - _TurbulenceScale: 3
     - _VertexOffset: 1
-    - _WaveDistortionIntensity: 0.06
-    - _WavesAmplitude: 1.4
-    - _WavesDirection: 360
-    - _WavesIntensity: 0.25
-    - _WavesSpeed: 2
+    - _WaveDistortionIntensity: 1.11
+    - _WavesAmplitude: 4.07
+    - _WavesDirection: 312
+    - _WavesIntensity: 0.2
+    - _WavesSpeed: 3.19
     m_Colors:
     - _Color0: {r: 0.55294114, g: 0.7597304, b: 1, a: 1}
-    - _DepthGradient1: {r: 0.43921545, g: 0.8427246, b: 1, a: 1}
+    - _DepthGradient1: {r: 0.43888736, g: 0.8427246, b: 1, a: 1}
     - _DepthGradient2: {r: 0, g: 0.54574716, b: 0.764151, a: 1}
-    - _DepthGradient3: {r: 0.0640333, g: 0.13338149, b: 0.30182484, a: 1}
+    - _DepthGradient3: {r: 0.06378723, g: 0.1330705, b: 0.30149674, a: 1}
     - _DepthGradient4: {r: 0.10164861, g: 0.10137052, b: 0.32075462, a: 1}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
-    - _FoamColor: {r: 1, g: 1, b: 1, a: 1}
+    - _FoamColor: {r: 0.4018137, g: 0.8113207, b: 0.7867857, a: 1}
     - _FresnelColor: {r: 0.44811308, g: 0.7287335, b: 1, a: 1}
     - _FresnelColor1: {r: 0.6462264, g: 0.9230234, b: 1, a: 1}
   m_BuildTextureStacks: []
