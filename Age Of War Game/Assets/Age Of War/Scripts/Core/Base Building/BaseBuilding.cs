@@ -11,15 +11,8 @@ namespace AgeOfWar.Core
         [SerializeField]
         private int TeamBaseID = 0;
         [SerializeField]
-        private Sprite DefaultForegroundSprite;
-        [SerializeField]
-        private Sprite DefaultBackgroundSprite;
-        [SerializeField]
         private Transform UnitSpawnTransform;
-        [SerializeField]
-        private SpriteRenderer BaseForegroundSpriteRenderer;
-        [SerializeField]
-        private SpriteRenderer BaseBackgroundSpriteRenderer;
+
         [SerializeField]
         private LayerMask UnitRaycastLayer;
         [SerializeField]
@@ -139,24 +132,6 @@ namespace AgeOfWar.Core
 
         public void SetNewData(BaseBuildingData Data)
         {
-            if (Data.BaseForegroundSprite == null)
-            {
-                BaseForegroundSpriteRenderer.sprite = DefaultForegroundSprite;
-            }
-            else
-            {
-                BaseForegroundSpriteRenderer.sprite = Data.BaseForegroundSprite;
-            }
-
-            if (Data.BaseBaseBackgroundSpriteprite == null)
-            {
-                BaseBackgroundSpriteRenderer.sprite = DefaultBackgroundSprite;
-            }
-            else
-            {
-                BaseBackgroundSpriteRenderer.sprite = Data.BaseBaseBackgroundSpriteprite;
-            }
-
             BuildingData = Data;
         }
 
@@ -518,9 +493,6 @@ namespace AgeOfWar.Core
 
         public int Experience = 0;
         public int MaxExperience = 1000;
-
-        public Sprite BaseForegroundSprite = null;
-        public Sprite BaseBaseBackgroundSpriteprite = null;
 
         public int MaxPopulation = 5;
     }
