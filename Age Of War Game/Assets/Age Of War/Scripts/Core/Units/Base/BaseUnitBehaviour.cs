@@ -108,7 +108,7 @@ namespace AgeOfWar.Core.Units
         protected int CurrentMagicArmorValue = 0;
         protected int MaxMagicArmorValue = 0;
         protected int FrameCounter = 0;
-        protected RaycastHit2D[] RayHits = new RaycastHit2D[0];
+        protected RaycastHit[] RayHits = new RaycastHit[0];
         protected IHealth HealthTarget = null;
         protected float LongestRaycastDistance;
         protected float RepairHealRestoreTimer = 0;
@@ -623,7 +623,7 @@ namespace AgeOfWar.Core.Units
         protected IHealth PotentialTarget;
         protected virtual void UpdateUnit()
         {
-            RayHits = Physics2D.RaycastAll(LookTransform.position, LookTransform.forward, LongestRaycastDistance, RaycastLayers);
+            RayHits = Physics.RaycastAll(LookTransform.position, LookTransform.forward, LongestRaycastDistance, RaycastLayers);
 
             bool NewMovingValue = false;
             if (RayHits.Length == 0)
@@ -634,7 +634,7 @@ namespace AgeOfWar.Core.Units
             {
                 BaseUnitBehaviour ClosestUnitHit = null;
                 BaseBuilding EnemyBase = null;
-                foreach (RaycastHit2D hit in RayHits)
+                foreach (RaycastHit hit in RayHits)
                 {
                     //Debug.Log($"Object In Front {hit.collider.gameObject.name}");
                     PotentialTarget = hit.collider.gameObject.GetComponent<IHealth>();
@@ -720,7 +720,7 @@ namespace AgeOfWar.Core.Units
 
                     if (HealthTarget == null)
                     {
-                        foreach (RaycastHit2D hit in RayHits)
+                        foreach (RaycastHit hit in RayHits)
                         {
                             PotentialTarget = hit.collider.gameObject.GetComponent<IHealth>();
                             if (PotentialTarget is BaseUnitBehaviour)
