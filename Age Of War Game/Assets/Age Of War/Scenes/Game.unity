@@ -4242,6 +4242,7 @@ Transform:
   m_Children:
   - {fileID: 345862145}
   - {fileID: 573896522}
+  - {fileID: 1343791380}
   m_Father: {fileID: 65346659}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -4258,11 +4259,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TeamBaseID: 2
-  DefaultForegroundSprite: {fileID: 21300000, guid: b325a13e94f3bac4199e75b91fa98449, type: 3}
-  DefaultBackgroundSprite: {fileID: 21300000, guid: b325a13e94f3bac4199e75b91fa98449, type: 3}
   UnitSpawnTransform: {fileID: 573896522}
-  BaseForegroundSpriteRenderer: {fileID: 690900944}
-  BaseBackgroundSpriteRenderer: {fileID: 345862148}
   UnitRaycastLayer:
     serializedVersion: 2
     m_Bits: 64
@@ -5959,6 +5956,7 @@ GameObject:
   - component: {fileID: 1005210070}
   - component: {fileID: 1005210072}
   - component: {fileID: 1005210071}
+  - component: {fileID: 1005210073}
   m_Layer: 0
   m_Name: Ground
   m_TagString: Untagged
@@ -6005,7 +6003,7 @@ Terrain:
   m_TreeBillboardDistance: 50
   m_TreeCrossFadeLength: 5
   m_TreeMaximumFullLODCount: 50
-  m_DetailObjectDistance: 80
+  m_DetailObjectDistance: 0
   m_DetailObjectDensity: 1
   m_HeightmapPixelError: 5
   m_SplatMapDistance: 1000
@@ -6024,6 +6022,42 @@ Terrain:
   m_GroupingID: 0
   m_RenderingLayerMask: 1
   m_AllowAutoConnect: 1
+--- !u!114 &1005210073
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1005210069}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1448045563, guid: b04c77e0938d27643b3f69f2dd39ce77, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _draw: 1
+  _renderProcessorLimit: 0.75
+  _stream: 1
+  _streamPrioritizeView: 1
+  _streamProcessorLimit: 0.25
+  _streamInDistance: 50
+  _streamOutDistance: 100
+  _detailDistance: 80
+  _reduceDensity: {x: 30, y: 100}
+  _reduceDensityAmount: 0.5
+  _ditherScale: 10
+  _billboardGrassMaterial: {fileID: 0}
+  _grassTextureShadowCasting: 2
+  _grassMeshNormalMode: 0
+  _splitShadows: 1
+  _proceduralInstancing: 1
+  _drawCells: 0
+  _shadowDistance: 40
+  _boostRenderingQuality: 1
+  _overrideRenderQueue: 1
+  _specularHighlights: 1
+  _translucency: 1
+  _renderReflectionProbes: 0
+  _autoRefreshTerrainAtRuntime: 1
 --- !u!1 &1026419326
 GameObject:
   m_ObjectHideFlags: 0
@@ -7916,11 +7950,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TeamBaseID: 1
-  DefaultForegroundSprite: {fileID: 21300000, guid: b325a13e94f3bac4199e75b91fa98449, type: 3}
-  DefaultBackgroundSprite: {fileID: 21300000, guid: b325a13e94f3bac4199e75b91fa98449, type: 3}
   UnitSpawnTransform: {fileID: 1807405103}
-  BaseForegroundSpriteRenderer: {fileID: 1184103268}
-  BaseBackgroundSpriteRenderer: {fileID: 1387011737}
   UnitRaycastLayer:
     serializedVersion: 2
     m_Bits: 64
@@ -8764,6 +8794,36 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1330631175}
   m_CullTransparentMesh: 1
+--- !u!1 &1343791379
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1343791380}
+  m_Layer: 7
+  m_Name: Graphics
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1343791380
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1343791379}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 690900941}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1348481626
 GameObject:
   m_ObjectHideFlags: 0
@@ -10445,6 +10505,10 @@ PrefabInstance:
     - target: {fileID: 7617537392311017519, guid: 069babf77dd68c14fbc9c99c81d035fe, type: 3}
       propertyPath: m_Name
       value: Turkish Warrior
+      objectReference: {fileID: 0}
+    - target: {fileID: 7617537392311017519, guid: 069babf77dd68c14fbc9c99c81d035fe, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 069babf77dd68c14fbc9c99c81d035fe, type: 3}
