@@ -57,6 +57,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -81,6 +82,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!205 &184465245658847311
 LODGroup:
   m_ObjectHideFlags: 0
@@ -95,7 +97,7 @@ LODGroup:
   m_AnimateCrossFading: 1
   m_LastLODIsBillboard: 0
   m_LODs:
-  - screenRelativeHeight: 0.048382718
+  - screenRelativeHeight: 0.0009035785
     fadeTransitionWidth: 0
     renderers:
     - renderer: {fileID: 23531301046798990}
@@ -112,4 +114,4 @@ MonoBehaviour:
   m_Script: {fileID: -785446727, guid: b04c77e0938d27643b3f69f2dd39ce77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _alignToTerrainSurface: 0.374
+  _alignToTerrainSurface: 1
