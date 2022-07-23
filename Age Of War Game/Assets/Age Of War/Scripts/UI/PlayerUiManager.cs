@@ -28,23 +28,15 @@ namespace AgeOfWar.UI
 
         [Header("Health and Info")]
         [SerializeField]
-        private ProgressBar PlayerHealthBar;
+        private UnitHealBarBase PlayerHealthArmorBar;
         [SerializeField]
         private ProgressBar PlayerXpBar;
         [SerializeField]
-        private ProgressBar PlayerArmorBar;
-        [SerializeField]
-        private ProgressBar EnemyHealthBar;
-        [SerializeField]
-        private ProgressBar EnemyArmorBar;
+        private UnitHealBarBase EnemyHealthArmorBar;
         [SerializeField]
         private TextMeshProUGUI CurrencyText;
         [SerializeField]
         private TextMeshProUGUI PopulationText;
-
-        [Header("Level Up")]
-        [SerializeField]
-        private GameObject ConfirmLevelUpObject;
 
         [Header("Speed Control")]
         [SerializeField]
@@ -190,26 +182,16 @@ namespace AgeOfWar.UI
             BaseBuilding CurrentBuilding = BaseBuilding.TeamBuildings[Team];
             if (Team == 1)
             {
-                PlayerHealthBar.maxValue = BuildingData.MaxHealth;
-                PlayerHealthBar.ChangeValue(CurrentBuilding.BuildingData.Health);
-
-                PlayerArmorBar.maxValue = BuildingData.MaxArmor;
-                PlayerArmorBar.ChangeValue(CurrentBuilding.BuildingData.Armor);
+                PlayerHealthArmorBar.SetUnit(CurrentBuilding);
+                PlayerHealthArmorBar.UpdateUi();
 
                 PlayerXpBar.maxValue = BuildingData.MaxExperience;
                 PlayerXpBar.ChangeValue(CurrentBuilding.BuildingData.Experience);
-
-                PlayerArmorBar.gameObject.SetActive(BuildingData.MaxArmor > 0);
             }
             else if (Team == 2)
             {
-                EnemyHealthBar.maxValue = BuildingData.MaxHealth;
-                EnemyHealthBar.ChangeValue(CurrentBuilding.BuildingData.Health);
-
-                EnemyArmorBar.maxValue = BuildingData.MaxArmor;
-                EnemyArmorBar.ChangeValue(CurrentBuilding.BuildingData.Armor);
-
-                EnemyArmorBar.gameObject.SetActive(BuildingData.MaxArmor > 0);
+                EnemyHealthArmorBar.SetUnit(CurrentBuilding);
+                EnemyHealthArmorBar.UpdateUi();
             }
 
             BuildingData.Health = CurrentBuilding.BuildingData.Health;
@@ -230,16 +212,11 @@ namespace AgeOfWar.UI
             {
                 PlayerBuilding = BaseBuilding.TeamBuildings[1];
             }
-            PlayerHealthBar.maxValue = PlayerBuilding.MaxHealth;
-            PlayerHealthBar.ChangeValue(PlayerBuilding.BuildingData.Health);
+            PlayerHealthArmorBar.SetUnit(PlayerBuilding);
+            PlayerHealthArmorBar.UpdateUi();
 
             PlayerXpBar.maxValue = PlayerBuilding.MaxXp;
             PlayerXpBar.ChangeValue(PlayerBuilding.BuildingData.Experience);
-
-            PlayerArmorBar.maxValue = PlayerBuilding.MaxArmor;
-            PlayerArmorBar.ChangeValue(PlayerBuilding.BuildingData.Armor);
-
-            PlayerArmorBar.gameObject.SetActive(PlayerBuilding.MaxArmor > 0);
 
             BaseBuilding EnemyBuilding;
             if (PlayerManager.Instance.CurrentMatchData.PlayMode == PlayModes.CustomGame || PlayerManager.Instance.CurrentMatchData.PlayMode == PlayModes.Quickplay || PlayerManager.Instance.CurrentMatchData.PlayMode == PlayModes.Ranked)
@@ -257,13 +234,8 @@ namespace AgeOfWar.UI
             {
                 EnemyBuilding = BaseBuilding.TeamBuildings[2];
             }
-            EnemyHealthBar.maxValue = EnemyBuilding.MaxHealth;
-            EnemyHealthBar.ChangeValue(EnemyBuilding.BuildingData.Health);
-
-            EnemyArmorBar.maxValue = EnemyBuilding.MaxArmor;
-            EnemyArmorBar.ChangeValue(EnemyBuilding.BuildingData.Armor);
-
-            EnemyArmorBar.gameObject.SetActive(EnemyBuilding.MaxArmor > 0);
+            EnemyHealthArmorBar.SetUnit(EnemyBuilding);
+            EnemyHealthArmorBar.UpdateUi();
 
             UpdatePopulationText();
             UpdateCurrencyText();

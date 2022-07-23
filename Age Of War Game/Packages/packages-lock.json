@@ -196,6 +196,16 @@
         "com.unity.modules.imgui": "1.0.0"
       }
     },
+    "com.unity.visualeffectgraph": {
+      "version": "10.8.1",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.shadergraph": "10.8.1",
+        "com.unity.render-pipelines.core": "10.8.1"
+      },
+      "url": "https://packages.unity.com"
+    },
     "net.tomweiland.riptidenetworking": {
       "version": "https://github.com/tom-weiland/RiptideNetworking.git?path=/UnityPackage",
       "depth": 0,

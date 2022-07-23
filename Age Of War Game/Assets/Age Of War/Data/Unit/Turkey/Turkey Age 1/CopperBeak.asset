@@ -12,24 +12,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b010b963f563964fb586ff803b4c8b8, type: 3}
   m_Name: CopperBeak
   m_EditorClassIdentifier: 
+  ShopDisplay: {fileID: 0}
+  AstheticChangeInIDs: 
+  AstheticChangeOutIDs: 
   EquipmentChangeDisplayName: Copper Beak
   Changes:
     StatChanges:
       UnitCostChange: 0
-      MeleeDamageChange: 0
-      MeleeRangeChange: 0
-      ProjectileDamageChange: 0
-      ProjectileRangeChange: 0
-      ExperienceGivenWhenKilledChange: 0
+      PhysicalDamageChange: 0
+      MagicDamageChange: 0
+      TrueDamageChange: 0
+      RangeChange: 0
+      OnKilledXPGiven: 0
+      ExperienceGainMultiplier: 1
+      AutoHealAmountChange: 0
       MaxHealthChange: 0
-      HealEquivalentHealth: 1
+      HealEquivalentHealth: 0
+      AutoRepairAmountChange: 0
       MaxArmorChange: 0
-      HealEquivalentArmor: 1
+      RepairEquivalentArmor: 0
+      AutoRestoreAmountChange: 0
+      MaxMagicArmorChange: 0
+      RestoreEquivalentArmor: 0
+      DamageMitigationChange: 0
       MovementSpeedChange: 0
-    NewHelmetSprite: {fileID: 0}
-    NewTorsoSprite: {fileID: 0}
-    NewLeggingSprite: {fileID: 0}
-    NewShoeSprite: {fileID: 0}
+      AttackRateMultiplier: 1
   PossibleEquipmentChanges:
   - {fileID: 0}
   PossibleClassChanges:

@@ -65,7 +65,10 @@ namespace AgeOfWar.Core.Units
         protected Transform HealthBarPositionTransform;
         [SerializeField]
         protected UnitDataScriptableObject UnitDataScriptableObject;
+        [SerializeField]
+        private List<EquipmentAsthetic> EquipmentAsthetics = new List<EquipmentAsthetic>();
 
+        public List<EquipmentAsthetic> Asthetics { get => EquipmentAsthetics; }
         public string DisplayName { get => UnitDisplayName; set => UnitDisplayName = value; }
         public Sprite DisplaySprite { get => UnitDisplaySprite; set => UnitDisplaySprite = value; }
         public int CurrentHealth { get => CurrentHP; set => CurrentHP = value; }
@@ -92,6 +95,7 @@ namespace AgeOfWar.Core.Units
 
         public UnitData UnitData { get; set; }
         public List<EquipmentChangeScriptableObject> CurrentListOfPossibleChanges { get; set; }
+        public List<EquipmentChangeScriptableObject> CurrentEquipment { get; set; }
         public bool Moving { get; set; }
         public bool Attacking { get; set; }
 
@@ -449,6 +453,7 @@ namespace AgeOfWar.Core.Units
 
             UnitData = UnitDataScriptableObject.Data.Clone();
             CurrentListOfPossibleChanges = UnitData.PossibleEquipmentChanges;
+            CurrentEquipment = new List<EquipmentChangeScriptableObject>();
             AttackPeriod = 1 / AttackRate;
             UnitHealthBarManager.Instance.GetHealthBar(this);
         }
@@ -852,6 +857,27 @@ namespace AgeOfWar.Core.Units
             }
 
             Initialize();
+        }
+
+        public virtual void EquipmentChange(EquipmentChangeScriptableObject EquipmentChange)
+        {
+            // Turn off / on pertaining asthetics per equipment change
+            foreach(int EquipmentID in EquipmentChange.AstheticChangeOutIDs)
+            {
+                EquipmentAsthetic TurnedOfEquipment = EquipmentAsthetics.Find(x => x.ID == EquipmentID);
+                TurnedOfEquipment?.TurnOff();
+            }
+
+            foreach (int EquipmentID in EquipmentChange.AstheticChangeInIDs)
+            {
+                EquipmentAsthetic TurnedOfEquipment = EquipmentAsthetics.Find(x => x.ID == EquipmentID);
+                TurnedOfEquipment?.TurnOn();
+            }
+
+            // Change Stats
+            CurrentEquipment.Add(EquipmentChange);
+
+
         }
     }
 }

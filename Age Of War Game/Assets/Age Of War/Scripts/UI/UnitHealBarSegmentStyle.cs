@@ -1,6 +1,7 @@
 using AgeOfWar.Core;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 namespace AgeOfWar.UI
 {
@@ -32,6 +33,13 @@ namespace AgeOfWar.UI
         private Transform ArmorSegmentSpawn;
         [SerializeField]
         private Transform MagicArmorSegmentSpawn;
+        [Header("Text")]
+        [SerializeField]
+        private TextMeshProUGUI HealthText;
+        [SerializeField]
+        private TextMeshProUGUI ArmorText;
+        [SerializeField]
+        private TextMeshProUGUI MagicArmorText;
 
         private List<HealthBarSegment> HealthBarSegmentsPool = new List<HealthBarSegment>();
         private List<HealthBarSegment> HealthBarSegmentsActive = new List<HealthBarSegment>();
@@ -190,6 +198,43 @@ namespace AgeOfWar.UI
             FirstSegment.CheckSegementPreceeding(HealthComponent.CurrentHealth, ArmorTypes.Health);
             LastSegment.CheckSegementFollowing(HealthComponent.CurrentArmor, ArmorTypes.Physical);
             FirstSegment.CheckSegementPreceeding(HealthComponent.CurrentMagicArmor, ArmorTypes.Magic);
+
+            if (HealthText != null)
+            {
+                HealthText.text = $"{HealthComponent.CurrentHealth} / {HealthComponent.MaxHealth}";
+            }
+
+            if (ArmorText != null)
+            {
+                ArmorText.text = $"{HealthComponent.CurrentArmor} / {HealthComponent.MaxArmor}";
+                if (HealthComponent.MaxArmor == 0)
+                {
+                    if (ArmorText.gameObject.activeInHierarchy)
+                    {
+                        ArmorText.gameObject.SetActive(false);
+                    }
+                }
+                else if (!ArmorText.gameObject.activeInHierarchy)
+                {
+                    ArmorText.gameObject.SetActive(true);
+                }
+            }
+
+            if (MagicArmorText != null)
+            {
+                MagicArmorText.text = $"{HealthComponent.CurrentMagicArmor} / {HealthComponent.MaxMagicArmor}";
+                if (HealthComponent.MaxMagicArmor == 0)
+                {
+                    if (MagicArmorText.gameObject.activeInHierarchy)
+                    {
+                        MagicArmorText.gameObject.SetActive(false);
+                    }
+                }
+                else if (!MagicArmorText.gameObject.activeInHierarchy)
+                {
+                    MagicArmorText.gameObject.SetActive(true);
+                }
+            }
         }
 
         private void ReturnAllSegments()
