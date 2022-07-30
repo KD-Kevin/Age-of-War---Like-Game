@@ -98,6 +98,7 @@ namespace AgeOfWar.Core.Units
         public List<EquipmentChangeScriptableObject> CurrentEquipment { get; set; }
         public bool Moving { get; set; }
         public bool Attacking { get; set; }
+        public bool AttackStarted { get; set; }
 
         protected int TeamID = -1;
         protected int PrefabSpawnID = -1;
@@ -702,6 +703,13 @@ namespace AgeOfWar.Core.Units
 
             if (Moving)
             {
+                if (Attacking)
+                {
+                    Attacking = false;
+                    AttackStarted = false;
+                    AttackEnd();
+                }
+
                 transform.position += LookTransform.forward * MovementSpeed * LockstepManager.Instance.HalfStepTime;
                 if (HealthTarget != null)
                 {
@@ -710,51 +718,54 @@ namespace AgeOfWar.Core.Units
             }
             else
             {
-                if (FrameCounter == 5)
+
+                Attacking = false;
+                if (RayHits.Length == 0)
                 {
-                    Attacking = false;
-                    if (RayHits.Length == 0)
-                    {
-                        return;
-                    }
+                    return;
+                }
 
-                    if (HealthTarget == null)
+                if (HealthTarget == null)
+                {
+                    foreach (RaycastHit hit in RayHits)
                     {
-                        foreach (RaycastHit hit in RayHits)
+                        PotentialTarget = hit.collider.gameObject.GetComponent<IHealth>();
+                        if (PotentialTarget is BaseUnitBehaviour)
                         {
-                            PotentialTarget = hit.collider.gameObject.GetComponent<IHealth>();
-                            if (PotentialTarget is BaseUnitBehaviour)
+                            BaseUnitBehaviour unit = PotentialTarget as BaseUnitBehaviour;
+                            if (unit.Team != TeamID && unit.Team != 0)
                             {
-                                BaseUnitBehaviour unit = PotentialTarget as BaseUnitBehaviour;
-                                if (unit.Team != TeamID && unit.Team != 0)
-                                {
-                                    HealthTarget = PotentialTarget;
-                                }
-                                break;
+                                HealthTarget = PotentialTarget;
                             }
+                            break;
+                        }
 
-                            if (PotentialTarget is BaseBuilding)
+                        if (PotentialTarget is BaseBuilding)
+                        {
+                            BaseBuilding baseBuilding = PotentialTarget as BaseBuilding;
+                            if (baseBuilding.Team != TeamID && baseBuilding.Team != 0)
                             {
-                                BaseBuilding baseBuilding = PotentialTarget as BaseBuilding;
-                                if (baseBuilding.Team != TeamID && baseBuilding.Team != 0)
-                                {
-                                    HealthTarget = PotentialTarget;
-                                }
-                                break;
+                                HealthTarget = PotentialTarget;
                             }
+                            break;
                         }
                     }
+                }
 
-                    if (HealthTarget != null)
-                    {
-                        // Attack
-                        Attacking = true;
-                    }
-                    else
-                    {
-                        Attacking = false;
-                    }
+                if (HealthTarget != null)
+                {
+                    // Attack
+                    Attacking = true;
+                }
+                else
+                {
+                    Attacking = false;
+                }
 
+                if (!AttackStarted)
+                {
+                    AttackStarted = true;
+                    AttackStart();
                 }
 
                 if (Attacking)
@@ -777,6 +788,16 @@ namespace AgeOfWar.Core.Units
                     }
                 }
             }
+        }
+
+        protected virtual void AttackEnd()
+        {
+
+        }
+
+        protected virtual void AttackStart()
+        {
+
         }
 
         protected virtual void AttackUpdate()
