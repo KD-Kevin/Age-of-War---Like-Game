@@ -1,3 +1,4 @@
+using AgeOfWar.Animation;
 using AgeOfWar.Data;
 using AgeOfWar.Networking;
 using AgeOfWar.UI;
@@ -70,7 +71,9 @@ namespace AgeOfWar.Core.Units
         [SerializeField]
         protected UnitDataScriptableObject UnitDataScriptableObject;
         [SerializeField]
-        private List<EquipmentAsthetic> EquipmentAsthetics = new List<EquipmentAsthetic>();
+        protected List<EquipmentAsthetic> EquipmentAsthetics = new List<EquipmentAsthetic>();
+        [SerializeField]
+        protected UnitAnimationController UnitAnimator;
 
         public List<EquipmentAsthetic> Asthetics { get => EquipmentAsthetics; }
         public string DisplayName { get => UnitDisplayName; set => UnitDisplayName = value; }
@@ -908,8 +911,15 @@ namespace AgeOfWar.Core.Units
 
             // Change Stats
             CurrentEquipment.Add(EquipmentChange);
-
-
         }
+
+        #region Unity
+
+        public void Awake()
+        {
+            UnitAnimator.ChangeAnimation(UnitAnimationKey.Idle);
+        }
+
+        #endregion
     }
 }

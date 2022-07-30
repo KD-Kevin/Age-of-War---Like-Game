@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fde3439e653957d40b8f360aa433b586, type: 3}
+  m_Name: Infantry Animation Data
+  m_EditorClassIdentifier: 
+  UnitAnimations:
+  - AnimationKey: 0
+    AnimationValue: Idle
+  - AnimationKey: 1
+    AnimationValue: Walking
+  - AnimationKey: 12
+    AnimationValue: Running
+  - AnimationKey: 6
+    AnimationValue: Attack 1
+  - AnimationKey: 2
+    AnimationValue: Death 1
