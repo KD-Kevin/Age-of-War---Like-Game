@@ -60,7 +60,11 @@ namespace AgeOfWar.Core.Units
         [SerializeField]
         protected LayerMask RaycastLayers;
         [SerializeField]
+        protected LayerMask GroundLayers;
+        [SerializeField]
         protected Transform LookTransform;
+        [SerializeField]
+        protected Transform FeetTransform;
         [SerializeField]
         protected Transform HealthBarPositionTransform;
         [SerializeField]
@@ -624,7 +628,7 @@ namespace AgeOfWar.Core.Units
         protected IHealth PotentialTarget;
         protected virtual void UpdateUnit()
         {
-            RayHits = Physics.RaycastAll(LookTransform.position, LookTransform.forward, LongestRaycastDistance, RaycastLayers);
+            RayHits = Physics.SphereCastAll(LookTransform.position, 1, LookTransform.forward, LongestRaycastDistance, RaycastLayers);
 
             bool NewMovingValue = false;
             if (RayHits.Length == 0)
@@ -787,6 +791,13 @@ namespace AgeOfWar.Core.Units
                         Restore(AutoRestore);
                     }
                 }
+            }
+
+            if (Physics.Raycast(FeetTransform.position + Vector3.up * 20, Vector3.down, out RaycastHit groundHit, 40, GroundLayers))
+            {
+                float HeightDiff = FeetTransform.position.y - groundHit.point.y;
+
+                transform.Translate(Vector3.down * HeightDiff);
             }
         }
 
