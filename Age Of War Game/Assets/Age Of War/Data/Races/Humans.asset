@@ -10,24 +10,22 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 17865979e80afb749bf7f47042974b1e, type: 3}
-  m_Name: Crazy Farmer
+  m_Name: Humans
   m_EditorClassIdentifier: 
-  DisplayName: Crazy Farmer
-  DisplayDescription: Trying to take my land are ya? I don't think so!
-  DisplayPlaystyleDescription: A versatile race that can transform your inumerable
-    amount of turkeys in a wide range of battle assets.
-  CampainSceneName: CrazyFarmerCampaign
-  DisplaySprite: {fileID: 21300000, guid: b7414fdd0411d364ab74c963a05b62d3, type: 3}
-  RaceType: 5
+  DisplayName: Human
+  DisplayDescription: 'Every growing and thirsting for expansion
+
+'
+  DisplayPlaystyleDescription: Humans are all rounders, make use of decent weapons,
+    units and ults
+  CampainSceneName: HumanCampaign
+  DisplaySprite: {fileID: 21300000, guid: e447bc2dc3ed4f14392d794b3b000985, type: 3}
+  RaceType: 1
   RaceSpecificUiPrefab: {fileID: 0}
   BaseBlueprint: {fileID: 0}
   Ultimates: []
   PossiblePerks: []
-  StartingUnitsBlueprints:
-  - {fileID: 7650381709119104208, guid: 069babf77dd68c14fbc9c99c81d035fe, type: 3}
-  - {fileID: 7650381709119104208, guid: 069babf77dd68c14fbc9c99c81d035fe, type: 3}
-  - {fileID: 7650381709119104208, guid: 069babf77dd68c14fbc9c99c81d035fe, type: 3}
-  - {fileID: 7650381709119104208, guid: 069babf77dd68c14fbc9c99c81d035fe, type: 3}
+  StartingUnitsBlueprints: []
   StartingTowerWeaponBlueprints: []
   UnlockableTowerWeaponBlueprints: []
   StartingFloorWeaponBlueprints: []

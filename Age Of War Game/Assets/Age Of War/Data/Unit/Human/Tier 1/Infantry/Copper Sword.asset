@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b010b963f563964fb586ff803b4c8b8, type: 3}
+  m_Name: Copper Sword
+  m_EditorClassIdentifier: 
+  EquipmentChangeDisplayName: Copper Sword
+  EquipmentChangeDisplayDescription: Primitive Copper Sword
+  ShopDisplay: {fileID: 0}
+  EquipmentCost: 35
+  Changes:
+    StatChanges:
+      UnitCostChange: 25
+      OnKilledXPGiven: 0
+      ExperienceGainMultiplier: 1.15
+      CooldownChange: 0.2
+      BuildTimeChange: 0.3
+      PhysicalDamageChange: 20
+      MagicDamageChange: 0
+      TrueDamageChange: 0
+      RangeChange: 0
+      AutoHealAmountChange: 0
+      MaxHealthChange: 0
+      HealEquivalentHealth: 0
+      AutoRepairAmountChange: 0
+      MaxArmorChange: 0
+      RepairEquivalentArmor: 0
+      AutoRestoreAmountChange: 0
+      MaxMagicArmorChange: 0
+      RestoreEquivalentArmor: 0
+      DamageMitigationChange: 0
+      DamageMitigationMultiplier: 0
+      MovementSpeedChange: 0
+      MovementSpeedMultiplier: 1
+      AttackRateMultiplier: 0
+  PossibleEquipmentChanges: []
+  PossibleClassChanges: []
+  AstheticChangeInIDs: 
+  AstheticChangeOutIDs: 

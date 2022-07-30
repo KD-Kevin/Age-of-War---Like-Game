@@ -10,8 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8cb49d4430f073b49abce538cc912fd2, type: 3}
-  m_Name: Caveman
+  m_Name: Swordsmen
   m_EditorClassIdentifier: 
   Data:
     PossibleEquipmentChanges:
-    - {fileID: 0}
+    - {fileID: 11400000, guid: 75237d5b54d1d6645bc6c2820a90c83f, type: 2}
+    - {fileID: 11400000, guid: 9aadf7af56074fa4fafad09084f720fb, type: 2}
+    - {fileID: 11400000, guid: 3547bd68e6945914abb30f9309fc5086, type: 2}

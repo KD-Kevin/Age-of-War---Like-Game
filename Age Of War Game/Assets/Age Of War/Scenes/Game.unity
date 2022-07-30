@@ -14602,7 +14602,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1337282550990498621, guid: 9fdee121df6c9874c998e09eacdc6893, type: 3}
       propertyPath: m_RenderingLayerMask
-      value: 4294967295
+      value: 4294959103
       objectReference: {fileID: 0}
     - target: {fileID: 1337282550990498621, guid: 9fdee121df6c9874c998e09eacdc6893, type: 3}
       propertyPath: m_ReflectionProbeUsage

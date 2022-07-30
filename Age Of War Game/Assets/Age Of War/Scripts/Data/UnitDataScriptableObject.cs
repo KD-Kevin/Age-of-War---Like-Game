@@ -42,13 +42,7 @@ namespace AgeOfWar.Data
         [Header("Unit Cost Changes")]
         public int UnitCostChange;
 
-        [Header("Damage Changes")]
-        public int PhysicalDamageChange;
-        public int MagicDamageChange;
-        public int TrueDamageChange;
-        public float RangeChange;
-
-        [Header("Experience Changes")]
+        [Header("Experience, Build Time, Cooldown Changes")]
         /// <summary>
         /// base Experience given to the other unit when this is killed
         /// </summary>
@@ -57,6 +51,14 @@ namespace AgeOfWar.Data
         /// How much this unit type gains on a kill (Base XP x ExperienceGainMultipler = Actual XP)
         /// </summary>
         public float ExperienceGainMultiplier;
+        public float CooldownChange;
+        public float BuildTimeChange;
+
+        [Header("Damage Changes")]
+        public int PhysicalDamageChange;
+        public int MagicDamageChange;
+        public int TrueDamageChange;
+        public float RangeChange;
 
         // Health, Armor, Magic Armor and related
         [Header("Health, Armor, etc Changes")]
@@ -69,17 +71,20 @@ namespace AgeOfWar.Data
         public int AutoRestoreAmountChange;
         public int MaxMagicArmorChange;
         public bool RestoreEquivalentArmor;
-        public float DamageMitigationChange;
+        public float DamageMitigationChange; // Flat Mitigation
+        public float DamageMitigationMultiplier; // Rate Mitigation
 
         [Header("Movement Changes")]
         public float MovementSpeedChange;
+        public float MovementSpeedMultiplier;
 
         [Header("Attack Rate Changes")]
         public float AttackRateMultiplier;
 
         public StatChanges(int unitCostChange = 0, int physicalDamageChange = 0, int magicDamageChange = 0, int trueDamageChange = 0, float rangeChange = 0, int onKilledXPGiven = 0, float experienceGainMultiplier = 1f,
-            int autoHealAmountChange = 0, int autoRepairAmountChange = 0, int autoRestoreAmountChange = 0, int maxHealthChange = 0, int maxArmorChange = 0, int maxMagicArmorChange = 0, float damageMitigationChange = 0,
-            float movementSpeedChange = 0, float attackRateMultiplier = 1, bool healHealthChange = true, bool repairArmorChange = true, bool restoreMagicArmorChange = true)
+            float cooldownChange = 0, float buildTimeChange = 0,
+            int autoHealAmountChange = 0, int autoRepairAmountChange = 0, int autoRestoreAmountChange = 0, int maxHealthChange = 0, int maxArmorChange = 0, int maxMagicArmorChange = 0, float damageMitigationChange = 0, float damageMitigationMultiplier = 0,
+            float movementSpeedChange = 0, float movementSpeedMultiplier = 1, float attackRateMultiplier = 1, bool healHealthChange = true, bool repairArmorChange = true, bool restoreMagicArmorChange = true)
         {
             UnitCostChange = unitCostChange;
 
@@ -90,7 +95,8 @@ namespace AgeOfWar.Data
 
             OnKilledXPGiven = onKilledXPGiven;
             ExperienceGainMultiplier = experienceGainMultiplier;
-
+            CooldownChange = cooldownChange;
+            BuildTimeChange = buildTimeChange;
 
             AutoHealAmountChange = autoHealAmountChange;
             MaxHealthChange = maxHealthChange;
@@ -102,8 +108,10 @@ namespace AgeOfWar.Data
             MaxMagicArmorChange = maxMagicArmorChange;
             RestoreEquivalentArmor = restoreMagicArmorChange;
             DamageMitigationChange = damageMitigationChange;
+            DamageMitigationMultiplier = damageMitigationMultiplier;
 
             MovementSpeedChange = movementSpeedChange;
+            MovementSpeedMultiplier = movementSpeedMultiplier;
 
             AttackRateMultiplier = attackRateMultiplier;
     }
@@ -121,6 +129,8 @@ namespace AgeOfWar.Data
 
             AddedChanges.OnKilledXPGiven = a.OnKilledXPGiven + b.OnKilledXPGiven;
             AddedChanges.ExperienceGainMultiplier = a.ExperienceGainMultiplier * b.ExperienceGainMultiplier;
+            AddedChanges.CooldownChange = a.CooldownChange * b.CooldownChange;
+            AddedChanges.BuildTimeChange = a.BuildTimeChange * b.BuildTimeChange;
 
             AddedChanges.MaxHealthChange = a.MaxHealthChange + b.MaxHealthChange;
             AddedChanges.MaxArmorChange = a.MaxArmorChange + b.MaxArmorChange;
@@ -129,12 +139,14 @@ namespace AgeOfWar.Data
             AddedChanges.AutoRepairAmountChange = a.AutoRepairAmountChange + b.AutoRepairAmountChange;
             AddedChanges.AutoRestoreAmountChange = a.AutoRestoreAmountChange + b.AutoRestoreAmountChange;
             AddedChanges.DamageMitigationChange = a.DamageMitigationChange + b.DamageMitigationChange;
+            AddedChanges.DamageMitigationMultiplier = a.DamageMitigationMultiplier * b.DamageMitigationMultiplier;
             AddedChanges.HealEquivalentHealth = false;
             AddedChanges.RepairEquivalentArmor = false;
             AddedChanges.RestoreEquivalentArmor = false;
 
             AddedChanges.MovementSpeedChange = a.MovementSpeedChange + b.MovementSpeedChange;
             AddedChanges.AttackRateMultiplier = a.AttackRateMultiplier * b.AttackRateMultiplier;
+            AddedChanges.MovementSpeedMultiplier = a.MovementSpeedMultiplier * b.MovementSpeedMultiplier;
 
             return AddedChanges;
         }
