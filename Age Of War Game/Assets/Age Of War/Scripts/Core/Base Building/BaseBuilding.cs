@@ -21,7 +21,8 @@ namespace AgeOfWar.Core
         private List<Transform> BackgroundWeaponSpawnLocations = new List<Transform>();
         [SerializeField]
         private List<Transform> FloorWeaponSpawnLocations = new List<Transform>(); // Usually Traps - Weapons that are not traps will need to take damage
-
+        [SerializeField]
+        private BaseBuildingData BaseData = new BaseBuildingData();
         public BaseBuildingData BuildingData { get; set; }
         public int Team { get => TeamBaseID; set => SetTeam(value); }
 
@@ -41,6 +42,7 @@ namespace AgeOfWar.Core
         public int AutoRestore { get => BuildingData.AutoRestoreAmount; set => BuildingData.AutoRestoreAmount = value; }
 
         public float DamgeMitigationMultiplier { get => BuildingData.DamageMitigationMultiplier; set => BuildingData.DamageMitigationMultiplier = value; }
+        public Transform SpawnPoint { get { return UnitSpawnTransform; } }
 
         public static Dictionary<int, BaseBuilding> TeamBuildings = new Dictionary<int, BaseBuilding>();
 
@@ -55,6 +57,9 @@ namespace AgeOfWar.Core
         [HideInInspector]
         public List<int> HoldPopulationSpot = new List<int>();
         public List<BuildOrder> BuildOrders = new List<BuildOrder>();
+        public bool LostGame { get; set; }
+        public bool WonGame { get; set; }
+        public bool DrawedGame { get; set; }
 
         private void Awake()
         {
@@ -67,8 +72,11 @@ namespace AgeOfWar.Core
                 TeamBuildings.Add(TeamBaseID, this);
             }
 
+            StartHealth = BaseData.MaxHealth;
+            StartArmor = BaseData.MaxArmor;
+            StartMagicArmor = BaseData.MaxMagicArmor;
+            BuildingData = BaseData;
             SetTeam(TeamBaseID);
-            BuildingData = new BaseBuildingData();
         }
 
         public static void UpdateBases()
@@ -81,6 +89,18 @@ namespace AgeOfWar.Core
 
         private void BaseUpdate()
         {
+            if (DrawedGame || WonGame || LostGame)
+            {
+                return;
+            }
+
+            if (CurrentHealth <= 0)
+            {
+                TeamBuildings[1].CheckForGameEndState();
+                TeamBuildings[2].CheckForGameEndState();
+                return;
+            }
+
             if (BuyUnitBuffer.Count > 0)
             {
                 // Check to see if we can buy unit
@@ -128,6 +148,36 @@ namespace AgeOfWar.Core
         public void SpawnUnit(BaseUnitBehaviour UnitPrefab)
         {
             BaseUnitBehaviour.SpawnUnit(UnitPrefab, UnitSpawnTransform.position).SetTeam(TeamBaseID);
+        }
+
+        public void CheckForGameEndState()
+        {
+            if (TeamBuildings[1].CurrentHealth <= 0 && TeamBuildings[2].CurrentHealth <= 0)
+            {
+                DrawedGame = true;
+                foreach(BaseUnitBehaviour unit in BaseUnitBehaviour.AllActiveTeamUnits[TeamBaseID])
+                {
+                    unit.DrawedGame = true;
+                }
+                return;
+            }
+
+            if (CurrentHealth <= 0)
+            {
+                LostGame = true;
+                foreach (BaseUnitBehaviour unit in BaseUnitBehaviour.AllActiveTeamUnits[TeamBaseID])
+                {
+                    unit.LostGame = true;
+                }
+            }
+            else
+            {
+                WonGame = true;
+                foreach (BaseUnitBehaviour unit in BaseUnitBehaviour.AllActiveTeamUnits[TeamBaseID])
+                {
+                    unit.WonGame = true;
+                }
+            }
         }
 
         public void SetNewData(BaseBuildingData Data)

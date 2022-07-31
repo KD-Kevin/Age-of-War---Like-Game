@@ -178,12 +178,12 @@ namespace AgeOfWar.UI
                 return;
             }
 
-            if (HealBarPointValue < MinHealthSegmentAmount)
+            if (HealBarPointValue <= MinHealthSegmentAmount)
             {
                 HealthAmount = 0;
                 UpdateSegment();
             }
-            else if (HealBarPointValue > MaxHealthSegmentAmount)
+            else if (HealBarPointValue >= MaxHealthSegmentAmount)
             {
                 HealthAmount = MaxHealthAmount;
                 UpdateSegment();

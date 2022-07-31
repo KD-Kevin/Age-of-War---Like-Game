@@ -26,18 +26,18 @@ namespace AgeOfWar.UI
         // Update is called once per frame
         void Update()
         {
-            foreach (UnitHealthBar HealthBar in AddList)
+            foreach (UnitHealBarBase HealthBar in AddList)
             {
                 Active.Add(HealthBar);
             }
             AddList.Clear();
 
-            foreach (UnitHealthBar HealthBar in Active)
+            foreach (UnitHealBarBase HealthBar in Active)
             {
                 HealthBar.UpdateUi();
             }
 
-            foreach (UnitHealthBar HealthBar in ReturnList)
+            foreach (UnitHealBarBase HealthBar in ReturnList)
             {
                 Active.Remove(HealthBar);
                 Pool.Add(HealthBar);

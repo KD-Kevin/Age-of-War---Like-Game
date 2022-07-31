@@ -46554,9 +46554,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 846e71cf5c6844b46b60c55db5c23341, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  RiptideNetworkManager: {fileID: 1766968649}
   FishnetNetworkManager: {fileID: 1211305128}
-  DarkriftManager: {fileID: 607592393}
   SteamLobbyManager: {fileID: 1211305137}
   NetworkHelperPrefab: {fileID: 1193315501137902656, guid: 1fb6451369c797f4f9466c0188b3f548, type: 3}
   ActiveOnlineMode: 0
@@ -51947,10 +51945,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   RaceDataList:
   - {fileID: 11400000, guid: e08b887102840274d9c2a2ff1c74bd39, type: 2}
-  - {fileID: 11400000, guid: e08b887102840274d9c2a2ff1c74bd39, type: 2}
-  - {fileID: 11400000, guid: e08b887102840274d9c2a2ff1c74bd39, type: 2}
-  - {fileID: 11400000, guid: e08b887102840274d9c2a2ff1c74bd39, type: 2}
-  - {fileID: 11400000, guid: e08b887102840274d9c2a2ff1c74bd39, type: 2}
+  - {fileID: 11400000, guid: ead52a07a13d252439705f762ccff00f, type: 2}
   RaceUiPrefab: {fileID: 4938955013019316233, guid: 53b8b1fa847ef1046b297a93c845d71a, type: 3}
   PrefabSpawn: {fileID: 1641725074}
   ConfirmButtonManager: {fileID: 241113335}

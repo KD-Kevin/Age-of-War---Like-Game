@@ -54,6 +54,7 @@ namespace AgeOfWar.UI
 
         public override void SetUnit(IHealth newUnit)
         {
+            Debug.Log($"Set Healthbar to {newUnit}");
             base.SetUnit(newUnit);
 
             ReturnAllSegments();
@@ -195,9 +196,14 @@ namespace AgeOfWar.UI
         {
             base.UpdateUi();
 
-            FirstSegment.CheckSegementPreceeding(HealthComponent.CurrentHealth, ArmorTypes.Health);
-            LastSegment.CheckSegementFollowing(HealthComponent.CurrentArmor, ArmorTypes.Physical);
-            FirstSegment.CheckSegementPreceeding(HealthComponent.CurrentMagicArmor, ArmorTypes.Magic);
+            FirstSegment?.CheckSegement(HealthComponent.CurrentHealth, ArmorTypes.Health);
+            FirstSegment?.CheckSegementPreceeding(HealthComponent.CurrentHealth, ArmorTypes.Health);
+
+            LastSegment.CheckSegement(HealthComponent.CurrentArmor, ArmorTypes.Physical);
+            LastSegment?.CheckSegementFollowing(HealthComponent.CurrentArmor, ArmorTypes.Physical);
+
+            FirstSegment?.CheckSegement(HealthComponent.CurrentMagicArmor, ArmorTypes.Magic);
+            FirstSegment?.CheckSegementPreceeding(HealthComponent.CurrentMagicArmor, ArmorTypes.Magic);
 
             if (HealthText != null)
             {

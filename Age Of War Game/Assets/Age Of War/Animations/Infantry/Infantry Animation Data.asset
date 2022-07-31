@@ -23,3 +23,9 @@ MonoBehaviour:
     AnimationValue: Attack 1
   - AnimationKey: 2
     AnimationValue: Death 1
+  - AnimationKey: 13
+    AnimationValue: Victory
+  - AnimationKey: 14
+    AnimationValue: Defeated
+  - AnimationKey: 15
+    AnimationValue: Defeated

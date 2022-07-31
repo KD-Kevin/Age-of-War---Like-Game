@@ -29,6 +29,8 @@ namespace AgeOfWar.Core.Units
         [SerializeField]
         protected int StartHealth = 100;
         [SerializeField]
+        protected int MaxHP = 0;
+        [SerializeField]
         protected int StartArmor = 0;
         [SerializeField]
         protected int StartMagicArmor = 0;
@@ -106,11 +108,14 @@ namespace AgeOfWar.Core.Units
         public bool Moving { get; set; }
         public bool Attacking { get; set; }
         public bool AttackStarted { get; set; }
+        public bool IdleStarted { get; set; }
+        public bool WonGame { get; set; }
+        public bool LostGame { get; set; }
+        public bool DrawedGame { get; set; }
 
         protected int TeamID = -1;
         protected int PrefabSpawnID = -1;
         protected int CurrentHP = 0;
-        protected int MaxHP = 0;
         protected int CurrentArmorValue = 0;
         protected int MaxArmorValue = 0;
         protected int CurrentMagicArmorValue = 0;
@@ -451,7 +456,20 @@ namespace AgeOfWar.Core.Units
 
             if (!AllActiveTeamUnits.ContainsKey(TeamID))
             {
-                AllActiveTeamUnits.Add(TeamID, new List<BaseUnitBehaviour>());
+                // To make sure tht both team pools are initialized
+                if (!AllActiveTeamUnits.ContainsKey(1))
+                {
+                    AllActiveTeamUnits.Add(1, new List<BaseUnitBehaviour>());
+                }
+                if (!AllActiveTeamUnits.ContainsKey(2))
+                {
+                    AllActiveTeamUnits.Add(2, new List<BaseUnitBehaviour>());
+                }
+
+                if (TeamID != 1 && TeamID != 2)
+                {
+                    Debug.Log($"Trying to play with more then 2 teams, get out of here team {TeamID}");
+                }
             }
 
             if (!AllActiveTeamUnits[TeamID].Contains(this))
@@ -464,6 +482,15 @@ namespace AgeOfWar.Core.Units
             CurrentEquipment = new List<EquipmentChangeScriptableObject>();
             AttackPeriod = 1 / AttackRate;
             UnitHealthBarManager.Instance.GetHealthBar(this);
+
+            if (TeamID == 1)
+            {
+                transform.LookAt(BaseBuilding.TeamBuildings[2].SpawnPoint);
+            }
+            else if (TeamID == 2)
+            {
+                transform.LookAt(BaseBuilding.TeamBuildings[1].SpawnPoint);
+            }
         }
 
         public virtual void Repair(int RepairAmount)
@@ -631,156 +658,32 @@ namespace AgeOfWar.Core.Units
         protected IHealth PotentialTarget;
         protected virtual void UpdateUnit()
         {
-            RayHits = Physics.SphereCastAll(LookTransform.position, 1, LookTransform.forward, LongestRaycastDistance, RaycastLayers);
+            #region Post Game
 
-            bool NewMovingValue = false;
-            if (RayHits.Length == 0)
+            if (DrawedGame)
             {
-                NewMovingValue = true;
-            }
-            else
-            {
-                BaseUnitBehaviour ClosestUnitHit = null;
-                BaseBuilding EnemyBase = null;
-                foreach (RaycastHit hit in RayHits)
-                {
-                    //Debug.Log($"Object In Front {hit.collider.gameObject.name}");
-                    PotentialTarget = hit.collider.gameObject.GetComponent<IHealth>();
-                    if (PotentialTarget is BaseBuilding)
-                    {
-                        //Debug.Log("Found base");
-                        BaseBuilding unit = PotentialTarget as BaseBuilding;
-                        if (unit.Team == TeamID)
-                        {
-                            NewMovingValue = true;
-                            break;
-                        }
-                        else
-                        {
-                            EnemyBase = unit;
-                            NewMovingValue = false;
-                            break;
-                        }
-                    }
-
-                    if (PotentialTarget is BaseUnitBehaviour)
-                    {
-                        BaseUnitBehaviour unit = PotentialTarget as BaseUnitBehaviour;
-                        if (ClosestUnitHit == null)
-                        {
-                            ClosestUnitHit = unit;
-                        }
-                    }
-                }
-
-                if (ClosestUnitHit != null)
-                {
-                    float Distance = Vector3.Distance(ClosestUnitHit.transform.position, transform.position);
-                    if (ClosestUnitHit.Team == TeamID)
-                    {
-                        NewMovingValue = Distance > AlliedUnitStopDistance;
-                        //Debug.Log($"Stop At {Distance} for Allies ({AlliedUnitStopDistance})");
-                    }
-                    else
-                    {
-                        NewMovingValue = Distance > StopDistance;
-                    }
-                }
-
-                if (!NewMovingValue && EnemyBase != null)
-                {
-                    float Distance = Vector3.Distance(EnemyBase.transform.position, transform.position);
-                    NewMovingValue = Distance < StopDistance;
-                }
+                // Drawed game Animation if its not startedyet
+                DrawedGameUpdate();
+                return;
             }
 
-            if (NewMovingValue != Moving)
+            if (WonGame)
             {
-                if (NewMovingValue)
-                {
-                    StartingToMoving();
-                }
-                else
-                {
-                    StoppedMoving();
-                }
+                // Start Win Animation if its not started yet
+                WonGameUpdate();
+                return;
             }
 
-            Moving = NewMovingValue;
-
-            if (Moving)
+            if (LostGame)
             {
-                if (Attacking)
-                {
-                    Attacking = false;
-                    AttackStarted = false;
-                    AttackEnd();
-                }
-
-                transform.position += LookTransform.forward * MovementSpeed * LockstepManager.Instance.HalfStepTime;
-                if (HealthTarget != null)
-                {
-                    HealthTarget = null;
-                }
-            }
-            else
-            {
-
-                Attacking = false;
-                if (RayHits.Length == 0)
-                {
-                    return;
-                }
-
-                if (HealthTarget == null)
-                {
-                    foreach (RaycastHit hit in RayHits)
-                    {
-                        PotentialTarget = hit.collider.gameObject.GetComponent<IHealth>();
-                        if (PotentialTarget is BaseUnitBehaviour)
-                        {
-                            BaseUnitBehaviour unit = PotentialTarget as BaseUnitBehaviour;
-                            if (unit.Team != TeamID && unit.Team != 0)
-                            {
-                                HealthTarget = PotentialTarget;
-                            }
-                            break;
-                        }
-
-                        if (PotentialTarget is BaseBuilding)
-                        {
-                            BaseBuilding baseBuilding = PotentialTarget as BaseBuilding;
-                            if (baseBuilding.Team != TeamID && baseBuilding.Team != 0)
-                            {
-                                HealthTarget = PotentialTarget;
-                            }
-                            break;
-                        }
-                    }
-                }
-
-                if (HealthTarget != null)
-                {
-                    // Attack
-                    Attacking = true;
-                }
-                else
-                {
-                    Attacking = false;
-                }
-
-                if (!AttackStarted)
-                {
-                    AttackStarted = true;
-                    AttackStart();
-                }
-
-                if (Attacking)
-                {
-                    AttackUpdate();
-                }
+                // Start Lost Animation if its not started yet
+                LostGameUpdate();
+                return;
             }
 
+            #endregion
+
+            // Healing, etc
             if (AutoHeal != 0 || AutoRepair != 0 || AutoRestore != 0)
             {
                 if (CurrentHealth < MaxHealth || CurrentArmor < MaxArmor || CurrentMagicArmor < MaxMagicArmor)
@@ -796,11 +699,246 @@ namespace AgeOfWar.Core.Units
                 }
             }
 
+            if (Attacking)
+            {
+                if (HealthTarget == null || HealthTarget.CurrentHealth <= 0)
+                {
+                    Attacking = false;
+                    if (HealthTarget != null)
+                    {
+                        if (HealthTarget is BaseBuilding)
+                        {
+                            // YOU WON!
+                            WonGame = true;
+                        }
+                    }
+                    return;
+                }
+
+                MonoBehaviour Target = HealthTarget as MonoBehaviour;
+                if (Target != null)
+                {
+                    transform.LookAt(Target.transform);
+                }
+            }
+            else
+            {
+                if (TeamID == 1)
+                {
+                    transform.LookAt(BaseBuilding.TeamBuildings[2].SpawnPoint);
+                }
+                else if (TeamID == 2)
+                {
+                    transform.LookAt(BaseBuilding.TeamBuildings[1].SpawnPoint);
+                }
+
+
+                RayHits = Physics.RaycastAll(LookTransform.position, LookTransform.forward, LongestRaycastDistance, RaycastLayers, QueryTriggerInteraction.Collide);
+
+                bool NewMovingValue = false;
+                if (RayHits.Length == 0)
+                {
+                    NewMovingValue = true;
+                }
+                else
+                {
+                    BaseUnitBehaviour ClosestUnitHit = null;
+                    BaseBuilding EnemyBase = null;
+                    foreach (RaycastHit hit in RayHits)
+                    {
+                        //Debug.Log($"Object In Front {hit.collider.gameObject.name}");
+                        PotentialTarget = hit.collider.gameObject.GetComponent<IHealth>();
+                        if (PotentialTarget != null)
+                        {
+                            if (PotentialTarget is BaseBuilding)
+                            {
+                                //Debug.Log("Found base");
+                                BaseBuilding unit = PotentialTarget as BaseBuilding;
+                                if (unit.Team == TeamID)
+                                {
+                                    NewMovingValue = true;
+                                    break;
+                                }
+                                else
+                                {
+                                    EnemyBase = unit;
+                                    NewMovingValue = false;
+                                    break;
+                                }
+                            }
+
+                            if (PotentialTarget is BaseUnitBehaviour)
+                            {
+                                BaseUnitBehaviour unit = PotentialTarget as BaseUnitBehaviour;
+
+                                if (ClosestUnitHit == null && unit != this)
+                                {
+                                    ClosestUnitHit = unit;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    if (ClosestUnitHit != null)
+                    {
+                        float Distance = Vector3.Distance(ClosestUnitHit.transform.position, transform.position);
+                        if (ClosestUnitHit.Team == TeamID)
+                        {
+                            NewMovingValue = Distance > AlliedUnitStopDistance;
+                            Debug.Log($"Stop At {Distance} for Allies ({AlliedUnitStopDistance})");
+                        }
+                        else
+                        {
+                            NewMovingValue = Distance > StopDistance;
+                        }
+                    }
+
+                    if (!NewMovingValue && EnemyBase != null)
+                    {
+                        float Distance = Vector3.Distance(EnemyBase.transform.position, transform.position);
+                        NewMovingValue = Distance < StopDistance;
+                    }
+                }
+
+                if (NewMovingValue != Moving)
+                {
+                    if (NewMovingValue)
+                    {
+                        StartingToMoving();
+                    }
+                    else
+                    {
+                        StoppedMoving();
+                    }
+                }
+
+                Moving = NewMovingValue;
+            }
+
+            if (Moving)
+            {
+                if (Attacking)
+                {
+                    Attacking = false;
+                    AttackStarted = false;
+                    IdleStarted = false;
+                    AttackEnd();
+                }
+
+                transform.position += LookTransform.forward * MovementSpeed * LockstepManager.Instance.HalfStepTime;
+                if (HealthTarget != null)
+                {
+                    HealthTarget = null;
+                }
+            }
+            else
+            {
+                if (Attacking)
+                {
+                    if (HealthTarget == null || HealthTarget.CurrentHealth <= 0)
+                    {
+                        Attacking = false;
+                        return;
+                    }
+                }
+                else
+                {
+                    Attacking = false;
+                    AttackStarted = false;
+                    if (RayHits.Length == 0)
+                    {
+                        RayHits = Physics.SphereCastAll(LookTransform.position, 1, LookTransform.forward, LongestRaycastDistance, RaycastLayers);
+                    }
+
+                    if (HealthTarget == null)
+                    {
+                        foreach (RaycastHit hit in RayHits)
+                        {
+                            PotentialTarget = hit.collider.gameObject.GetComponent<IHealth>();
+                            if (PotentialTarget is BaseUnitBehaviour)
+                            {
+                                BaseUnitBehaviour unit = PotentialTarget as BaseUnitBehaviour;
+                                if (unit.Team != TeamID && unit.Team != 0)
+                                {
+                                    HealthTarget = PotentialTarget;
+                                }
+                                break;
+                            }
+
+                            if (PotentialTarget is BaseBuilding)
+                            {
+                                BaseBuilding baseBuilding = PotentialTarget as BaseBuilding;
+                                if (baseBuilding.Team != TeamID && baseBuilding.Team != 0)
+                                {
+                                    HealthTarget = PotentialTarget;
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (HealthTarget != null)
+                {
+                    // Attack
+                    Attacking = true;
+                }
+                else
+                {
+                    Attacking = false;
+                }
+
+
+                if (Attacking)
+                {
+                    if (!AttackStarted)
+                    {
+                        AttackStarted = true;
+                        AttackStart();
+                    }
+                    AttackUpdate();
+                }
+                else
+                {
+                    if (!IdleStarted)
+                    {
+                        IdleStarted = true;
+                        IdleStart();
+                    }
+                    IdleUpdate();
+                }
+            }
+
             if (Physics.Raycast(FeetTransform.position + Vector3.up * 20, Vector3.down, out RaycastHit groundHit, 40, GroundLayers))
             {
                 float HeightDiff = FeetTransform.position.y - groundHit.point.y;
 
                 transform.Translate(Vector3.down * HeightDiff);
+            }
+        }
+
+        protected virtual void WonGameUpdate()
+        {
+            if (UnitAnimator.CurrentAnimation != UnitAnimationKey.Win.ToString())
+            {
+                UnitAnimator.ChangeAnimation(UnitAnimationKey.Win);
+            }
+        }
+
+        protected virtual void LostGameUpdate()
+        {
+            if (UnitAnimator.CurrentAnimation != UnitAnimationKey.Lose.ToString())
+            {
+                UnitAnimator.ChangeAnimation(UnitAnimationKey.Lose);
+            }
+        }
+
+        protected virtual void DrawedGameUpdate()
+        {
+            if (UnitAnimator.CurrentAnimation != UnitAnimationKey.Draw.ToString())
+            {
+                UnitAnimator.ChangeAnimation(UnitAnimationKey.Draw);
             }
         }
 
@@ -811,7 +949,10 @@ namespace AgeOfWar.Core.Units
 
         protected virtual void AttackStart()
         {
-
+            if (UnitAnimator.CurrentAnimation != UnitAnimationKey.Attack1.ToString())
+            {
+                UnitAnimator.ChangeAnimation(UnitAnimationKey.Attack1);
+            }
         }
 
         protected virtual void AttackUpdate()
@@ -823,6 +964,19 @@ namespace AgeOfWar.Core.Units
 
                 Attack();
             }
+        }
+
+        protected virtual void IdleStart()
+        {
+            if (UnitAnimator.CurrentAnimation != UnitAnimationKey.Attack1.ToString())
+            {
+                UnitAnimator.ChangeAnimation(UnitAnimationKey.Idle);
+            }
+        }
+
+        protected virtual void IdleUpdate()
+        {
+
         }
 
         // Melee Combat by default, change this to launch a projectile for ranged combat or mixed combat or non combat abilities
@@ -849,12 +1003,12 @@ namespace AgeOfWar.Core.Units
 
         protected virtual void StoppedMoving()
         {
-
+            UnitAnimator.ChangeAnimation(UnitAnimationKey.Idle);
         }
 
         protected virtual void StartingToMoving()
         {
-
+            UnitAnimator.ChangeAnimation(UnitAnimationKey.Walk);
         }
 
         public virtual void SetTeam(int NewTeamID)
@@ -912,14 +1066,5 @@ namespace AgeOfWar.Core.Units
             // Change Stats
             CurrentEquipment.Add(EquipmentChange);
         }
-
-        #region Unity
-
-        public void Awake()
-        {
-            UnitAnimator.ChangeAnimation(UnitAnimationKey.Idle);
-        }
-
-        #endregion
     }
 }

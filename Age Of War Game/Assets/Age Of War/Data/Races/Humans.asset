@@ -25,7 +25,11 @@ MonoBehaviour:
   BaseBlueprint: {fileID: 0}
   Ultimates: []
   PossiblePerks: []
-  StartingUnitsBlueprints: []
+  StartingUnitsBlueprints:
+  - {fileID: 5713253874831204078, guid: 6dd937438d4b5d84baadd775cb7d07dd, type: 3}
+  - {fileID: 5713253874831204078, guid: 6dd937438d4b5d84baadd775cb7d07dd, type: 3}
+  - {fileID: 5713253874831204078, guid: 6dd937438d4b5d84baadd775cb7d07dd, type: 3}
+  - {fileID: 5713253874831204078, guid: 6dd937438d4b5d84baadd775cb7d07dd, type: 3}
   StartingTowerWeaponBlueprints: []
   UnlockableTowerWeaponBlueprints: []
   StartingFloorWeaponBlueprints: []

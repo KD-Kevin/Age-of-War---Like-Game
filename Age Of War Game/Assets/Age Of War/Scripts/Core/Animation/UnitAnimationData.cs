@@ -44,6 +44,9 @@ namespace AgeOfWar.Animation
         Jump,
         InAir,
         Land,
-        Run
+        Run,
+        Win,
+        Lose, 
+        Draw
     }
 }

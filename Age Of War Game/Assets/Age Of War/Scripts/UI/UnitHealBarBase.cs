@@ -25,6 +25,7 @@ namespace AgeOfWar.UI
             {
                 BaseUnitBehaviour Unit = HealthComponent as BaseUnitBehaviour;
                 transform.position = Unit.HealthBarTransform.position;
+                transform.forward = -Camera.main.transform.forward;
             }
         }
     }

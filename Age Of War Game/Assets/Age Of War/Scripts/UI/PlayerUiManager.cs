@@ -177,6 +177,12 @@ namespace AgeOfWar.UI
             PlayerManager.Instance.SendReadyToStart();
         }
 
+        private void Update()
+        {
+            EnemyHealthArmorBar.UpdateUi();
+            PlayerHealthArmorBar.UpdateUi();
+        }
+
         public void ChangeBase(BaseBuildingData BuildingData, int Team)
         {
             BaseBuilding CurrentBuilding = BaseBuilding.TeamBuildings[Team];
